@@ -34,7 +34,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
 ) {
 
-    val feedbackUiState by homeViewModel.homeState.collectAsState()
+    //val feedbackUiState by homeViewModel.homeState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
@@ -44,10 +44,10 @@ fun HomeScreen(
 
     val showDialog = remember { mutableStateOf(false) }
     var errorTxt by remember { mutableStateOf(Pair("", "")) }
+    var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
-        println(newFormData.toString())
-        feedbackUiState.extractorFormData = newFormData.copy()
+        extractorFormData = newFormData
     }
 
     val scope = rememberCoroutineScope()
@@ -92,18 +92,18 @@ fun HomeScreen(
     )*/
 
     val apkExtractor = ApkExtractor(
-        adbPath = feedbackUiState.extractorFormData.adbPath,
-        aabPath = feedbackUiState.extractorFormData.aabPath,
-        outputApksPath = feedbackUiState.extractorFormData.outputApksPath
+        adbPath = extractorFormData.adbPath,
+        aabPath = extractorFormData.aabPath,
+        outputApksPath = extractorFormData.outputApksPath
     )
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
             InputPathType.KEYSTORE_PATH ->
-                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(keystorePath = platformFile?.path ?: "")
+                extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
             InputPathType.AAB_PATH ->
-                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(aabPath = platformFile?.path ?: "")
+                extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -113,9 +113,9 @@ fun HomeScreen(
         showDirPicker = false
         when (inputType) {
             InputPathType.ADB_DIR_PATH ->
-                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(adbPath = path ?: "")
+                extractorFormData = extractorFormData.copy(adbPath = path ?: "")
             InputPathType.OUTPUT_DIR_PATH ->
-                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(outputApksPath = path ?: "")
+                extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -131,16 +131,16 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ExtractorContent(
-                extractorFormData = feedbackUiState.extractorFormData,
+                extractorFormData = extractorFormData,
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
                 onExtractApksButtonClick = {
                     scope.launch {
                         apkExtractor.setSignConfig(
-                            keystorePath = feedbackUiState.extractorFormData.keystorePath,
-                            keyAlias = feedbackUiState.extractorFormData.keystoreAlias,
-                            keystorePassword = feedbackUiState.extractorFormData.keystorePassword,
-                            keyPassword = feedbackUiState.extractorFormData.keyPassword,
+                            keystorePath = extractorFormData.keystorePath,
+                            keyAlias = extractorFormData.keystoreAlias,
+                            keystorePassword = extractorFormData.keystorePassword,
+                            keyPassword = extractorFormData.keyPassword,
                             onFailure = { errorTitle, errorMsg ->
                                 showDialog.value = true
                                 errorTxt = Pair(errorTitle, errorMsg)
@@ -148,8 +148,8 @@ fun HomeScreen(
                         )
 
                         apkExtractor.aabToApks(
-                            apksFileName = File(feedbackUiState.extractorFormData.aabPath).nameWithoutExtension,
-                            overwriteApks = feedbackUiState.extractorFormData.isOverwriteApks,
+                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                            overwriteApks = extractorFormData.isOverwriteApks,
                             onSuccess = {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(
