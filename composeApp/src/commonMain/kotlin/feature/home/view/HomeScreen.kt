@@ -14,12 +14,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.ddmlib.Log
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import feature.home.model.ExtractorFormData
 import feature.home.model.ExtractorFormDataCallback
 import feature.home.model.InputPathType
+import feature.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
@@ -28,19 +30,24 @@ import utils.ApkExtractor
 import java.io.File
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
+) {
+
+    val feedbackUiState by homeViewModel.homeState.collectAsState()
+
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
 
-    var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
 
     val showDialog = remember { mutableStateOf(false) }
     var errorTxt by remember { mutableStateOf(Pair("", "")) }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
-        extractorFormData = newFormData
+        println(newFormData.toString())
+        feedbackUiState.extractorFormData = newFormData.copy()
     }
 
     val scope = rememberCoroutineScope()
@@ -73,7 +80,7 @@ fun HomeScreen() {
         }
     )
 
-    extractorFormData = extractorFormData.copy(
+    /*feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(
         adbPath = "/home/felipe/Development/Android/Sdk/platform-tools",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
@@ -82,19 +89,21 @@ fun HomeScreen() {
         aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
         outputApksPath = "/home/felipe/Downloads",
         isOverwriteApks = false
-    )
+    )*/
 
     val apkExtractor = ApkExtractor(
-        adbPath = extractorFormData.adbPath,
-        aabPath = extractorFormData.aabPath,
-        outputApksPath = extractorFormData.outputApksPath
+        adbPath = feedbackUiState.extractorFormData.adbPath,
+        aabPath = feedbackUiState.extractorFormData.aabPath,
+        outputApksPath = feedbackUiState.extractorFormData.outputApksPath
     )
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
-            InputPathType.KEYSTORE_PATH -> extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
-            InputPathType.AAB_PATH -> extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
+            InputPathType.KEYSTORE_PATH ->
+                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(keystorePath = platformFile?.path ?: "")
+            InputPathType.AAB_PATH ->
+                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(aabPath = platformFile?.path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -103,8 +112,10 @@ fun HomeScreen() {
     DirectoryPicker(showDirPicker) { path ->
         showDirPicker = false
         when (inputType) {
-            InputPathType.ADB_DIR_PATH -> extractorFormData = extractorFormData.copy(adbPath = path ?: "")
-            InputPathType.OUTPUT_DIR_PATH -> extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
+            InputPathType.ADB_DIR_PATH ->
+                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(adbPath = path ?: "")
+            InputPathType.OUTPUT_DIR_PATH ->
+                feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(outputApksPath = path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -120,16 +131,16 @@ fun HomeScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ExtractorContent(
-                extractorFormData = extractorFormData,
+                extractorFormData = feedbackUiState.extractorFormData,
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
                 onExtractApksButtonClick = {
                     scope.launch {
                         apkExtractor.setSignConfig(
-                            keystorePath = extractorFormData.keystorePath,
-                            keyAlias = extractorFormData.keystoreAlias,
-                            keystorePassword = extractorFormData.keystorePassword,
-                            keyPassword = extractorFormData.keyPassword,
+                            keystorePath = feedbackUiState.extractorFormData.keystorePath,
+                            keyAlias = feedbackUiState.extractorFormData.keystoreAlias,
+                            keystorePassword = feedbackUiState.extractorFormData.keystorePassword,
+                            keyPassword = feedbackUiState.extractorFormData.keyPassword,
                             onFailure = { errorTitle, errorMsg ->
                                 showDialog.value = true
                                 errorTxt = Pair(errorTitle, errorMsg)
@@ -137,8 +148,8 @@ fun HomeScreen() {
                         )
 
                         apkExtractor.aabToApks(
-                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                            overwriteApks = extractorFormData.isOverwriteApks,
+                            apksFileName = File(feedbackUiState.extractorFormData.aabPath).nameWithoutExtension,
+                            overwriteApks = feedbackUiState.extractorFormData.isOverwriteApks,
                             onSuccess = {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(
@@ -245,6 +256,8 @@ fun AdbForm(
     onFormDataChange: (ExtractorFormData) -> Unit,
     onAdbPathIconClick: () -> Unit
 ) {
+    var adbText by remember { mutableStateOf("") }
+
     FormCard(
         title = "ADB"
     ) {
@@ -252,6 +265,8 @@ fun AdbForm(
             modifier = Modifier.fillMaxWidth(),
             value = extractorFormData.adbPath,
             onValueChange = {
+                println("aaaaaaaaaa: $adbText")
+                //adbText = it
                 onFormDataChange(extractorFormData.copy(adbPath = it))
             },
             label = {
