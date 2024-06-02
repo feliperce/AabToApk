@@ -3,6 +3,7 @@ package feature.home.model
 data class ExtractorFormData(
     val aabPath: String = "",
     val outputApksPath: String = "",
+    val isOverwriteApks: Boolean = false,
     val keystorePath: String = "",
     val keystorePassword: String = "",
     val keystoreAlias: String = "",

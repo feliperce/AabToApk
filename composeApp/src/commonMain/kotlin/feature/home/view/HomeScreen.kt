@@ -9,7 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FolderOpen
@@ -45,6 +44,7 @@ fun HomeScreen() {
     }
 
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     ErrorDialog(
         showDialog = showDialog,
@@ -80,7 +80,8 @@ fun HomeScreen() {
         keystoreAlias = "teste",
         keyPassword = "testeteste",
         aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
-        outputApksPath = "/home/felipe/Downloads"
+        outputApksPath = "/home/felipe/Downloads",
+        isOverwriteApks = false
     )
 
     val apkExtractor = ApkExtractor(
@@ -111,6 +112,7 @@ fun HomeScreen() {
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -136,7 +138,13 @@ fun HomeScreen() {
 
                         apkExtractor.aabToApks(
                             apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                            overwriteApks = extractorFormData.isOverwriteApks,
                             onSuccess = {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = "Apks extracted with success!"
+                                    )
+                                }
                                 Log.d("HOME-SCREEN", "SUCCESSS!!!!!!!!")
                             },
                             onFailure = { errorTitle, errorMsg ->
@@ -402,6 +410,21 @@ fun OutputForm(
                 )
             }
         )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Checkbox(
+                checked = extractorFormData.isOverwriteApks,
+                onCheckedChange = {
+                    onFormDataChange(extractorFormData.copy(isOverwriteApks = it))
+                },
+            )
+            Text(
+                text = "Overwrite APKS"
+            )
+        }
     }
 }
 

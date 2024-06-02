@@ -45,6 +45,7 @@ class ApkExtractor(
 
     suspend fun aabToApks(
         apksFileName: String = "",
+        overwriteApks: Boolean,
         onSuccess: () -> Unit,
         onFailure: (errorTitle: String, errorMsg: String) -> Unit
     ) = withContext(Dispatchers.IO) {
@@ -65,6 +66,7 @@ class ApkExtractor(
                             signingConfig
                         )
                         .setVerbose(true)
+                        .setOverwriteOutput(overwriteApks)
                         .setOutputFile(Paths.get(formattedOutputPath))
                         .build()
                         .execute()

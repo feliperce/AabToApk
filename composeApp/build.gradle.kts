@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.test)
             implementation(libs.mpfilepicker)
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
             implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
         }
         desktopMain.dependencies {
