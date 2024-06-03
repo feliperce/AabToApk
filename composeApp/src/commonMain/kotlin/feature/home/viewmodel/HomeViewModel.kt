@@ -75,11 +75,11 @@ class HomeViewModel : ViewModel() {
             apkExtractor?.aabToApks(
                 apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
                 overwriteApks = extractorFormData.isOverwriteApks,
-                onSuccess = {
+                onSuccess = { output ->
                     _homeState.update {
                         it.copy(
                             loading = false,
-                            successMsg = SuccessMsg(msg = "Apks extracted with success!")
+                            successMsg = SuccessMsg(msg = "Apks extracted with success: $output")
                         )
                     }
                 },

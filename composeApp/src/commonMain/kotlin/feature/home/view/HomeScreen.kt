@@ -30,14 +30,12 @@ import ui.theme.MarginPaddingSizeSmall
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
 ) {
-
     val homeUiState by homeViewModel.homeState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
-
 
     val showErrorDialog = remember { mutableStateOf(false) }
     var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
@@ -46,15 +44,10 @@ fun HomeScreen(
         extractorFormData = newFormData
     }
 
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(homeUiState.errorMsg.id) {
-        if (homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()) {
-            showErrorDialog.value = true
-        } else {
-            showErrorDialog.value = false
-        }
+        showErrorDialog.value = homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()
     }
 
     LaunchedEffect(homeUiState.successMsg.id) {
@@ -459,13 +452,6 @@ fun OutputForm(
                 text = "Overwrite APKS"
             )
         }
-    }
-}
-
-@Composable
-fun ConverterForm() {
-    Column {
-        
     }
 }
 

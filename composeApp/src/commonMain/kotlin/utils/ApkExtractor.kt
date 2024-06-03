@@ -51,7 +51,7 @@ class ApkExtractor(
     suspend fun aabToApks(
         apksFileName: String = "",
         overwriteApks: Boolean,
-        onSuccess: () -> Unit,
+        onSuccess: (output: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
@@ -61,9 +61,8 @@ class ApkExtractor(
                         "extracted.apks"
                     }
 
-                    println("extracted - $newApksFileName")
-                    val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }.plus("/$newApksFileName.apks")
-                    println("extracted - $formattedOutputPath")
+                    val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
+                        .plus("/$newApksFileName.apks")
 
                     BuildApksCommand.builder()
                         .setBundlePath(Paths.get(aabPath))
@@ -76,7 +75,7 @@ class ApkExtractor(
                         .build()
                         .execute()
 
-                    onSuccess()
+                    onSuccess(formattedOutputPath)
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
