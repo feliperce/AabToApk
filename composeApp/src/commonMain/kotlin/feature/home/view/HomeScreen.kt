@@ -1,6 +1,5 @@
 package feature.home.view
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +21,7 @@ import feature.home.model.ExtractorFormDataCallback
 import feature.home.model.InputPathType
 import feature.home.state.HomeIntent
 import feature.home.viewmodel.HomeViewModel
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall

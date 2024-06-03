@@ -24,6 +24,8 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+            //implementation("com.android.tools.build:bundletool:1.16.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -36,8 +38,11 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.test)
             implementation(libs.mpfilepicker)
-            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1")
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.kotlinx.coroutines.swing)
+            /*implementation("com.android.tools.build:bundletool:1.16.0")
+            implementation("com.android.tools.build:aapt2:8.4.1-11315950")
+            implementation("com.android.tools.build:aaptcompiler:8.4.1")*/
             implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
         }
         desktopMain.dependencies {
@@ -77,6 +82,10 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
+
+        /*implementation("com.example:library") {
+            exclude(group = "com.google.guava", module = "listenablefuture") // Exclui o ListenableFuture de "com.example:library"
+        }*/
     }
 }
 dependencies {
