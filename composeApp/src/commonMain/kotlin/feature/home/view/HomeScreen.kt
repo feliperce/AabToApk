@@ -15,26 +15,24 @@ import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.ddmlib.Log
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import feature.home.model.ExtractorFormData
 import feature.home.model.ExtractorFormDataCallback
 import feature.home.model.InputPathType
+import feature.home.state.HomeIntent
 import feature.home.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import utils.ApkExtractor
-import java.io.File
 
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
 ) {
 
-    //val feedbackUiState by homeViewModel.homeState.collectAsState()
+    val homeUiState by homeViewModel.homeState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
@@ -42,7 +40,7 @@ fun HomeScreen(
     var fileType by remember { mutableStateOf(listOf("")) }
 
 
-    val showDialog = remember { mutableStateOf(false) }
+    val showErrorDialog = remember { mutableStateOf(false) }
     var errorTxt by remember { mutableStateOf(Pair("", "")) }
     var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
 
@@ -53,10 +51,19 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(homeUiState.errorMsg.id) {
+        if (homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()) {
+            println("LAUCNHED IF TRUE")
+            showErrorDialog.value = true
+        } else {
+            println("LAUCNHED IF FALSE")
+            showErrorDialog.value = false
+        }
+    }
+
     ErrorDialog(
-        showDialog = showDialog,
-        errorTitle = errorTxt.first,
-        errorMsg = errorTxt.second
+        showDialog = showErrorDialog,
+        errorMsg = homeUiState.errorMsg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -80,7 +87,7 @@ fun HomeScreen(
         }
     )
 
-    /*feedbackUiState.extractorFormData = feedbackUiState.extractorFormData.copy(
+    extractorFormData = extractorFormData.copy(
         adbPath = "/home/felipe/Development/Android/Sdk/platform-tools",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
@@ -89,13 +96,8 @@ fun HomeScreen(
         aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
         outputApksPath = "/home/felipe/Downloads",
         isOverwriteApks = false
-    )*/
-
-    val apkExtractor = ApkExtractor(
-        adbPath = extractorFormData.adbPath,
-        aabPath = extractorFormData.aabPath,
-        outputApksPath = extractorFormData.outputApksPath
     )
+
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
@@ -135,35 +137,11 @@ fun HomeScreen(
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
                 onExtractApksButtonClick = {
-                    scope.launch {
-                        apkExtractor.setSignConfig(
-                            keystorePath = extractorFormData.keystorePath,
-                            keyAlias = extractorFormData.keystoreAlias,
-                            keystorePassword = extractorFormData.keystorePassword,
-                            keyPassword = extractorFormData.keyPassword,
-                            onFailure = { errorTitle, errorMsg ->
-                                showDialog.value = true
-                                errorTxt = Pair(errorTitle, errorMsg)
-                            }
+                    homeViewModel.sendIntent(
+                        HomeIntent.ExtractAab(
+                            extractorFormData = extractorFormData
                         )
-
-                        apkExtractor.aabToApks(
-                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                            overwriteApks = extractorFormData.isOverwriteApks,
-                            onSuccess = {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Apks extracted with success!"
-                                    )
-                                }
-                                Log.d("HOME-SCREEN", "SUCCESSS!!!!!!!!")
-                            },
-                            onFailure = { errorTitle, errorMsg ->
-                                showDialog.value = true
-                                errorTxt = Pair(errorTitle, errorMsg)
-                            }
-                        )
-                    }
+                    )
                 },
                 onInstallExtractedApksButtonClick = {
 

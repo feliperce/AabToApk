@@ -1,11 +1,13 @@
 package feature.home.state
 
 import feature.home.model.ExtractorFormData
+import utils.ErrorMsg
 
 data class HomeUiState (
     val loading: Boolean = false,
-    var errorMsg: String? = null,
-    var extractorFormData: ExtractorFormData = ExtractorFormData()
+    var errorMsg: ErrorMsg = ErrorMsg(),
+    var extractorFormData: ExtractorFormData = ExtractorFormData(),
+    val successText: String = ""
 )
 
 sealed class HomeIntent {

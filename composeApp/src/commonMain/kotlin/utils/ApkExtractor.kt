@@ -27,7 +27,7 @@ class ApkExtractor(
         keyAlias: String,
         keystorePassword: String,
         keyPassword: String,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        onFailure: (error: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             runCatching {
@@ -37,8 +37,13 @@ class ApkExtractor(
                     Optional.of(Password.createFromStringValue("pass:$keystorePassword")),
                     Optional.of(Password.createFromStringValue("pass:$keyPassword"))
                 )
-            }.onFailure { error ->
-                onFailure("SIGN FAILURE", error.message ?: "Keystore sign error")
+            }.onFailure { failure ->
+                onFailure(
+                    ErrorMsg(
+                        title = "SIGN FAILURE",
+                        msg = failure.message ?: "Keystore sign error"
+                    )
+                )
             }
         }.await()
     }
@@ -47,7 +52,7 @@ class ApkExtractor(
         apksFileName: String = "",
         overwriteApks: Boolean,
         onSuccess: () -> Unit,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             if (signingConfig != null) {
@@ -73,17 +78,27 @@ class ApkExtractor(
 
                     onSuccess()
                 }.onFailure { failure ->
-                    onFailure("AAB EXTRACT FAILURE", failure.message ?: "Error on Extract aab")
+                    onFailure(
+                        ErrorMsg(
+                            title = "AAB EXTRACT FAILURE",
+                            msg = failure.message ?: "Error on Extract aab"
+                        )
+                    )
                 }
             } else {
-                onFailure("KEYSTORE FAILURE","Wrong keystore settings")
+                onFailure(
+                    ErrorMsg(
+                        title = "KEYSTORE FAILURE",
+                        msg = "Wrong keystore settings"
+                    )
+                )
             }
         }.await()
     }
 
     suspend fun installApks(
         onSuccess: () -> Unit,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             runCatching {
@@ -95,7 +110,12 @@ class ApkExtractor(
 
                 onSuccess()
             }.onFailure { error ->
-                onFailure("INSTALL APK ERROR", error.message ?: "Error on install APKS")
+                onFailure(
+                    ErrorMsg(
+                        title = "INSTALL APK ERROR",
+                        msg = error.message ?: "Error on install APKS"
+                    )
+                )
             }
         }.await()
     }
