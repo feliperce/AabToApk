@@ -7,12 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.FontWeight
 import ui.theme.Red800
+import utils.ErrorMsg
 
 @Composable
 fun ErrorDialog(
     showDialog: MutableState<Boolean>,
-    errorTitle: String,
-    errorMsg: String
+    errorMsg: ErrorMsg
 ) {
     if (showDialog.value) {
         AlertDialog(
@@ -28,13 +28,13 @@ fun ErrorDialog(
             },
             title = {
                 Text(
-                    text = errorTitle,
+                    text = errorMsg.title,
                     fontWeight = FontWeight.SemiBold,
                     color = Red800
                 )
             },
             text = {
-                Text(text = errorMsg)
+                Text(text = errorMsg.msg)
             },
         )
     }
