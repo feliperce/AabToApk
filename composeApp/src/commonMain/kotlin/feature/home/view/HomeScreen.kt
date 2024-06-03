@@ -9,47 +9,58 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.android.ddmlib.Log
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import feature.home.model.ExtractorFormData
 import feature.home.model.ExtractorFormDataCallback
 import feature.home.model.InputPathType
-import kotlinx.coroutines.launch
+import feature.home.state.HomeIntent
+import feature.home.viewmodel.HomeViewModel
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
-import utils.ApkExtractor
-import java.io.File
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
+) {
+    val homeUiState by homeViewModel.homeState.collectAsState()
+
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
 
+    val showErrorDialog = remember { mutableStateOf(false) }
     var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
-
-    val showDialog = remember { mutableStateOf(false) }
-    var errorTxt by remember { mutableStateOf(Pair("", "")) }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
     }
 
-    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(homeUiState.errorMsg.id) {
+        showErrorDialog.value = homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()
+    }
+
+    LaunchedEffect(homeUiState.successMsg.id) {
+        if (homeUiState.successMsg.msg.isNotEmpty()) {
+            snackbarHostState.showSnackbar(
+                message = homeUiState.successMsg.msg
+            )
+        }
+    }
 
     ErrorDialog(
-        showDialog = showDialog,
-        errorTitle = errorTxt.first,
-        errorMsg = errorTxt.second
+        showDialog = showErrorDialog,
+        errorMsg = homeUiState.errorMsg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -80,20 +91,18 @@ fun HomeScreen() {
         keystoreAlias = "teste",
         keyPassword = "testeteste",
         aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
-        outputApksPath = "/home/felipe/Downloads"
+        outputApksPath = "/home/felipe/Downloads",
+        isOverwriteApks = false
     )
 
-    val apkExtractor = ApkExtractor(
-        adbPath = extractorFormData.adbPath,
-        aabPath = extractorFormData.aabPath,
-        outputApksPath = extractorFormData.outputApksPath
-    )
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
-            InputPathType.KEYSTORE_PATH -> extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
-            InputPathType.AAB_PATH -> extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
+            InputPathType.KEYSTORE_PATH ->
+                extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
+            InputPathType.AAB_PATH ->
+                extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -102,8 +111,10 @@ fun HomeScreen() {
     DirectoryPicker(showDirPicker) { path ->
         showDirPicker = false
         when (inputType) {
-            InputPathType.ADB_DIR_PATH -> extractorFormData = extractorFormData.copy(adbPath = path ?: "")
-            InputPathType.OUTPUT_DIR_PATH -> extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
+            InputPathType.ADB_DIR_PATH ->
+                extractorFormData = extractorFormData.copy(adbPath = path ?: "")
+            InputPathType.OUTPUT_DIR_PATH ->
+                extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -111,6 +122,7 @@ fun HomeScreen() {
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -121,35 +133,27 @@ fun HomeScreen() {
                 extractorFormData = extractorFormData,
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
+                isLoading = homeUiState.loading,
                 onExtractApksButtonClick = {
-                    scope.launch {
-                        apkExtractor.setSignConfig(
-                            keystorePath = extractorFormData.keystorePath,
-                            keyAlias = extractorFormData.keystoreAlias,
-                            keystorePassword = extractorFormData.keystorePassword,
-                            keyPassword = extractorFormData.keyPassword,
-                            onFailure = { errorTitle, errorMsg ->
-                                showDialog.value = true
-                                errorTxt = Pair(errorTitle, errorMsg)
-                            }
+                    homeViewModel.sendIntent(
+                        HomeIntent.ExtractAab(
+                            extractorFormData = extractorFormData
                         )
-
-                        apkExtractor.aabToApks(
-                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                            onSuccess = {
-                                Log.d("HOME-SCREEN", "SUCCESSS!!!!!!!!")
-                            },
-                            onFailure = { errorTitle, errorMsg ->
-                                showDialog.value = true
-                                errorTxt = Pair(errorTitle, errorMsg)
-                            }
-                        )
-                    }
+                    )
                 },
                 onInstallExtractedApksButtonClick = {
 
                 }
             )
+        }
+
+        if (homeUiState.loading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -158,6 +162,7 @@ fun HomeScreen() {
 fun ExtractorContent(
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
     onExtractApksButtonClick: () -> Unit,
     onInstallExtractedApksButtonClick: () -> Unit
@@ -168,6 +173,7 @@ fun ExtractorContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ExtractorForm(
+            isLoading = isLoading,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange
@@ -181,7 +187,8 @@ fun ExtractorContent(
                 content = {
                     Text("AAB TO APKS")
                 },
-                onClick = onExtractApksButtonClick
+                onClick = onExtractApksButtonClick,
+                enabled = !isLoading
             )
 
             Spacer(
@@ -193,7 +200,8 @@ fun ExtractorContent(
                 content = {
                     Text("INSTALL EXTRACTED APKS")
                 },
-                onClick = onInstallExtractedApksButtonClick
+                onClick = onInstallExtractedApksButtonClick,
+                enabled = !isLoading
             )
         }
     }
@@ -203,6 +211,7 @@ fun ExtractorContent(
 fun ExtractorForm(
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
 ) {
     val spacerModifier = Modifier
@@ -213,18 +222,21 @@ fun ExtractorForm(
         AdbForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
+            isLoading = isLoading,
             onAdbPathIconClick = extractorFormDataCallback.onAdbPathIconClick
         )
         Spacer(modifier = spacerModifier)
         KeystoreSignForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
+            isLoading = isLoading,
             onKeystorePathIconClick = extractorFormDataCallback.onKeystorePathIconClick
         )
         Spacer(modifier = spacerModifier)
         OutputForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
+            isLoading = isLoading,
             onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick,
             onOutputPathIconClick = extractorFormDataCallback.onOutputPathIconClick
         )
@@ -235,6 +247,7 @@ fun ExtractorForm(
 fun AdbForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    isLoading: Boolean,
     onAdbPathIconClick: () -> Unit
 ) {
     FormCard(
@@ -243,6 +256,7 @@ fun AdbForm(
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = extractorFormData.adbPath,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(adbPath = it))
             },
@@ -251,7 +265,11 @@ fun AdbForm(
             },
             trailingIcon = {
                 Icon(
-                    modifier = Modifier.clickable { onAdbPathIconClick() },
+                    modifier = Modifier.clickable {
+                        if (!isLoading) {
+                            onAdbPathIconClick()
+                        }
+                    },
                     imageVector = Icons.Rounded.FolderOpen,
                     contentDescription = null
                 )
@@ -264,6 +282,7 @@ fun AdbForm(
 fun KeystoreSignForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    isLoading: Boolean,
     onKeystorePathIconClick: () -> Unit
 ) {
     val inputModifier = Modifier.fillMaxWidth()
@@ -275,6 +294,7 @@ fun KeystoreSignForm(
         OutlinedTextField(
             modifier = inputModifier,
             value = extractorFormData.keystorePath,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(keystorePath = it))
             },
@@ -294,6 +314,7 @@ fun KeystoreSignForm(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
             value = extractorFormData.keystorePassword,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(keystorePassword = it))
             },
@@ -306,6 +327,7 @@ fun KeystoreSignForm(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
             value = extractorFormData.keystoreAlias,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(keystoreAlias = it))
             },
@@ -318,6 +340,7 @@ fun KeystoreSignForm(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
             value = extractorFormData.keyPassword,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(keyPassword = it))
             },
@@ -357,6 +380,7 @@ fun FormCard(
 fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    isLoading: Boolean,
     onAabPathIconClick: () -> Unit,
     onOutputPathIconClick: () -> Unit
 ) {
@@ -369,6 +393,7 @@ fun OutputForm(
         OutlinedTextField(
             modifier = inputModifier,
             value = extractorFormData.aabPath,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(aabPath = it))
             },
@@ -377,7 +402,11 @@ fun OutputForm(
             },
             trailingIcon = {
                 Icon(
-                    modifier = Modifier.clickable { onAabPathIconClick() },
+                    modifier = Modifier.clickable {
+                        if (!isLoading) {
+                            onAabPathIconClick()
+                        }
+                    },
                     imageVector = Icons.Rounded.FolderOpen,
                     contentDescription = null
                 )
@@ -388,6 +417,7 @@ fun OutputForm(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
             value = extractorFormData.outputApksPath,
+            enabled = !isLoading,
             onValueChange = {
                 onFormDataChange(extractorFormData.copy(outputApksPath = it))
             },
@@ -396,19 +426,32 @@ fun OutputForm(
             },
             trailingIcon = {
                 Icon(
-                    modifier = Modifier.clickable { onOutputPathIconClick() },
+                    modifier = Modifier.clickable {
+                        if (!isLoading) {
+                            onOutputPathIconClick()
+                        }
+                    },
                     imageVector = Icons.Rounded.FolderOpen,
                     contentDescription = null
                 )
             }
         )
-    }
-}
 
-@Composable
-fun ConverterForm() {
-    Column {
-        
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Checkbox(
+                checked = extractorFormData.isOverwriteApks,
+                onCheckedChange = {
+                    onFormDataChange(extractorFormData.copy(isOverwriteApks = it))
+                },
+                enabled = isLoading
+            )
+            Text(
+                text = "Overwrite APKS"
+            )
+        }
     }
 }
 
@@ -418,7 +461,8 @@ private fun AdbFormPreview() {
     AdbForm(
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
-        onAdbPathIconClick = {}
+        onAdbPathIconClick = {},
+        isLoading = false
     )
 }
 
@@ -428,7 +472,8 @@ private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
-        onKeystorePathIconClick = {}
+        onKeystorePathIconClick = {},
+        isLoading = false
     )
 }
 
@@ -439,6 +484,7 @@ private fun OutputFormPreview() {
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onAabPathIconClick = {},
-        onOutputPathIconClick = {}
+        onOutputPathIconClick = {},
+        isLoading = false
     )
 }

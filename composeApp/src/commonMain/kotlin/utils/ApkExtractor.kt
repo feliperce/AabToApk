@@ -27,7 +27,7 @@ class ApkExtractor(
         keyAlias: String,
         keystorePassword: String,
         keyPassword: String,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        onFailure: (error: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             runCatching {
@@ -37,16 +37,22 @@ class ApkExtractor(
                     Optional.of(Password.createFromStringValue("pass:$keystorePassword")),
                     Optional.of(Password.createFromStringValue("pass:$keyPassword"))
                 )
-            }.onFailure { error ->
-                onFailure("SIGN FAILURE", error.message ?: "Keystore sign error")
+            }.onFailure { failure ->
+                onFailure(
+                    ErrorMsg(
+                        title = "SIGN FAILURE",
+                        msg = failure.message ?: "Keystore sign error"
+                    )
+                )
             }
         }.await()
     }
 
     suspend fun aabToApks(
         apksFileName: String = "",
-        onSuccess: () -> Unit,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        overwriteApks: Boolean,
+        onSuccess: (output: String) -> Unit,
+        onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             if (signingConfig != null) {
@@ -55,9 +61,8 @@ class ApkExtractor(
                         "extracted.apks"
                     }
 
-                    println("extracted - $newApksFileName")
-                    val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }.plus("/$newApksFileName.apks")
-                    println("extracted - $formattedOutputPath")
+                    val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
+                        .plus("/$newApksFileName.apks")
 
                     BuildApksCommand.builder()
                         .setBundlePath(Paths.get(aabPath))
@@ -65,23 +70,34 @@ class ApkExtractor(
                             signingConfig
                         )
                         .setVerbose(true)
+                        .setOverwriteOutput(overwriteApks)
                         .setOutputFile(Paths.get(formattedOutputPath))
                         .build()
                         .execute()
 
-                    onSuccess()
+                    onSuccess(formattedOutputPath)
                 }.onFailure { failure ->
-                    onFailure("AAB EXTRACT FAILURE", failure.message ?: "Error on Extract aab")
+                    onFailure(
+                        ErrorMsg(
+                            title = "AAB EXTRACT FAILURE",
+                            msg = failure.message ?: "Error on Extract aab"
+                        )
+                    )
                 }
             } else {
-                onFailure("KEYSTORE FAILURE","Wrong keystore settings")
+                onFailure(
+                    ErrorMsg(
+                        title = "KEYSTORE FAILURE",
+                        msg = "Wrong keystore settings"
+                    )
+                )
             }
         }.await()
     }
 
     suspend fun installApks(
         onSuccess: () -> Unit,
-        onFailure: (errorTitle: String, errorMsg: String) -> Unit
+        onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
             runCatching {
@@ -93,7 +109,12 @@ class ApkExtractor(
 
                 onSuccess()
             }.onFailure { error ->
-                onFailure("INSTALL APK ERROR", error.message ?: "Error on install APKS")
+                onFailure(
+                    ErrorMsg(
+                        title = "INSTALL APK ERROR",
+                        msg = error.message ?: "Error on install APKS"
+                    )
+                )
             }
         }.await()
     }
