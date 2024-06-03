@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import utils.ApkExtractor
+import utils.SuccessMsg
 import java.io.File
 
 class HomeViewModel : ViewModel() {
@@ -78,7 +79,7 @@ class HomeViewModel : ViewModel() {
                     _homeState.update {
                         it.copy(
                             loading = false,
-                            successText = "Apks extracted with success!"
+                            successMsg = SuccessMsg(msg = "Apks extracted with success!")
                         )
                     }
                 },
