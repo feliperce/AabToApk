@@ -6,11 +6,12 @@ import utils.SuccessMsg
 
 data class HomeUiState (
     val loading: Boolean = false,
-    var errorMsg: ErrorMsg = ErrorMsg(),
-    var extractorFormData: ExtractorFormData = ExtractorFormData(),
-    val successMsg: SuccessMsg = SuccessMsg()
+    val errorMsg: ErrorMsg = ErrorMsg(),
+    val successMsg: SuccessMsg = SuccessMsg(),
+    val extractedApksPath: String = ""
 )
 
 sealed class HomeIntent {
     class ExtractAab(val extractorFormData: ExtractorFormData) : HomeIntent()
+    class InstallApks(val extractorFormData: ExtractorFormData) : HomeIntent()
 }

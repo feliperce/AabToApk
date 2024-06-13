@@ -1,24 +1,22 @@
 package br.com.mobileti.aartoapk
 
-import App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import feature.home.di.homeModule
+import feature.home.view.HomeScreen
+import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        startKoin {
+            modules(homeModule)
+        }
+
         setContent {
-            App()
+            HomeScreen()
         }
     }
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
 }

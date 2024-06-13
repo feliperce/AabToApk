@@ -10,5 +10,12 @@ data class ErrorMsg(
 
 data class SuccessMsg(
     val msg: String = "",
+    val type: SuccessMsgType = SuccessMsgType.NONE,
     val id: String = UUID.randomUUID().toString()
 )
+
+enum class SuccessMsgType {
+    NONE,
+    EXTRACT_AAB,
+    INSTALL_APKS
+}
