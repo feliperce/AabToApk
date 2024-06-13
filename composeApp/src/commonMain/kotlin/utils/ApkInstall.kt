@@ -1,0 +1,39 @@
+package utils
+
+import com.android.tools.build.bundletool.commands.InstallApksCommand
+import com.android.tools.build.bundletool.device.DdmlibAdbServer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import java.nio.file.Path
+
+class ApkInstall(
+    private val adbPath: String
+) {
+
+    suspend fun installApks(
+        apksPath: String,
+        onSuccess: () -> Unit,
+        onFailure: (errorMsg: ErrorMsg) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        println(apksPath)
+        async {
+            runCatching {
+                InstallApksCommand.builder()
+                    .setAdbPath(Path.of(adbPath))
+                    .setAdbServer(DdmlibAdbServer.getInstance())
+                    .setApksArchivePath(Path.of(apksPath))
+                    .build().execute()
+
+                onSuccess()
+            }.onFailure { error ->
+                onFailure(
+                    ErrorMsg(
+                        title = "INSTALL APK ERROR",
+                        msg = error.message ?: "Error on install APKS"
+                    )
+                )
+            }
+        }.await()
+    }
+}

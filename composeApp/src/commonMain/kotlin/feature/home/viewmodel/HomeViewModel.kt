@@ -9,7 +9,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import utils.ApkExtractor
+import utils.ApkInstall
 import utils.SuccessMsg
+import utils.SuccessMsgType
 import java.io.File
 
 class HomeViewModel : ViewModel() {
@@ -37,6 +39,9 @@ class HomeViewModel : ViewModel() {
                 when(intent) {
                     is HomeIntent.ExtractAab -> {
                         extractAab(intent.extractorFormData)
+                    }
+                    is HomeIntent.InstallApks -> {
+                        installApks(intent.extractorFormData)
                     }
                 }
             }.launchIn(viewModelScope)
@@ -79,7 +84,46 @@ class HomeViewModel : ViewModel() {
                     _homeState.update {
                         it.copy(
                             loading = false,
-                            successMsg = SuccessMsg(msg = "Apks extracted with success: $output")
+                            successMsg = SuccessMsg(
+                                msg = "Apks extracted with success: $output",
+                                type = SuccessMsgType.EXTRACT_AAB
+                            ),
+                            extractedApksPath = output
+                        )
+                    }
+                },
+                onFailure = { errorMsg ->
+                    _homeState.update {
+                        it.copy(
+                            loading = false,
+                            errorMsg = errorMsg
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun installApks(extractorFormData: ExtractorFormData) {
+        _homeState.update {
+            it.copy(
+                loading = true
+            )
+        }
+
+        val apkInstall = ApkInstall(extractorFormData.adbPath)
+
+        viewModelScope.launch {
+            apkInstall.installApks(
+                apksPath = _homeState.value.extractedApksPath,
+                onSuccess = {
+                    _homeState.update {
+                        it.copy(
+                            loading = false,
+                            successMsg = SuccessMsg(
+                                msg = "Apks installed with success!",
+                                type = SuccessMsgType.INSTALL_APKS
+                            )
                         )
                     }
                 },

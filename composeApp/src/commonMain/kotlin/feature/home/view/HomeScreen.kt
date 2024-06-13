@@ -25,6 +25,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import utils.SuccessMsgType
 
 @Composable
 fun HomeScreen(
@@ -51,10 +52,33 @@ fun HomeScreen(
     }
 
     LaunchedEffect(homeUiState.successMsg.id) {
-        if (homeUiState.successMsg.msg.isNotEmpty()) {
-            snackbarHostState.showSnackbar(
-                message = homeUiState.successMsg.msg
-            )
+        val successMsg = homeUiState.successMsg
+
+        if (successMsg.msg.isNotEmpty()) {
+            if (successMsg.type == SuccessMsgType.EXTRACT_AAB) {
+                val result = snackbarHostState
+                    .showSnackbar(
+                        message = successMsg.msg,
+                        actionLabel = "INSTALL APKS",
+                        duration = SnackbarDuration.Indefinite
+                    )
+                when (result) {
+                    SnackbarResult.ActionPerformed -> {
+                        homeViewModel.sendIntent(
+                            HomeIntent.InstallApks(
+                                extractorFormData = extractorFormData
+                            )
+                        )
+                    }
+                    SnackbarResult.Dismissed -> { }
+                }
+            } else {
+                snackbarHostState
+                    .showSnackbar(
+                        message = successMsg.msg,
+                        duration = SnackbarDuration.Long
+                    )
+            }
         }
     }
 
@@ -90,12 +114,23 @@ fun HomeScreen(
         keystorePassword = "testeteste",
         keystoreAlias = "teste",
         keyPassword = "testeteste",
-        aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
+        aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
         outputApksPath = "/home/felipe/Downloads",
         isOverwriteApks = false
     )
 
+     /*extractorFormData = extractorFormData.copy(
+        adbPath = "/storage/emulated/0/Download",
+        keystorePath = "/storage/emulated/0/Download/teste.jks",
+        keystorePassword = "testeteste",
+        keystoreAlias = "teste",
+        keyPassword = "testeteste",
+        aabPath = "/storage/emulated/0/Download/8.6.0-1939.aab",
+        outputApksPath = "/home/felipe/Downloads",
+        isOverwriteApks = false
+    )*/
 
+///storage/emulated/0/Download/teste.jks
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
@@ -195,14 +230,14 @@ fun ExtractorContent(
                 modifier = Modifier.width(MarginPaddingSizeSmall)
             )
 
-            Button(
+            /*Button(
                 modifier = Modifier.weight(1f),
                 content = {
                     Text("INSTALL EXTRACTED APKS")
                 },
                 onClick = onInstallExtractedApksButtonClick,
                 enabled = !isLoading
-            )
+            )*/
         }
     }
 }

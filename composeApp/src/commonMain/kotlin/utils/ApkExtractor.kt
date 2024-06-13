@@ -90,28 +90,4 @@ class ApkExtractor(
             }
         }.await()
     }
-
-    suspend fun installApks(
-        onSuccess: () -> Unit,
-        onFailure: (errorMsg: ErrorMsg) -> Unit
-    ) = withContext(Dispatchers.IO) {
-        async {
-            runCatching {
-                InstallApksCommand.builder()
-                    .setAdbPath(Path.of(adbPath))
-                    .setAdbServer(DdmlibAdbServer.getInstance())
-                    .setApksArchivePath(Path.of(outputApksPath))
-                    .build().execute()
-
-                onSuccess()
-            }.onFailure { error ->
-                onFailure(
-                    ErrorMsg(
-                        title = "INSTALL APK ERROR",
-                        msg = error.message ?: "Error on install APKS"
-                    )
-                )
-            }
-        }.await()
-    }
 }
