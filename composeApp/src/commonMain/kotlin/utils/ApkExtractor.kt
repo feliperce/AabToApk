@@ -1,17 +1,13 @@
 package utils
 
 import com.android.tools.build.bundletool.commands.BuildApksCommand
-import com.android.tools.build.bundletool.commands.InstallApksCommand
-import com.android.tools.build.bundletool.device.DdmlibAdbServer
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
 import kotlinx.coroutines.*
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
 class ApkExtractor(
-    private val adbPath: String,
     private val aabPath: String,
     private val outputApksPath: String
 ) {
