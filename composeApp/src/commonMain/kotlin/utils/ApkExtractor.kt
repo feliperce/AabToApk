@@ -80,7 +80,7 @@ class ApkExtractor(
                 onFailure(
                     ErrorMsg(
                         title = "KEYSTORE FAILURE",
-                        msg = "Wrong keystore settings"
+                        msg = "Keystore not found"
                     )
                 )
             }

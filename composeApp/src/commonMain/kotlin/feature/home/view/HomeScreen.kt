@@ -108,7 +108,7 @@ fun HomeScreen(
         }
     )
 
-    extractorFormData = extractorFormData.copy(
+    /*extractorFormData = extractorFormData.copy(
         adbPath = "/home/felipe/Development/Android/Sdk/platform-tools",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
@@ -117,18 +117,18 @@ fun HomeScreen(
         aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
         outputApksPath = "/home/felipe/Downloads",
         isOverwriteApks = false
-    )
+    )*/
 
-     /*extractorFormData = extractorFormData.copy(
+     extractorFormData = extractorFormData.copy(
         adbPath = "/storage/emulated/0/Download",
         keystorePath = "/storage/emulated/0/Download/teste.jks",
         keystorePassword = "testeteste",
         keystoreAlias = "teste",
         keyPassword = "testeteste",
         aabPath = "/storage/emulated/0/Download/8.6.0-1939.aab",
-        outputApksPath = "/home/felipe/Downloads",
+        outputApksPath = "/storage/emulated/0/Download/",
         isOverwriteApks = false
-    )*/
+    )
 
 ///storage/emulated/0/Download/teste.jks
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->

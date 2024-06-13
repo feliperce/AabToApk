@@ -57,7 +57,6 @@ class HomeViewModel : ViewModel() {
 
         viewModelScope.launch {
             apkExtractor = ApkExtractor(
-                adbPath = extractorFormData.adbPath,
                 aabPath = extractorFormData.aabPath,
                 outputApksPath = extractorFormData.outputApksPath
             ).apply {
