@@ -18,9 +18,9 @@ import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
-import utils.InputPathType
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.viewmodel.ExtractorViewModel
+import utils.InputPathType
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
@@ -31,7 +31,7 @@ import utils.SuccessMsgType
 fun ExtractorScreen(
     extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() }
 ) {
-    val homeUiState by extractorViewModel.extractorState.collectAsState()
+    val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
@@ -47,12 +47,12 @@ fun ExtractorScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(homeUiState.errorMsg.id) {
-        showErrorDialog.value = homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()
+    LaunchedEffect(extractorUiState.errorMsg.id) {
+        showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
     }
 
-    LaunchedEffect(homeUiState.successMsg.id) {
-        val successMsg = homeUiState.successMsg
+    LaunchedEffect(extractorUiState.successMsg.id) {
+        val successMsg = extractorUiState.successMsg
 
         if (successMsg.msg.isNotEmpty()) {
             if (successMsg.type == SuccessMsgType.EXTRACT_AAB) {
@@ -84,7 +84,7 @@ fun ExtractorScreen(
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        errorMsg = homeUiState.errorMsg
+        errorMsg = extractorUiState.errorMsg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -145,7 +145,14 @@ fun ExtractorScreen(
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("AabToApk")
+                }
+            )
+        }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -156,7 +163,7 @@ fun ExtractorScreen(
                 extractorFormData = extractorFormData,
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
-                isLoading = homeUiState.loading,
+                isLoading = extractorUiState.loading,
                 onExtractApksButtonClick = {
                     /*scope.launch {
                         val apkExtractor = ApkExtractor(
@@ -196,7 +203,7 @@ fun ExtractorScreen(
             )
         }
 
-        if (homeUiState.loading) {
+        if (extractorUiState.loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

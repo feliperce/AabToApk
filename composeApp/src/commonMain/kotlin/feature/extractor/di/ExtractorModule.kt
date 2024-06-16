@@ -1,8 +1,8 @@
 package feature.extractor.di
 
-import feature.extractor.viewmodel.ExtractorViewModel
+import feature.settings.viewmodel.SettingsViewModel
 import org.koin.dsl.module
 
 val extractorModule = module {
-    single { ExtractorViewModel() }
+    single { SettingsViewModel() }
 }

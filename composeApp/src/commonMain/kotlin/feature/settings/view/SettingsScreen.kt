@@ -4,23 +4,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import feature.settings.model.SettingsFormData
 import feature.settings.model.SettingsFormDataCallback
+import feature.settings.state.SettingsIntent
+import feature.settings.viewmodel.SettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.theme.MarginPaddingSizeMedium
 import utils.InputPathType
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    settingsViewModel: SettingsViewModel = viewModel { SettingsViewModel() }
+) {
+    val settingsUiState by settingsViewModel.settingsState.collectAsState()
 
     var showDirPicker by remember { mutableStateOf(false) }
     var settingsFormData by remember { mutableStateOf(SettingsFormData()) }
@@ -28,6 +31,9 @@ fun SettingsScreen() {
 
     val onFormDataChange: (SettingsFormData) -> Unit = { newFormData ->
         settingsFormData = newFormData
+        settingsViewModel.sendIntent(
+            SettingsIntent.ValidateForm(newFormData)
+        )
     }
 
     val settingsFormDataCallback = SettingsFormDataCallback(
@@ -41,9 +47,12 @@ fun SettingsScreen() {
         },
         onOutputPathIconClick = {
             inputType = InputPathType.OUTPUT_DIR_PATH
+            showDirPicker = true
         },
         onSaveButtonClick = {
-
+            settingsViewModel.sendIntent(
+                SettingsIntent.SaveSettings(settingsFormData)
+            )
         }
     )
 
@@ -59,13 +68,31 @@ fun SettingsScreen() {
         }
         inputType = InputPathType.NONE
         showDirPicker = false
+        settingsViewModel.sendIntent(
+            SettingsIntent.ValidateForm(settingsFormData)
+        )
     }
 
-    SettingsContent(
-        settingsFormData = settingsFormData,
-        settingsFormDataCallback = settingsFormDataCallback,
-        isFormValid = true,
-        onSettingsFormChange = onFormDataChange
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Settings")
+                }
+            )
+        },
+        content = {
+            Column(
+                modifier = Modifier.padding(it)
+            ) {
+                SettingsContent(
+                    settingsFormData = settingsFormData,
+                    settingsFormDataCallback = settingsFormDataCallback,
+                    isFormValid = settingsUiState.isFormValid,
+                    onSettingsFormChange = onFormDataChange
+                )
+            }
+        }
     )
 
 }
@@ -81,7 +108,9 @@ fun SettingsContent(
         .fillMaxWidth()
         .padding(top = MarginPaddingSizeMedium)
 
-    Column {
+    Column(
+        modifier = Modifier.padding(MarginPaddingSizeMedium)
+    ) {
         OutlinedTextField(
             modifier = defaultModifier,
             value = settingsFormData.adbPath,
@@ -106,7 +135,7 @@ fun SettingsContent(
             modifier = defaultModifier,
             value = settingsFormData.buildToolsPath,
             onValueChange = {
-                onSettingsFormChange(settingsFormData.copy(adbPath = it))
+                onSettingsFormChange(settingsFormData.copy(buildToolsPath = it))
             },
             label = {
                 Text("Build Tools Dir Path")
@@ -114,7 +143,7 @@ fun SettingsContent(
             trailingIcon = {
                 Icon(
                     modifier = Modifier.clickable {
-                        settingsFormDataCallback.onBuildToolsPathIconClick
+                        settingsFormDataCallback.onBuildToolsPathIconClick()
                     },
                     imageVector = Icons.Rounded.FolderOpen,
                     contentDescription = null
@@ -126,7 +155,7 @@ fun SettingsContent(
             modifier = defaultModifier,
             value = settingsFormData.outputApksPath,
             onValueChange = {
-                onSettingsFormChange(settingsFormData.copy(adbPath = it))
+                onSettingsFormChange(settingsFormData.copy(outputApksPath = it))
             },
             label = {
                 Text("Output Dir Path")
@@ -134,7 +163,7 @@ fun SettingsContent(
             trailingIcon = {
                 Icon(
                     modifier = Modifier.clickable {
-                        settingsFormDataCallback.onAdbPathIconClick()
+                        settingsFormDataCallback.onOutputPathIconClick()
                     },
                     imageVector = Icons.Rounded.FolderOpen,
                     contentDescription = null
