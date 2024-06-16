@@ -2,8 +2,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import shared.di.PlatformModule
-import feature.home.di.homeModule
-import feature.home.view.HomeScreen
+import feature.extractor.view.HomeScreen
 import org.koin.core.context.startKoin
 
 fun main() = application {

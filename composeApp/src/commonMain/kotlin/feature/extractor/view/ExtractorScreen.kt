@@ -1,4 +1,4 @@
-package feature.home.view
+package feature.extractor.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
-import feature.home.model.ExtractorFormData
-import feature.home.model.ExtractorFormDataCallback
+import feature.extractor.model.ExtractorFormData
+import feature.extractor.model.ExtractorFormDataCallback
 import utils.InputPathType
-import feature.home.state.HomeIntent
-import feature.home.viewmodel.HomeViewModel
+import feature.extractor.state.ExtractorIntent
+import feature.extractor.viewmodel.ExtractorViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
@@ -29,9 +29,9 @@ import utils.SuccessMsgType
 
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
+    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() }
 ) {
-    val homeUiState by homeViewModel.homeState.collectAsState()
+    val homeUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
@@ -64,8 +64,8 @@ fun HomeScreen(
                     )
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
-                        homeViewModel.sendIntent(
-                            HomeIntent.InstallApks(
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.InstallApks(
                                 extractorFormData = extractorFormData
                             )
                         )
@@ -187,8 +187,8 @@ fun HomeScreen(
                     }*/
 
 
-                    homeViewModel.sendIntent(
-                        HomeIntent.ExtractAab(
+                    extractorViewModel.sendIntent(
+                        ExtractorIntent.ExtractAab(
                             extractorFormData = extractorFormData
                         )
                     )

@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import feature.home.di.homeModule
-import feature.home.view.HomeScreen
+import feature.extractor.di.extractorModule
+import feature.extractor.view.HomeScreen
 import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         startKoin {
-            modules(homeModule)
+            modules(extractorModule)
         }
 
         requestStoragePermissions {

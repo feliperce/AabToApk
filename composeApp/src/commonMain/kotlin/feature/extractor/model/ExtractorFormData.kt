@@ -1,4 +1,4 @@
-package feature.home.model
+package feature.extractor.model
 
 data class ExtractorFormData(
     val aabPath: String = "",
