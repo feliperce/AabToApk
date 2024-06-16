@@ -28,7 +28,7 @@ import ui.theme.MarginPaddingSizeSmall
 import utils.SuccessMsgType
 
 @Composable
-fun HomeScreen(
+fun ExtractorScreen(
     extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() }
 ) {
     val homeUiState by extractorViewModel.extractorState.collectAsState()

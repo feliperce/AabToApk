@@ -1,4 +1,4 @@
-rootProject.name = "AarToApk"
+rootProject.name = "AabToApk"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

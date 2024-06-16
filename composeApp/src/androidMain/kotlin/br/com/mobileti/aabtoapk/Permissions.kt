@@ -1,4 +1,4 @@
-package br.com.mobileti.aartoapk
+package br.com.mobileti.aabtoapk
 
 import android.app.Activity
 import android.content.Context

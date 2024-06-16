@@ -2,7 +2,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import shared.di.PlatformModule
-import feature.extractor.view.HomeScreen
+import feature.settings.view.SettingsScreen
 import org.koin.core.context.startKoin
 
 fun main() = application {
@@ -20,10 +20,11 @@ fun main() = application {
 
         Window(
             onCloseRequest = ::exitApplication,
-            title = "AarToApk",
+            title = "AabToApk",
             state = state
         ) {
-            HomeScreen()
+            SettingsScreen()
+            //HomeScreen()
         }
     }
 }
