@@ -21,11 +21,16 @@ import feature.home.model.ExtractorFormDataCallback
 import feature.home.model.InputPathType
 import feature.home.state.HomeIntent
 import feature.home.viewmodel.HomeViewModel
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import utils.ApkExtractor
+import utils.SuccessMsg
 import utils.SuccessMsgType
+import java.io.File
 
 @Composable
 fun HomeScreen(
@@ -109,28 +114,16 @@ fun HomeScreen(
     )
 
     extractorFormData = extractorFormData.copy(
-        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools",
+        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools/adb",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
         keystoreAlias = "teste",
         keyPassword = "testeteste",
         aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
         outputApksPath = "/home/felipe/Downloads",
-        isOverwriteApks = false
+        isOverwriteApks = true
     )
 
-     /*extractorFormData = extractorFormData.copy(
-        adbPath = "/storage/emulated/0/Download",
-        keystorePath = "/storage/emulated/0/Download/teste.jks",
-        keystorePassword = "testeteste",
-        keystoreAlias = "teste",
-        keyPassword = "testeteste",
-        aabPath = "/storage/emulated/0/Download/8.6.0-1939.aab",
-        outputApksPath = "/home/felipe/Downloads",
-        isOverwriteApks = false
-    )*/
-
-///storage/emulated/0/Download/teste.jks
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
@@ -170,14 +163,40 @@ fun HomeScreen(
                 onFormDataChange = onFormDataChange,
                 isLoading = homeUiState.loading,
                 onExtractApksButtonClick = {
+                    /*scope.launch {
+                        val apkExtractor = ApkExtractor(
+                            aabPath = extractorFormData.aabPath,
+                            outputApksPath = extractorFormData.outputApksPath
+                        ).apply {
+                            setSignConfig(
+                                keystorePath = extractorFormData.keystorePath,
+                                keyAlias = extractorFormData.keystoreAlias,
+                                keystorePassword = extractorFormData.keystorePassword,
+                                keyPassword = extractorFormData.keyPassword,
+                                onFailure = { errorMsg ->
+                                    println("FAILURE SIGN -> $errorMsg")
+                                }
+                            )
+                        }
+
+                        apkExtractor?.aabToApks(
+                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                            overwriteApks = extractorFormData.isOverwriteApks,
+                            onSuccess = { output ->
+                                println("success -> $output")
+                            },
+                            onFailure = { errorMsg ->
+                                println("FAILURE EXTRACT -> $errorMsg")
+                            }
+                        )
+                    }*/
+
+
                     homeViewModel.sendIntent(
                         HomeIntent.ExtractAab(
                             extractorFormData = extractorFormData
                         )
                     )
-                },
-                onInstallExtractedApksButtonClick = {
-
                 }
             )
         }
@@ -199,8 +218,7 @@ fun ExtractorContent(
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
-    onExtractApksButtonClick: () -> Unit,
-    onInstallExtractedApksButtonClick: () -> Unit
+    onExtractApksButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()

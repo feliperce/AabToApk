@@ -1,13 +1,16 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
+import shared.di.PlatformModule
 import feature.home.di.homeModule
 import feature.home.view.HomeScreen
 import org.koin.core.context.startKoin
 
 fun main() = application {
     startKoin {
-        modules(homeModule)
+        val platformModule = PlatformModule()
+
+        modules(platformModule.module)
     }
 
     MaterialTheme {
