@@ -76,13 +76,6 @@ class ApkExtractor(
                         )
                     )
                 }
-            } else {
-                onFailure(
-                    ErrorMsg(
-                        title = "KEYSTORE FAILURE",
-                        msg = "Keystore not found"
-                    )
-                )
             }
         }.await()
     }
