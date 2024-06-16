@@ -1,5 +1,6 @@
 package utils
 
+import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration

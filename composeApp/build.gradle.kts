@@ -40,9 +40,9 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
-            implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+            //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-            /*implementation("com.android.tools.build:bundletool:1.16.0")
+            implementation("com.android.tools.build:bundletool:1.16.0")
             implementation("com.android.tools.build:aapt2:8.4.2-11315950")
             implementation("com.android.tools.build:aaptcompiler:8.4.2")
             implementation("com.android.tools.build:aapt2-proto:7.3.1-8691043")
@@ -50,7 +50,7 @@ kotlin {
             implementation("com.android.tools:r8:8.3.37")
             implementation("com.android.tools.build:apksig:4.2.2")
             implementation("com.android.tools.ddms:ddmlib:31.4.2")
-            implementation("com.android:zipflinger:8.4.2")*/
+            implementation("com.android:zipflinger:8.4.2")
 
         }
         desktopMain.dependencies {
@@ -90,10 +90,6 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
-
-        /*implementation("com.example:library") {
-            exclude(group = "com.google.guava", module = "listenablefuture") // Exclui o ListenableFuture de "com.example:library"
-        }*/
     }
 }
 dependencies {

@@ -124,18 +124,6 @@ fun HomeScreen(
         isOverwriteApks = true
     )
 
-     /*extractorFormData = extractorFormData.copy(
-        adbPath = "/storage/emulated/0/Download",
-        keystorePath = "/storage/emulated/0/Download/teste.jks",
-        keystorePassword = "testeteste",
-        keystoreAlias = "teste",
-        keyPassword = "testeteste",
-        aabPath = "/storage/emulated/0/Download/8.6.0-1939.aab",
-        outputApksPath = "/storage/emulated/0/Download/",
-        isOverwriteApks = false
-    )*/
-
-///storage/emulated/0/Download/teste.jks
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
