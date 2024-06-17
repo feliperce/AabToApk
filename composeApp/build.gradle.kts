@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -40,6 +41,11 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
+
+            implementation(libs.datastore.preferences)
+
             //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
             implementation("com.android.tools.build:bundletool:1.16.0")
@@ -51,6 +57,8 @@ kotlin {
             implementation("com.android.tools.build:apksig:4.2.2")
             implementation("com.android.tools.ddms:ddmlib:31.4.2")
             implementation("com.android:zipflinger:8.4.2")
+
+
 
         }
         desktopMain.dependencies {
@@ -72,7 +80,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.5"
     }
     packaging {
         resources {
@@ -106,4 +114,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
