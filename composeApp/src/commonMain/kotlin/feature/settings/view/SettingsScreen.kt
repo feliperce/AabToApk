@@ -41,6 +41,9 @@ fun SettingsScreen() {
         settingsViewModel.sendIntent(
             SettingsIntent.GetSettings
         )
+        settingsViewModel.sendIntent(
+            SettingsIntent.GetIsFirstAccess
+        )
     }
 
     LaunchedEffect(settingsUiState.settingsData) {
@@ -67,6 +70,7 @@ fun SettingsScreen() {
             showDirPicker = true
         },
         onSaveButtonClick = {
+            // TODO
             settingsViewModel.sendIntent(
                 SettingsIntent.SaveSettings(settingsFormData)
             )

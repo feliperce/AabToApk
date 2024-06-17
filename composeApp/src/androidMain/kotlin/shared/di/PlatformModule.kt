@@ -13,6 +13,6 @@ actual class PlatformModule {
         viewModel { ExtractorViewModel() }
         viewModel { SettingsViewModel(get()) }
 
-        single { dataStore(androidContext()) }
+        single { dataStore(get()) }
     }
 }

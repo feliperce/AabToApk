@@ -38,6 +38,9 @@ class SettingsViewModel(
                     is SettingsIntent.GetSettings -> {
                         getSettings()
                     }
+                    is SettingsIntent.GetIsFirstAccess -> {
+                        getIsFirstAccess()
+                    }
                     is SettingsIntent.SaveSettings -> {
                         saveSettings(intent.settingsFormData)
                     }
@@ -46,6 +49,16 @@ class SettingsViewModel(
                     }
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private fun getIsFirstAccess() {
+        viewModelScope.launch {
+            settingsRepository.getIsFirstAccess().collect { isFirstAccess ->
+                _settingsState.update {
+                    it.copy(isFirstAccess = isFirstAccess)
+                }
+            }
+        }
     }
 
     private fun getSettings() {

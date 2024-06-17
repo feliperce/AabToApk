@@ -13,7 +13,15 @@ class SettingsRepository(
         emitAll(appSettings.settingsData)
     }
 
+    suspend fun getIsFirstAccess() = flow {
+        emitAll(appSettings.isFirstAccess)
+    }
+
     suspend fun saveSettings(settingsData: SettingsData) {
         appSettings.updateSettingsData(settingsData)
+    }
+
+    suspend fun saveIsFirstAccess(isFirstAccess: Boolean) {
+        appSettings.updateIsFirstAccess(isFirstAccess)
     }
 }

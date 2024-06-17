@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            implementation(libs.androidx.material3.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -47,6 +48,8 @@ kotlin {
 
             implementation(libs.datastore.preferences)
 
+            implementation(libs.navigation.compose)
+
             //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
             implementation("com.android.tools.build:bundletool:1.16.0")
@@ -63,6 +66,7 @@ kotlin {
 
         }
         desktopMain.dependencies {
+            implementation(libs.androidx.material3.desktop)
             implementation(compose.desktop.currentOs)
         }
     }
@@ -102,7 +106,7 @@ android {
     }
 }
 dependencies {
-    implementation(libs.androidx.material3.desktop)
+
 }
 
 compose.desktop {

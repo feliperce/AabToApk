@@ -1,10 +1,7 @@
 package shared.settings
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import okio.Path.Companion.toPath
@@ -29,6 +26,11 @@ class AppSettings(private val dataStore: DataStore<Preferences>) {
             )
         }
 
+    val isFirstAccess: Flow<Boolean> =
+        dataStore.data.map { preferences ->
+            preferences[IS_FIRST_ACCESS_PREF_KEY] ?: true
+        }
+
     suspend fun updateAdbPath(adbPath: String) {
         dataStore.edit { preferences ->
             preferences[ADB_PATH_PREF_KEY] = adbPath
@@ -47,6 +49,12 @@ class AppSettings(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    suspend fun updateIsFirstAccess(isFirstAccess: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[IS_FIRST_ACCESS_PREF_KEY] = isFirstAccess
+        }
+    }
+
     suspend fun updateSettingsData(settingsData: SettingsData) {
         dataStore.edit { preferences ->
             preferences[ADB_PATH_PREF_KEY] = settingsData.adbPath
@@ -59,6 +67,7 @@ class AppSettings(private val dataStore: DataStore<Preferences>) {
         val ADB_PATH_PREF_KEY = stringPreferencesKey("adbPath")
         val BUILD_TOOLS_PATH_PREF_KEY = stringPreferencesKey("buildToolsPath")
         val OUTPUT_PATH_PREF_KEY = stringPreferencesKey("outputPath")
+        val IS_FIRST_ACCESS_PREF_KEY = booleanPreferencesKey("isFirstAccess")
 
         const val DATA_STORE_FILE = "settings.preferences_pb"
     }
