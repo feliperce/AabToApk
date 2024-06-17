@@ -16,13 +16,14 @@ import feature.settings.model.SettingsFormDataCallback
 import feature.settings.state.SettingsIntent
 import feature.settings.viewmodel.SettingsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 import ui.theme.MarginPaddingSizeMedium
 import utils.InputPathType
 
 @Composable
-fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = viewModel { SettingsViewModel() }
-) {
+fun SettingsScreen() {
+    val settingsViewModel = koinViewModel<SettingsViewModel>()
+
     val settingsUiState by settingsViewModel.settingsState.collectAsState()
 
     var showDirPicker by remember { mutableStateOf(false) }

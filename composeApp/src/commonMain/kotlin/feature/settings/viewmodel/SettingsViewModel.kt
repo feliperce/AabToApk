@@ -3,13 +3,16 @@ package feature.settings.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import feature.settings.model.SettingsFormData
+import feature.settings.repository.SettingsRepository
 import feature.settings.state.SettingsIntent
 import feature.settings.state.SettingsUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
 
     private val intentChannel = Channel<SettingsIntent>(Channel.UNLIMITED)
 

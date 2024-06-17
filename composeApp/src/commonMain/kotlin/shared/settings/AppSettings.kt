@@ -59,5 +59,7 @@ class AppSettings(private val dataStore: DataStore<Preferences>) {
         val ADB_PATH_PREF_KEY = stringPreferencesKey("adbPath")
         val BUILD_TOOLS_PATH_PREF_KEY = stringPreferencesKey("buildToolsPath")
         val OUTPUT_PATH_PREF_KEY = stringPreferencesKey("outputPath")
+
+        const val DATA_STORE_FILE = "settings.preferences_pb"
     }
 }
