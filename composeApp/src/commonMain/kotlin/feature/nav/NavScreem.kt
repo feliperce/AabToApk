@@ -1,16 +1,29 @@
-package shared
+package feature.nav
 
-import androidx.compose.material3.Icon
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import feature.nav.bottomNavigationItems
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-actual fun DefaultBottomNavigation(navController: NavHostController) {
+fun NavScreen() {
+
+    val navController = rememberNavController()
+
+    Scaffold(
+        bottomBar = { DefaultBottomNavigation(navController) }
+    ) {
+
+    }
+}
+
+@Composable
+fun DefaultBottomNavigation(navController: NavHostController) {
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -26,7 +39,7 @@ actual fun DefaultBottomNavigation(navController: NavHostController) {
                 selected = currentRoute == bottomNavigationItem.route,
                 onClick = {
                     navController.navigate(bottomNavigationItem.route) {
-                        popUpTo(navController.graph.id)
+                        popUpTo(bottomNavigationItem.route)
                         launchSingleTop = true
                     }
                 }

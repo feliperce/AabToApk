@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import feature.nav.NavScreen
 import feature.settings.view.SettingsScreen
 
 class MainActivity : ComponentActivity() {
@@ -15,7 +16,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            SettingsScreen()
+            NavScreen()
         }
     }
 }

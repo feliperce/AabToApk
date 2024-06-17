@@ -5,9 +5,9 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Screen(val title: String) {
-    data object ExtractorScreen : Screen("ExtractorScreen")
-    data object SettingsScreen : Screen("SettingsScreen")
+sealed class Screen(val title: String, val route: String) {
+    data object ExtractorScreen : Screen("AarToApk", "extractor")
+    data object SettingsScreen : Screen("Settings", "settings")
 }
 
 data class BottomNavigationItem(
@@ -18,12 +18,12 @@ data class BottomNavigationItem(
 
 val bottomNavigationItems = listOf(
     BottomNavigationItem(
-        Screen.ExtractorScreen.title,
+        Screen.ExtractorScreen.route,
         Icons.Default.Person,
         "Extractor"
     ),
     BottomNavigationItem(
-        Screen.SettingsScreen.title,
+        Screen.SettingsScreen.route,
         Icons.Filled.DateRange,
         "Settings"
     )

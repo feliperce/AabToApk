@@ -2,6 +2,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import di.initKoin
+import feature.nav.NavScreen
 import shared.di.PlatformModule
 import feature.settings.view.SettingsScreen
 import org.koin.core.context.startKoin
@@ -22,7 +23,8 @@ fun main() = application {
             title = "AabToApk",
             state = state
         ) {
-            SettingsScreen()
+            NavScreen()
+            //SettingsScreen()
             //HomeScreen()
         }
     }
