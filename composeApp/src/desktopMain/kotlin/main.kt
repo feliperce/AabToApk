@@ -7,9 +7,9 @@ import feature.settings.view.SettingsScreen
 import org.koin.core.context.startKoin
 
 fun main() = application {
-    initKoin {
-        modules(PlatformModule().module)
-    }
+    initKoin(
+        actualModules = listOf(PlatformModule().module)
+    )
 
     MaterialTheme {
         val state = rememberWindowState(

@@ -5,19 +5,18 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import di.initKoin
-import feature.extractor.view.ExtractorScreen
-import org.koin.core.context.startKoin
+import feature.settings.view.SettingsScreen
+import org.koin.android.ext.koin.androidContext
 import shared.di.PlatformModule
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initKoin {
-            modules(PlatformModule().module)
-        }
-        startKoin {
-
+        initKoin(
+            actualModules = listOf(PlatformModule().module)
+        ) {
+            androidContext(this@MainActivity)
         }
 
         requestStoragePermissions {
@@ -25,7 +24,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            ExtractorScreen()
+            SettingsScreen()
         }
     }
 }

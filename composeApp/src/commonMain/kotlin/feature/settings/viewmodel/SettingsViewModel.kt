@@ -9,6 +9,7 @@ import feature.settings.state.SettingsUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import shared.settings.SettingsData
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository
@@ -34,6 +35,9 @@ class SettingsViewModel(
             .consumeAsFlow()
             .onEach { intent ->
                 when(intent) {
+                    is SettingsIntent.GetSettings -> {
+                        getSettings()
+                    }
                     is SettingsIntent.SaveSettings -> {
                         saveSettings(intent.settingsFormData)
                     }
@@ -44,15 +48,25 @@ class SettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun saveSettings(settingsFormData: SettingsFormData) {
-        _settingsState.update {
-            it.copy(
-                loading = true
-            )
+    private fun getSettings() {
+        viewModelScope.launch {
+            settingsRepository.getSettings().collect { settingsData ->
+                _settingsState.update {
+                    it.copy(settingsData = settingsData)
+                }
+            }
         }
+    }
+
+    private fun saveSettings(settingsFormData: SettingsFormData) {
+        val settingsData = SettingsData(
+            adbPath = settingsFormData.adbPath,
+            buildToolsPath = settingsFormData.buildToolsPath,
+            outputPath = settingsFormData.outputApksPath
+        )
 
         viewModelScope.launch {
-
+            settingsRepository.saveSettings(settingsData)
         }
     }
 

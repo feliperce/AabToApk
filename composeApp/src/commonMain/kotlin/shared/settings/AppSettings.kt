@@ -24,8 +24,8 @@ class AppSettings(private val dataStore: DataStore<Preferences>) {
         dataStore.data.map { preferences ->
             SettingsData(
                 adbPath = preferences[ADB_PATH_PREF_KEY] ?: "",
-                buildToolsPath = preferences[ADB_PATH_PREF_KEY] ?: "",
-                outputPath = preferences[ADB_PATH_PREF_KEY] ?: ""
+                buildToolsPath = preferences[BUILD_TOOLS_PATH_PREF_KEY] ?: "",
+                outputPath = preferences[OUTPUT_PATH_PREF_KEY] ?: ""
             )
         }
 

@@ -37,6 +37,22 @@ fun SettingsScreen() {
         )
     }
 
+    LaunchedEffect(Unit) {
+        settingsViewModel.sendIntent(
+            SettingsIntent.GetSettings
+        )
+    }
+
+    LaunchedEffect(settingsUiState.settingsData) {
+        settingsUiState.settingsData?.let {
+            settingsFormData = settingsFormData.copy(
+                adbPath = it.adbPath,
+                outputApksPath = it.outputPath,
+                buildToolsPath = it.buildToolsPath
+            )
+        }
+    }
+
     val settingsFormDataCallback = SettingsFormDataCallback(
         onAdbPathIconClick = {
             inputType = InputPathType.ADB_DIR_PATH

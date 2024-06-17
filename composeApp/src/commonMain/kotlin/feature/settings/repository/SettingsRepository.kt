@@ -13,5 +13,7 @@ class SettingsRepository(
         emitAll(appSettings.settingsData)
     }
 
-
+    suspend fun saveSettings(settingsData: SettingsData) {
+        appSettings.updateSettingsData(settingsData)
+    }
 }
