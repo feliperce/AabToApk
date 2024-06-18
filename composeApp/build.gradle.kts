@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -28,17 +29,40 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
             implementation(libs.koin.core)
             implementation(libs.koin.test)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.mpfilepicker)
-            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1")
-            implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+            implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.kotlinx.coroutines.swing)
+
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
+
+            implementation(libs.datastore.preferences)
+
+            implementation(libs.navigation.compose)
+
+            //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+
+            implementation("com.android.tools.build:bundletool:1.16.0")
+            implementation("com.android.tools.build:aapt2:8.4.2-11315950")
+            implementation("com.android.tools.build:aaptcompiler:8.4.2")
+            implementation("com.android.tools.build:aapt2-proto:7.3.1-8691043")
+            implementation("com.android.tools:common:31.4.2")
+            implementation("com.android.tools:r8:8.3.37")
+            implementation("com.android.tools.build:apksig:4.2.2")
+            implementation("com.android.tools.ddms:ddmlib:31.4.2")
+            implementation("com.android:zipflinger:8.4.2")
+
+
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -47,7 +71,7 @@ kotlin {
 }
 
 android {
-    namespace = "br.com.mobileti.aartoapk"
+    namespace = "br.com.mobileti.aabtoapk"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -55,11 +79,11 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "br.com.mobileti.aartoapk"
+        applicationId = "br.com.mobileti.aabtoapk"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.5"
     }
     packaging {
         resources {
@@ -89,8 +113,12 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "br.com.mobileti.aartoapk"
+            packageName = "br.com.mobileti.aabtoapk"
             packageVersion = "1.0.0"
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

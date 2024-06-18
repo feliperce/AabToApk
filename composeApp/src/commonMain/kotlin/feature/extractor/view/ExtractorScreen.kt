@@ -1,6 +1,5 @@
-package feature.home.view
+package feature.extractor.view
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,20 +16,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
-import feature.home.model.ExtractorFormData
-import feature.home.model.ExtractorFormDataCallback
-import feature.home.model.InputPathType
-import feature.home.state.HomeIntent
-import feature.home.viewmodel.HomeViewModel
+import feature.extractor.model.ExtractorFormData
+import feature.extractor.model.ExtractorFormDataCallback
+import feature.extractor.state.ExtractorIntent
+import feature.extractor.viewmodel.ExtractorViewModel
+import utils.InputPathType
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import ui.components.ErrorDialog
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import utils.SuccessMsgType
 
 @Composable
-fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel { HomeViewModel() }
+fun ExtractorScreen(
+    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() }
 ) {
-    val homeUiState by homeViewModel.homeState.collectAsState()
+    val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
     var showDirPicker by remember { mutableStateOf(false) }
@@ -46,21 +47,44 @@ fun HomeScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(homeUiState.errorMsg.id) {
-        showErrorDialog.value = homeUiState.errorMsg.title.isNotEmpty() && homeUiState.errorMsg.msg.isNotEmpty()
+    LaunchedEffect(extractorUiState.errorMsg.id) {
+        showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
     }
 
-    LaunchedEffect(homeUiState.successMsg.id) {
-        if (homeUiState.successMsg.msg.isNotEmpty()) {
-            snackbarHostState.showSnackbar(
-                message = homeUiState.successMsg.msg
-            )
+    LaunchedEffect(extractorUiState.successMsg.id) {
+        val successMsg = extractorUiState.successMsg
+
+        if (successMsg.msg.isNotEmpty()) {
+            if (successMsg.type == SuccessMsgType.EXTRACT_AAB) {
+                val result = snackbarHostState
+                    .showSnackbar(
+                        message = successMsg.msg,
+                        actionLabel = "INSTALL APKS",
+                        duration = SnackbarDuration.Indefinite
+                    )
+                when (result) {
+                    SnackbarResult.ActionPerformed -> {
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.InstallApks(
+                                extractorFormData = extractorFormData
+                            )
+                        )
+                    }
+                    SnackbarResult.Dismissed -> { }
+                }
+            } else {
+                snackbarHostState
+                    .showSnackbar(
+                        message = successMsg.msg,
+                        duration = SnackbarDuration.Long
+                    )
+            }
         }
     }
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        errorMsg = homeUiState.errorMsg
+        errorMsg = extractorUiState.errorMsg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -85,16 +109,15 @@ fun HomeScreen(
     )
 
     extractorFormData = extractorFormData.copy(
-        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools",
+        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools/adb",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
         keystoreAlias = "teste",
         keyPassword = "testeteste",
-        aabPath = "/home/felipe/Downloads/8.4.1-1936.aab",
+        aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
         outputApksPath = "/home/felipe/Downloads",
-        isOverwriteApks = false
+        isOverwriteApks = true
     )
-
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
@@ -122,7 +145,14 @@ fun HomeScreen(
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("AabToApk")
+                }
+            )
+        }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -133,21 +163,47 @@ fun HomeScreen(
                 extractorFormData = extractorFormData,
                 extractorFormDataCallback = extractorFormDataCallback,
                 onFormDataChange = onFormDataChange,
-                isLoading = homeUiState.loading,
+                isLoading = extractorUiState.loading,
                 onExtractApksButtonClick = {
-                    homeViewModel.sendIntent(
-                        HomeIntent.ExtractAab(
+                    /*scope.launch {
+                        val apkExtractor = ApkExtractor(
+                            aabPath = extractorFormData.aabPath,
+                            outputApksPath = extractorFormData.outputApksPath
+                        ).apply {
+                            setSignConfig(
+                                keystorePath = extractorFormData.keystorePath,
+                                keyAlias = extractorFormData.keystoreAlias,
+                                keystorePassword = extractorFormData.keystorePassword,
+                                keyPassword = extractorFormData.keyPassword,
+                                onFailure = { errorMsg ->
+                                    println("FAILURE SIGN -> $errorMsg")
+                                }
+                            )
+                        }
+
+                        apkExtractor?.aabToApks(
+                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                            overwriteApks = extractorFormData.isOverwriteApks,
+                            onSuccess = { output ->
+                                println("success -> $output")
+                            },
+                            onFailure = { errorMsg ->
+                                println("FAILURE EXTRACT -> $errorMsg")
+                            }
+                        )
+                    }*/
+
+
+                    extractorViewModel.sendIntent(
+                        ExtractorIntent.ExtractAab(
                             extractorFormData = extractorFormData
                         )
                     )
-                },
-                onInstallExtractedApksButtonClick = {
-
                 }
             )
         }
 
-        if (homeUiState.loading) {
+        if (extractorUiState.loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -164,8 +220,7 @@ fun ExtractorContent(
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
-    onExtractApksButtonClick: () -> Unit,
-    onInstallExtractedApksButtonClick: () -> Unit
+    onExtractApksButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -195,14 +250,14 @@ fun ExtractorContent(
                 modifier = Modifier.width(MarginPaddingSizeSmall)
             )
 
-            Button(
+            /*Button(
                 modifier = Modifier.weight(1f),
                 content = {
                     Text("INSTALL EXTRACTED APKS")
                 },
                 onClick = onInstallExtractedApksButtonClick,
                 enabled = !isLoading
-            )
+            )*/
         }
     }
 }

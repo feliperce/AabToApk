@@ -1,21 +1,14 @@
 package utils
 
-import com.android.bundle.Commands.ApkDescription
-import com.android.ddmlib.Log
+import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
-import com.android.tools.build.bundletool.commands.InstallApksCommand
-import com.android.tools.build.bundletool.device.DdmlibAdbServer
-import com.android.tools.build.bundletool.model.ApkListener
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
 import kotlinx.coroutines.*
-import java.io.File
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
 class ApkExtractor(
-    private val adbPath: String,
     private val aabPath: String,
     private val outputApksPath: String
 ) {
@@ -84,37 +77,6 @@ class ApkExtractor(
                         )
                     )
                 }
-            } else {
-                onFailure(
-                    ErrorMsg(
-                        title = "KEYSTORE FAILURE",
-                        msg = "Wrong keystore settings"
-                    )
-                )
-            }
-        }.await()
-    }
-
-    suspend fun installApks(
-        onSuccess: () -> Unit,
-        onFailure: (errorMsg: ErrorMsg) -> Unit
-    ) = withContext(Dispatchers.IO) {
-        async {
-            runCatching {
-                InstallApksCommand.builder()
-                    .setAdbPath(Path.of(adbPath))
-                    .setAdbServer(DdmlibAdbServer.getInstance())
-                    .setApksArchivePath(Path.of(outputApksPath))
-                    .build().execute()
-
-                onSuccess()
-            }.onFailure { error ->
-                onFailure(
-                    ErrorMsg(
-                        title = "INSTALL APK ERROR",
-                        msg = error.message ?: "Error on install APKS"
-                    )
-                )
             }
         }.await()
     }
