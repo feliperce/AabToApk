@@ -46,9 +46,7 @@ fun NavScreen() {
             }
         },
         bottomBar = {
-            if (!navUiState.isFirstAccess) {
-                DefaultBottomNavigation(navController)
-            }
+            DefaultBottomNavigation(navController)
         }
     ) { paddingValues ->
         Column(
@@ -80,6 +78,11 @@ fun DefaultBottomNavigation(navController: NavHostController) {
 
         bottomNavigationItems.forEach { bottomNavigationItem ->
             NavigationBarItem(
+                label = {
+                    Text(
+                        text = bottomNavigationItem.label
+                    )
+                },
                 icon = {
                     Icon(
                         bottomNavigationItem.icon,
