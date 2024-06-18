@@ -1,17 +1,14 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
+import di.initKoin
+import feature.nav.view.NavScreen
 import shared.di.PlatformModule
-import feature.home.di.homeModule
-import feature.home.view.HomeScreen
-import org.koin.core.context.startKoin
 
 fun main() = application {
-    startKoin {
-        val platformModule = PlatformModule()
-
-        modules(platformModule.module)
-    }
+    initKoin(
+        actualModules = listOf(PlatformModule().module)
+    )
 
     MaterialTheme {
         val state = rememberWindowState(
@@ -21,10 +18,12 @@ fun main() = application {
 
         Window(
             onCloseRequest = ::exitApplication,
-            title = "AarToApk",
+            title = "AabToApk",
             state = state
         ) {
-            HomeScreen()
+            NavScreen()
+            //SettingsScreen()
+            //HomeScreen()
         }
     }
 }

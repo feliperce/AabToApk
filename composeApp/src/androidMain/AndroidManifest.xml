@@ -8,6 +8,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:name=".DefaultApplication"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -15,7 +16,7 @@
 
         <provider
                 android:name="androidx.core.content.FileProvider"
-                android:authorities="br.com.mobileti.aartoapk.fileprovider"
+                android:authorities="br.com.mobileti.aabtoapk.fileprovider"
                 android:exported="false"
                 android:grantUriPermissions="true">
             <meta-data

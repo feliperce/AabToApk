@@ -1,10 +1,10 @@
-package feature.home.viewmodel
+package feature.extractor.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import feature.home.model.ExtractorFormData
-import feature.home.state.HomeIntent
-import feature.home.state.HomeUiState
+import feature.extractor.model.ExtractorFormData
+import feature.extractor.state.ExtractorIntent
+import feature.extractor.state.ExtractorUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,19 +14,19 @@ import utils.SuccessMsg
 import utils.SuccessMsgType
 import java.io.File
 
-class HomeViewModel : ViewModel() {
+class ExtractorViewModel : ViewModel() {
 
-    private val intentChannel = Channel<HomeIntent>(Channel.UNLIMITED)
+    private val intentChannel = Channel<ExtractorIntent>(Channel.UNLIMITED)
     private var apkExtractor: ApkExtractor? = null
 
-    private val _homeState = MutableStateFlow(HomeUiState(loading = false))
-    val homeState: StateFlow<HomeUiState> = _homeState.asStateFlow()
+    private val _extractorState = MutableStateFlow(ExtractorUiState(loading = false))
+    val extractorState: StateFlow<ExtractorUiState> = _extractorState.asStateFlow()
 
     init {
         handleIntents()
     }
 
-    fun sendIntent(intent: HomeIntent) {
+    fun sendIntent(intent: ExtractorIntent) {
         viewModelScope.launch {
             intentChannel.send(intent)
         }
@@ -37,10 +37,10 @@ class HomeViewModel : ViewModel() {
             .consumeAsFlow()
             .onEach { intent ->
                 when(intent) {
-                    is HomeIntent.ExtractAab -> {
+                    is ExtractorIntent.ExtractAab -> {
                         extractAab(intent.extractorFormData)
                     }
-                    is HomeIntent.InstallApks -> {
+                    is ExtractorIntent.InstallApks -> {
                         installApks(intent.extractorFormData)
                     }
                 }
@@ -49,7 +49,7 @@ class HomeViewModel : ViewModel() {
 
 
     private fun extractAab(extractorFormData: ExtractorFormData) {
-        _homeState.update {
+        _extractorState.update {
             it.copy(
                 loading = true
             )
@@ -66,7 +66,7 @@ class HomeViewModel : ViewModel() {
                     keystorePassword = extractorFormData.keystorePassword,
                     keyPassword = extractorFormData.keyPassword,
                     onFailure = { errorMsg ->
-                        _homeState.update {
+                        _extractorState.update {
                             it.copy(
                                 loading = false,
                                 errorMsg = errorMsg
@@ -80,7 +80,7 @@ class HomeViewModel : ViewModel() {
                 apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
                 overwriteApks = extractorFormData.isOverwriteApks,
                 onSuccess = { output ->
-                    _homeState.update {
+                    _extractorState.update {
                         it.copy(
                             loading = false,
                             successMsg = SuccessMsg(
@@ -92,7 +92,7 @@ class HomeViewModel : ViewModel() {
                     }
                 },
                 onFailure = { errorMsg ->
-                    _homeState.update {
+                    _extractorState.update {
                         it.copy(
                             loading = false,
                             errorMsg = errorMsg
@@ -104,7 +104,7 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun installApks(extractorFormData: ExtractorFormData) {
-        _homeState.update {
+        _extractorState.update {
             it.copy(
                 loading = true
             )
@@ -114,9 +114,9 @@ class HomeViewModel : ViewModel() {
 
         viewModelScope.launch {
             apkInstall.installApks(
-                apksPath = _homeState.value.extractedApksPath,
+                apksPath = _extractorState.value.extractedApksPath,
                 onSuccess = {
-                    _homeState.update {
+                    _extractorState.update {
                         it.copy(
                             loading = false,
                             successMsg = SuccessMsg(
@@ -127,7 +127,7 @@ class HomeViewModel : ViewModel() {
                     }
                 },
                 onFailure = { errorMsg ->
-                    _homeState.update {
+                    _extractorState.update {
                         it.copy(
                             loading = false,
                             errorMsg = errorMsg
@@ -137,5 +137,4 @@ class HomeViewModel : ViewModel() {
             )
         }
     }
-
 }
