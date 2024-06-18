@@ -25,12 +25,11 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
-            //implementation(libs.androidx.material3.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -49,8 +48,6 @@ kotlin {
             implementation(libs.datastore.preferences)
 
             implementation(libs.navigation.compose)
-
-            implementation(libs.androidx.material3.desktop)
 
             //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
@@ -107,7 +104,7 @@ android {
     }
 }
 dependencies {
-
+    implementation(libs.androidx.material3.desktop)
 }
 
 compose.desktop {

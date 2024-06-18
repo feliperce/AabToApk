@@ -4,8 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import feature.nav.NavScreen
-import feature.settings.view.SettingsScreen
+import feature.nav.view.NavScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -9,8 +9,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import feature.nav.view.Screen
 import feature.settings.model.SettingsFormData
 import feature.settings.model.SettingsFormDataCallback
 import feature.settings.state.SettingsIntent
@@ -21,7 +22,9 @@ import ui.theme.MarginPaddingSizeMedium
 import utils.InputPathType
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    navHostController: NavHostController
+) {
     val settingsViewModel = koinViewModel<SettingsViewModel>()
 
     val settingsUiState by settingsViewModel.settingsState.collectAsState()
@@ -70,10 +73,15 @@ fun SettingsScreen() {
             showDirPicker = true
         },
         onSaveButtonClick = {
-            // TODO
             settingsViewModel.sendIntent(
                 SettingsIntent.SaveSettings(settingsFormData)
             )
+            settingsViewModel.sendIntent(
+                SettingsIntent.SaveIsFirstAccess(false)
+            )
+            if (!settingsUiState.isFirstAccess) {
+                navHostController.navigate(Screen.ExtractorScreen.route)
+            }
         }
     )
 

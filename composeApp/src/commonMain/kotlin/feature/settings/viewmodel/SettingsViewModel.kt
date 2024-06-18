@@ -47,6 +47,9 @@ class SettingsViewModel(
                     is SettingsIntent.ValidateForm -> {
                         validateForm(intent.settingsFormData)
                     }
+                    is SettingsIntent.SaveIsFirstAccess -> {
+                        saveIsFirstAccess(intent.isFirstAccess)
+                    }
                 }
             }.launchIn(viewModelScope)
     }
@@ -80,6 +83,12 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             settingsRepository.saveSettings(settingsData)
+        }
+    }
+
+    private fun saveIsFirstAccess(isFirstAccess: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.saveIsFirstAccess(isFirstAccess)
         }
     }
 
