@@ -29,7 +29,8 @@ import utils.SuccessMsgType
 
 @Composable
 fun ExtractorScreen(
-    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() }
+    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() },
+    snackbarHostState: SnackbarHostState
 ) {
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
@@ -44,8 +45,6 @@ fun ExtractorScreen(
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
     }
-
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
         showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
@@ -143,73 +142,32 @@ fun ExtractorScreen(
         inputType = InputPathType.NONE
     }
 
-    Scaffold(
-        scaffoldState = rememberScaffoldState(),
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("AabToApk")
-                }
-            )
-        }
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ExtractorContent(
-                extractorFormData = extractorFormData,
-                extractorFormDataCallback = extractorFormDataCallback,
-                onFormDataChange = onFormDataChange,
-                isLoading = extractorUiState.loading,
-                onExtractApksButtonClick = {
-                    /*scope.launch {
-                        val apkExtractor = ApkExtractor(
-                            aabPath = extractorFormData.aabPath,
-                            outputApksPath = extractorFormData.outputApksPath
-                        ).apply {
-                            setSignConfig(
-                                keystorePath = extractorFormData.keystorePath,
-                                keyAlias = extractorFormData.keystoreAlias,
-                                keystorePassword = extractorFormData.keystorePassword,
-                                keyPassword = extractorFormData.keyPassword,
-                                onFailure = { errorMsg ->
-                                    println("FAILURE SIGN -> $errorMsg")
-                                }
-                            )
-                        }
-
-                        apkExtractor?.aabToApks(
-                            apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                            overwriteApks = extractorFormData.isOverwriteApks,
-                            onSuccess = { output ->
-                                println("success -> $output")
-                            },
-                            onFailure = { errorMsg ->
-                                println("FAILURE EXTRACT -> $errorMsg")
-                            }
-                        )
-                    }*/
-
-
-                    extractorViewModel.sendIntent(
-                        ExtractorIntent.ExtractAab(
-                            extractorFormData = extractorFormData
-                        )
+        ExtractorContent(
+            extractorFormData = extractorFormData,
+            extractorFormDataCallback = extractorFormDataCallback,
+            onFormDataChange = onFormDataChange,
+            isLoading = extractorUiState.loading,
+            onExtractApksButtonClick = {
+                extractorViewModel.sendIntent(
+                    ExtractorIntent.ExtractAab(
+                        extractorFormData = extractorFormData
                     )
-                }
-            )
-        }
-
-        if (extractorUiState.loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+                )
             }
+        )
+    }
+
+    if (extractorUiState.loading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
@@ -501,7 +459,7 @@ fun OutputForm(
                 onCheckedChange = {
                     onFormDataChange(extractorFormData.copy(isOverwriteApks = it))
                 },
-                enabled = isLoading
+                enabled = !isLoading
             )
             Text(
                 text = "Overwrite APKS"
