@@ -8,7 +8,8 @@ import utils.SuccessMsg
 data class SettingsUiState (
     val settingsData: SettingsData? = null,
     val isFormValid: Boolean = false,
-    val isFirstAccess: Boolean = true
+    val isFirstAccess: Boolean = true,
+    val successMsg: SuccessMsg = SuccessMsg()
 )
 
 sealed class SettingsIntent {

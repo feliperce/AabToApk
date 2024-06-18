@@ -2,10 +2,7 @@ package feature.nav.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.*
@@ -28,7 +25,7 @@ fun NavScreen() {
 
     val navUiState by navViewModel.navState.collectAsState()
     var currentScreen: Screen? by remember { mutableStateOf(null) }
-    var startDestination = ""
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         navViewModel.sendIntent(
@@ -36,15 +33,9 @@ fun NavScreen() {
         )
     }
 
-    LaunchedEffect(navUiState.isFirstAccess) {
-        startDestination = if (navUiState.isFirstAccess) {
-            Screen.SettingsScreen.route
-        } else {
-            Screen.ExtractorScreen.route
-        }
-    }
-
     Scaffold(
+        scaffoldState = rememberScaffoldState(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             currentScreen?.let {
                 TopAppBar(
@@ -63,13 +54,17 @@ fun NavScreen() {
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
-            NavHost(navController, startDestination = startDestination) {
+            NavHost(navController, startDestination = Screen.ExtractorScreen.route) {
                 composable(route = Screen.SettingsScreen.route) {
-                    SettingsScreen(navController)
+                    SettingsScreen(
+                        snackbarHostState = snackbarHostState
+                    )
                     currentScreen = Screen.SettingsScreen
                 }
                 composable(route = Screen.ExtractorScreen.route) {
-                    ExtractorScreen()
+                    ExtractorScreen(
+                        snackbarHostState = snackbarHostState
+                    )
                     currentScreen = Screen.ExtractorScreen
                 }
             }
@@ -95,7 +90,7 @@ fun DefaultBottomNavigation(navController: NavHostController) {
                 onClick = {
                     navController.navigate(bottomNavigationItem.route) {
                         //popUpTo(bottomNavigationItem.route)
-                        //launchSingleTop = true
+                        launchSingleTop = true
                     }
                 }
             )

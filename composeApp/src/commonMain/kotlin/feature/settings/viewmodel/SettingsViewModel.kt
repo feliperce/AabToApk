@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import shared.settings.SettingsData
+import utils.SuccessMsg
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository
@@ -83,6 +84,11 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             settingsRepository.saveSettings(settingsData)
+            _settingsState.update {
+                it.copy(successMsg = SuccessMsg(
+                    msg = "Settings changed with success!"
+                ))
+            }
         }
     }
 

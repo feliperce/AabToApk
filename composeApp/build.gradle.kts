@@ -42,6 +42,8 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
+            //implementation(libs.androidx.material3.desktop)
+
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
 
@@ -104,7 +106,7 @@ android {
     }
 }
 dependencies {
-    implementation(libs.androidx.material3.desktop)
+    //implementation(libs.androidx.material3.desktop)
 }
 
 compose.desktop {
