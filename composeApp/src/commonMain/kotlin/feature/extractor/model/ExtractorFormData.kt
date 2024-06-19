@@ -13,6 +13,5 @@ data class ExtractorFormData(
 data class ExtractorFormDataCallback(
     val onKeystorePathIconClick: () -> Unit,
     val onAabPathIconClick: () -> Unit,
-    val onKeystoreNameChanged: (String) -> Unit,
     val onItemChanged: (KeystoreDto) -> Unit
 )

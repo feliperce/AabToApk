@@ -116,13 +116,10 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             inputType = InputPathType.AAB_PATH
             fileType = listOf("aab")
         },
-        onKeystoreNameChanged = { keystoreDto ->
+        onItemChanged = { keystoreDto ->
             extractorFormData = extractorFormData.copy(
                 keystoreDto = keystoreDto
             )
-        },
-        onItemChanged = {
-
         }
     )
 
@@ -268,7 +265,6 @@ fun ExtractorForm(
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
             onKeystorePathIconClick = extractorFormDataCallback.onKeystorePathIconClick,
-            onKeystoreNameChange = extractorFormDataCallback.onKeystoreNameChanged,
             onItemChanged = extractorFormDataCallback.onItemChanged
         )
         Spacer(modifier = spacerModifier)
@@ -286,7 +282,6 @@ fun KeystoreSignForm(
     keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
-    onKeystoreNameChange: (String) -> Unit,
     onItemChanged: (keystoreDto: KeystoreDto) -> Unit,
     isLoading: Boolean,
     onKeystorePathIconClick: () -> Unit
@@ -317,17 +312,6 @@ fun KeystoreSignForm(
             title = "Name",
             items = spinnerItems,
             supportingText = "Select a name to save keystore information, leave it empty to not save",
-            onTextChanged = { name ->
-                /*val keystoreDto = (spinnerItem.data as KeystoreDto?)?.copy(
-                    name = spinnerItem.name,
-                    id = if (spinnerItem.name.isEmpty()) {
-                        null
-                    } else {
-                        spinnerItem.data?.id
-                    }
-                )*/
-                onKeystoreNameChange(name)
-            },
             onItemChanged = { spinnerItem: SpinnerItem ->
                 val keystoreDto = (spinnerItem.data as KeystoreDto?)?.copy(
                     name = spinnerItem.name,
@@ -505,8 +489,6 @@ fun OutputForm(
             }
         )
 
-
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
@@ -534,7 +516,7 @@ private fun KeystoreSignFormPreview() {
         extractorFormData = ExtractorFormData(),
         onKeystorePathIconClick = {},
         isLoading = false,
-        onKeystoreNameChange = {}
+        onItemChanged = {}
     )
 }
 
