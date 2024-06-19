@@ -10,7 +10,7 @@ actual class PlatformModule {
     actual val module: Module = module {
         single { dataStore() }
 
-        factory { ExtractorViewModel() }
+        factory { ExtractorViewModel(get()) }
         factory { SettingsViewModel(get()) }
     }
 }

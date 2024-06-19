@@ -23,6 +23,7 @@ import feature.extractor.state.ExtractorIntent
 import feature.extractor.viewmodel.ExtractorViewModel
 import utils.InputPathType
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.Black
 import ui.theme.MarginPaddingSizeMedium
@@ -30,10 +31,9 @@ import ui.theme.MarginPaddingSizeSmall
 import utils.SuccessMsgType
 
 @Composable
-fun ExtractorScreen(
-    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() },
-    snackbarHostState: SnackbarHostState
-) {
+fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
+    val extractorViewModel: ExtractorViewModel = koinViewModel()
+
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
@@ -45,6 +45,12 @@ fun ExtractorScreen(
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
+    }
+
+    SideEffect {
+        extractorViewModel.sendIntent(
+            ExtractorIntent.GetSettingsData
+        )
     }
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
@@ -82,6 +88,12 @@ fun ExtractorScreen(
         }
     }
 
+    LaunchedEffect(extractorUiState.settingsData) {
+        extractorFormData = extractorFormData.copy(
+            settingsData = extractorUiState.settingsData
+        )
+    }
+
     ErrorDialog(
         showDialog = showErrorDialog,
         errorMsg = extractorUiState.errorMsg
@@ -101,13 +113,11 @@ fun ExtractorScreen(
     )
 
     extractorFormData = extractorFormData.copy(
-        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools/adb",
         keystorePath = "/home/felipe/Downloads/teste.jks",
         keystorePassword = "testeteste",
         keystoreAlias = "teste",
         keyPassword = "testeteste",
         aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
-        outputApksPath = "/home/felipe/Downloads",
         isOverwriteApks = true
     )
 
@@ -167,9 +177,13 @@ fun ExtractorContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        WarningCard(
-            msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
-        )
+        extractorFormData.settingsData?.let {
+            if (it.adbPath.isEmpty() || it.outputPath.isEmpty() || it.buildToolsPath.isEmpty()) {
+                WarningCard(
+                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
+                )
+            }
+        }
 
         Spacer(
             modifier = Modifier
