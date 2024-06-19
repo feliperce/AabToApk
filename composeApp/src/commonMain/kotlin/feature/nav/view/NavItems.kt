@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val title: String, val route: String) {
-    data object ExtractorScreen : Screen("AarToApk", "extractor")
+    data object ExtractorScreen : Screen("AabToApk", "extractor")
     data object SettingsScreen : Screen("Settings", "settings")
 }
 
