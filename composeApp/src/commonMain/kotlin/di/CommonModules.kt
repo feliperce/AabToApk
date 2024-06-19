@@ -1,6 +1,5 @@
 package di
 
-import feature.nav.repository.NavRepository
 import feature.settings.repository.SettingsRepository
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -15,7 +14,7 @@ fun initKoin(
     startKoin {
         appDeclarations()
         modules(
-            listOf(dataModule, settingsModule, navModule) + actualModules
+            listOf(dataModule, settingsModule) + actualModules
         )
     }
 
@@ -25,8 +24,4 @@ internal val dataModule = module {
 
 internal val settingsModule = module {
     single { SettingsRepository(get()) }
-}
-
-internal val navModule = module {
-    single { NavRepository(get()) }
 }

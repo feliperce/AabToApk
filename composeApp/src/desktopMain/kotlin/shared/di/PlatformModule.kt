@@ -1,7 +1,6 @@
 package shared.di
 
 import feature.extractor.viewmodel.ExtractorViewModel
-import feature.nav.viewmodel.NavViewModel
 import feature.settings.viewmodel.SettingsViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -13,6 +12,5 @@ actual class PlatformModule {
 
         factory { ExtractorViewModel() }
         factory { SettingsViewModel(get()) }
-        factory { NavViewModel(get()) }
     }
 }
