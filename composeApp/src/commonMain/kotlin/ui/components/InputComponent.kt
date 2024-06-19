@@ -19,7 +19,16 @@ fun SpinnerTextInput(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("") }
-    var selectedItem by remember { mutableStateOf(items[0]) }
+
+    var selectedItem by remember {
+        if (items.isEmpty()) {
+            mutableStateOf(SpinnerItem("", null))
+        } else {
+            mutableStateOf(items[0])
+        }
+    }
+
+
 
     ExposedDropdownMenuBox(
         expanded = expanded,

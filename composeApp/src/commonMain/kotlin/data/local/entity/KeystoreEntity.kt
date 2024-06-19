@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "Keystore")
 data class KeystoreEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val id: Long? = null,
     @ColumnInfo(name = "name") val name: String,
     val path: String,
     val password: String,

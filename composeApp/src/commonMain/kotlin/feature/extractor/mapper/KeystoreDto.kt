@@ -1,7 +1,7 @@
 package feature.extractor.mapper
 
 data class KeystoreDto(
-    val id: Int = -1,
+    val id: Long? = null,
     val name: String = "",
     val path: String = "",
     val password: String = "",

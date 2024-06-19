@@ -18,10 +18,10 @@ class ExtractorRepository(
         extractorDao.insertOrUpdate(keystoreDto.toKeystoreEntity())
     }
 
-    suspend fun getKeystoreAll() = flow {
+    suspend fun getKeystoreAll() = flow<List<KeystoreDto>> {
         emitAll(
             extractorDao.getAll().map {
-                emit(it.toKeystoreDtoList())
+                it.toKeystoreDtoList()
             }
         )
     }

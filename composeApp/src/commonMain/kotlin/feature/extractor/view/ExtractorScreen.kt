@@ -54,6 +54,12 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
         )
     }
 
+    LaunchedEffect(Unit) {
+        extractorViewModel.sendIntent(
+            ExtractorIntent.GetKeystoreData
+        )
+    }
+
     LaunchedEffect(extractorUiState.errorMsg.id) {
         showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
     }
@@ -140,6 +146,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ExtractorContent(
+            keystoreDtoList = extractorUiState.keystoreDtoList,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange,
@@ -153,7 +160,13 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
                 extractorViewModel.sendIntent(
                     ExtractorIntent.SaveKeystore(
-                        keystoreDto = KeystoreDto(name = "dasdasdasdasda")
+                        keystoreDto = KeystoreDto(
+                            name = "gfggggggggggggggggg",
+                            keyPassword = "fff",
+                            keyAlias = "poopo",
+                            path = "fsd",
+                            password = "fasdfsdfds"
+                        )
                     )
                 )
             }
@@ -173,6 +186,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 @Composable
 fun ExtractorContent(
     extractorFormData: ExtractorFormData,
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
@@ -199,6 +213,7 @@ fun ExtractorContent(
         )
 
         ExtractorForm(
+            keystoreDtoList = keystoreDtoList,
             isLoading = isLoading,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
@@ -226,6 +241,7 @@ fun ExtractorContent(
 
 @Composable
 fun ExtractorForm(
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
@@ -237,6 +253,7 @@ fun ExtractorForm(
 
     Column {
         KeystoreSignForm(
+            keystoreDtoList = keystoreDtoList,
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
@@ -254,6 +271,7 @@ fun ExtractorForm(
 
 @Composable
 fun KeystoreSignForm(
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
     isLoading: Boolean,
@@ -261,20 +279,12 @@ fun KeystoreSignForm(
 ) {
     val inputModifier = Modifier.fillMaxWidth()
 
-    val spinnerItems = listOf(
+    val spinnerItems = keystoreDtoList.map {
         SpinnerItem(
-            "Aaaaaaa",
-            0
-        ),
-        SpinnerItem(
-            "dasf afs",
-            0
-        ),
-        SpinnerItem(
-            "f asf as2",
-            0
+            name = it.name,
+            data = it
         )
-    )
+    }
 
     FormCard(
         modifier = Modifier.fillMaxWidth(),
@@ -433,6 +443,7 @@ fun OutputForm(
 @Preview
 private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
+        keystoreDtoList = emptyList(),
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onKeystorePathIconClick = {},

@@ -11,7 +11,8 @@ data class ExtractorUiState (
     val errorMsg: ErrorMsg = ErrorMsg(),
     val successMsg: SuccessMsg = SuccessMsg(),
     val extractedApksPath: String = "",
-    val settingsData: SettingsData? = null
+    val settingsData: SettingsData? = null,
+    val keystoreDtoList: List<KeystoreDto> = listOf()
 )
 
 sealed class ExtractorIntent {
@@ -19,4 +20,5 @@ sealed class ExtractorIntent {
     class InstallApks(val extractorFormData: ExtractorFormData) : ExtractorIntent()
     class SaveKeystore(val keystoreDto: KeystoreDto) : ExtractorIntent()
     data object GetSettingsData : ExtractorIntent()
+    data object GetKeystoreData : ExtractorIntent()
 }

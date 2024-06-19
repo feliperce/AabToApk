@@ -52,6 +52,9 @@ class ExtractorViewModel(
                     is ExtractorIntent.SaveKeystore -> {
                         saveKeystore(intent.keystoreDto)
                     }
+                    is ExtractorIntent.GetKeystoreData -> {
+                        getSettingsData()
+                    }
                 }
             }.launchIn(viewModelScope)
     }
@@ -59,6 +62,16 @@ class ExtractorViewModel(
     private fun saveKeystore(keystoreDto: KeystoreDto) {
         viewModelScope.launch {
             extractorRepository.insertOrUpdateKeystore(keystoreDto)
+        }
+    }
+
+    private fun getKeystoreData() {
+        viewModelScope.launch {
+            extractorRepository.getKeystoreAll().collect { keystoreList ->
+                _extractorState.update {
+                    it.copy(keystoreDtoList = keystoreList)
+                }
+            }
         }
     }
 
