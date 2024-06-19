@@ -55,8 +55,17 @@ class ExtractorViewModel(
                     is ExtractorIntent.GetKeystoreData -> {
                         getKeystoreData()
                     }
+                    is ExtractorIntent.RemoveKeystore -> {
+                        removeKeystore(intent.keystoreDto)
+                    }
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private fun removeKeystore(keystoreDto: KeystoreDto) {
+        viewModelScope.launch {
+            extractorRepository.deleteKeystore(keystoreDto)
+        }
     }
 
     private fun saveKeystore(keystoreDto: KeystoreDto) {
@@ -94,7 +103,6 @@ class ExtractorViewModel(
 
         extractorFormData.settingsData?.let { settingsData ->
             viewModelScope.launch {
-
                 val keystoreDto = extractorFormData.keystoreDto
 
                 apkExtractor = ApkExtractor(

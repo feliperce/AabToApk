@@ -26,4 +26,8 @@ class ExtractorRepository(
         )
     }
 
+    suspend fun deleteKeystore(keystoreDto: KeystoreDto) {
+        extractorDao.delete(keystoreDto.toKeystoreEntity())
+    }
+
 }

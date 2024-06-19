@@ -1,11 +1,6 @@
 package data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
-import androidx.room.Upsert
+import androidx.room.*
 import data.local.entity.KeystoreEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -25,6 +20,9 @@ interface ExtractorDao {
 
     @Transaction
     @Update
-    suspend fun update(scheduleEntity: KeystoreEntity)
+    suspend fun update(keystoreEntity: KeystoreEntity)
+
+    @Delete
+    suspend fun delete(keystoreEntity: KeystoreEntity)
 
 }

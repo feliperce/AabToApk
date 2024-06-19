@@ -38,7 +38,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
     var showFilePicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
-    var currentKeystoreDto by remember { mutableStateOf(KeystoreDto()) }
+    var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
     val showErrorDialog = remember { mutableStateOf(false) }
     var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
@@ -116,21 +116,15 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             inputType = InputPathType.AAB_PATH
             fileType = listOf("aab")
         },
-        onItemChanged = { keystoreDto ->
+        onKeystoreSpinnerItemChanged = { keystoreDto ->
             extractorFormData = extractorFormData.copy(
                 keystoreDto = keystoreDto
             )
+        },
+        onKeystoreRemoveClick = {
+            showKeystoreRemoveDialog = true
         }
     )
-
-    /*extractorFormData = extractorFormData.copy(
-        keystorePath = "/home/felipe/Downloads/teste.jks",
-        keystorePassword = "testeteste",
-        keystoreAlias = "teste",
-        keyPassword = "testeteste",
-        aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
-        isOverwriteApks = true
-    )*/
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
@@ -146,6 +140,22 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             else -> {}
         }
         inputType = InputPathType.NONE
+    }
+
+    if (showKeystoreRemoveDialog) {
+        KeystoreRemovalDialog(
+            keystoreName = extractorFormData.keystoreDto.name,
+            onDismiss = { showKeystoreRemoveDialog = false },
+            onPositiveButtonClick = {
+                extractorViewModel.sendIntent(
+                    ExtractorIntent.RemoveKeystore(extractorFormData.keystoreDto)
+                )
+
+                extractorFormData = extractorFormData.copy(
+                    keystoreDto = KeystoreDto()
+                )
+            }
+        )
     }
 
     Column(
@@ -167,7 +177,6 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
                 )
 
                 extractorFormData.keystoreDto.let { keystoreDto ->
-                    println("ID FORA -> ${keystoreDto?.id}")
                     if (keystoreDto.name.isNotEmpty()) {
                         extractorViewModel.sendIntent(
                             ExtractorIntent.SaveKeystore(
@@ -265,7 +274,8 @@ fun ExtractorForm(
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
             onKeystorePathIconClick = extractorFormDataCallback.onKeystorePathIconClick,
-            onItemChanged = extractorFormDataCallback.onItemChanged
+            onItemChanged = extractorFormDataCallback.onKeystoreSpinnerItemChanged,
+            onKeystoreRemoveIconClick = extractorFormDataCallback.onKeystoreRemoveClick
         )
         Spacer(modifier = spacerModifier)
         OutputForm(
@@ -283,6 +293,7 @@ fun KeystoreSignForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
     onItemChanged: (keystoreDto: KeystoreDto) -> Unit,
+    onKeystoreRemoveIconClick: () -> Unit,
     isLoading: Boolean,
     onKeystorePathIconClick: () -> Unit
 ) {
@@ -303,9 +314,7 @@ fun KeystoreSignForm(
         } else {
             Icons.Rounded.Delete
         },
-        onActionClick = {
-
-        }
+        onActionClick = onKeystoreRemoveIconClick
     ) {
         SpinnerTextInput(
             modifier = inputModifier,
@@ -512,6 +521,34 @@ fun OutputForm(
 }
 
 @Composable
+fun KeystoreRemovalDialog(
+    keystoreName: String,
+    onPositiveButtonClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("REMOVE KEYSTORE DATA")
+        },
+        text = {
+            Text("Remove $keystoreName?")
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onPositiveButtonClick()
+                    onDismiss()
+                },
+                content = {
+                    Text("REMOVE")
+                }
+            )
+        }
+    )
+}
+
+@Composable
 @Preview
 private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
@@ -520,7 +557,8 @@ private fun KeystoreSignFormPreview() {
         extractorFormData = ExtractorFormData(),
         onKeystorePathIconClick = {},
         isLoading = false,
-        onItemChanged = {}
+        onItemChanged = {},
+        onKeystoreRemoveIconClick = {}
     )
 }
 
