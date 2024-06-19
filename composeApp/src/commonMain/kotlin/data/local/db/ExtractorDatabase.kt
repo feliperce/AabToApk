@@ -14,12 +14,20 @@ import kotlinx.coroutines.Dispatchers
     version = 1,
     exportSchema = true
 )
-abstract class ExtractorDatabase : RoomDatabase() {
+abstract class ExtractorDatabase : RoomDatabase(), DB {
     abstract fun extractorDao(): ExtractorDao
+
+    override fun clearAllTables() {
+        super.clearAllTables()
+    }
 
     companion object {
         const val DATABASE_NAME = "extractor.db"
     }
+}
+
+interface DB {
+    fun clearAllTables(): Unit {}
 }
 
 fun getRoomDatabase(
