@@ -53,7 +53,7 @@ class ExtractorViewModel(
                         saveKeystore(intent.keystoreDto)
                     }
                     is ExtractorIntent.GetKeystoreData -> {
-                        getSettingsData()
+                        getKeystoreData()
                     }
                 }
             }.launchIn(viewModelScope)
@@ -94,16 +94,19 @@ class ExtractorViewModel(
 
         extractorFormData.settingsData?.let { settingsData ->
             viewModelScope.launch {
+
+                val keystoreDto = extractorFormData.keystoreDto
+
                 apkExtractor = ApkExtractor(
                     aabPath = extractorFormData.aabPath,
                     outputApksPath = settingsData.outputPath,
                     buildToolsPath = settingsData.buildToolsPath
                 ).apply {
                     setSignConfig(
-                        keystorePath = extractorFormData.keystorePath,
-                        keyAlias = extractorFormData.keystoreAlias,
-                        keystorePassword = extractorFormData.keystorePassword,
-                        keyPassword = extractorFormData.keyPassword,
+                        keystorePath = keystoreDto.path,
+                        keyAlias = keystoreDto.keyAlias,
+                        keystorePassword = keystoreDto.password,
+                        keyPassword = keystoreDto.keyPassword,
                         onFailure = { errorMsg ->
                             _extractorState.update {
                                 it.copy(

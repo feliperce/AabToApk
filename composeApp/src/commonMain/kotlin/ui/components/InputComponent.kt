@@ -15,7 +15,8 @@ fun SpinnerTextInput(
     title: String,
     supportingText: String? = null,
     items: List<SpinnerItem>,
-    onTextChanged: (item: SpinnerItem) -> Unit = {}
+    onTextChanged: (text: String) -> Unit = {},
+    onItemChanged: (item: SpinnerItem) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("") }
@@ -28,8 +29,6 @@ fun SpinnerTextInput(
         }
     }
 
-
-
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
@@ -39,7 +38,7 @@ fun SpinnerTextInput(
             value = selectedOptionText,
             onValueChange = {
                 selectedOptionText = it
-                onTextChanged(selectedItem)
+                onTextChanged(it)
             },
             label = { Text(title) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -71,6 +70,7 @@ fun SpinnerTextInput(
                         onClick = {
                             selectedItem = selectionOption
                             selectedOptionText = selectionOption.name
+                            onItemChanged(selectedItem.copy(name = selectedOptionText))
                             expanded = false
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
