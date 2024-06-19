@@ -1,5 +1,6 @@
 package feature.extractor.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,7 +23,8 @@ import feature.extractor.state.ExtractorIntent
 import feature.extractor.viewmodel.ExtractorViewModel
 import utils.InputPathType
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import ui.components.ErrorDialog
+import ui.components.*
+import ui.theme.Black
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import utils.SuccessMsgType
@@ -35,7 +37,6 @@ fun ExtractorScreen(
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
-    var showDirPicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
 
@@ -87,10 +88,6 @@ fun ExtractorScreen(
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
-        onAdbPathIconClick = {
-            showDirPicker = true
-            inputType = InputPathType.ADB_DIR_PATH
-        },
         onKeystorePathIconClick = {
             showFilePicker = true
             inputType = InputPathType.KEYSTORE_PATH
@@ -101,10 +98,6 @@ fun ExtractorScreen(
             inputType = InputPathType.AAB_PATH
             fileType = listOf("aab")
         },
-        onOutputPathIconClick = {
-            showDirPicker = true
-            inputType = InputPathType.OUTPUT_DIR_PATH
-        }
     )
 
     extractorFormData = extractorFormData.copy(
@@ -125,18 +118,6 @@ fun ExtractorScreen(
                 extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
             InputPathType.AAB_PATH ->
                 extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
-            else -> {}
-        }
-        inputType = InputPathType.NONE
-    }
-
-    DirectoryPicker(showDirPicker) { path ->
-        showDirPicker = false
-        when (inputType) {
-            InputPathType.ADB_DIR_PATH ->
-                extractorFormData = extractorFormData.copy(adbPath = path ?: "")
-            InputPathType.OUTPUT_DIR_PATH ->
-                extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
             else -> {}
         }
         inputType = InputPathType.NONE
@@ -207,15 +188,6 @@ fun ExtractorContent(
             Spacer(
                 modifier = Modifier.width(MarginPaddingSizeSmall)
             )
-
-            /*Button(
-                modifier = Modifier.weight(1f),
-                content = {
-                    Text("INSTALL EXTRACTED APKS")
-                },
-                onClick = onInstallExtractedApksButtonClick,
-                enabled = !isLoading
-            )*/
         }
     }
 }
@@ -232,13 +204,6 @@ fun ExtractorForm(
         .padding(top = MarginPaddingSizeMedium)
 
     Column {
-        AdbForm(
-            extractorFormData = extractorFormData,
-            onFormDataChange = onFormDataChange,
-            isLoading = isLoading,
-            onAdbPathIconClick = extractorFormDataCallback.onAdbPathIconClick
-        )
-        Spacer(modifier = spacerModifier)
         KeystoreSignForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
@@ -250,43 +215,7 @@ fun ExtractorForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
-            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick,
-            onOutputPathIconClick = extractorFormDataCallback.onOutputPathIconClick
-        )
-    }
-}
-
-@Composable
-fun AdbForm(
-    extractorFormData: ExtractorFormData,
-    onFormDataChange: (ExtractorFormData) -> Unit,
-    isLoading: Boolean,
-    onAdbPathIconClick: () -> Unit
-) {
-    FormCard(
-        title = "ADB"
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = extractorFormData.adbPath,
-            enabled = !isLoading,
-            onValueChange = {
-                onFormDataChange(extractorFormData.copy(adbPath = it))
-            },
-            label = {
-                Text("ADB Dir Path")
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (!isLoading) {
-                            onAdbPathIconClick()
-                        }
-                    },
-                    imageVector = Icons.Rounded.FolderOpen,
-                    contentDescription = null
-                )
-            }
+            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick
         )
     }
 }
@@ -300,12 +229,34 @@ fun KeystoreSignForm(
 ) {
     val inputModifier = Modifier.fillMaxWidth()
 
+    val spinnerItems = listOf(
+        SpinnerItem(
+            "Aaaaaaa",
+            0
+        ),
+        SpinnerItem(
+            "dasf afs",
+            0
+        ),
+        SpinnerItem(
+            "f asf as2",
+            0
+        )
+    )
+
     FormCard(
         modifier = Modifier.fillMaxWidth(),
         title = "Kesytore Sign"
     ) {
-        OutlinedTextField(
+        SpinnerTextInput(
             modifier = inputModifier,
+            title = "Name",
+            items = spinnerItems,
+            supportingText = "Select a name to save keystore information, leave it empty to not save"
+        )
+
+        OutlinedTextField(
+            modifier = inputModifier.padding(top = MarginPaddingSizeMedium),
             value = extractorFormData.keystorePath,
             enabled = !isLoading,
             onValueChange = {
@@ -380,6 +331,7 @@ fun FormCard(
         ) {
             Text(
                 modifier = Modifier
+                    .padding(bottom = MarginPaddingSizeSmall)
                     .fillMaxWidth(),
                 fontWeight = FontWeight.W500,
                 text = title
@@ -394,8 +346,7 @@ fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
     isLoading: Boolean,
-    onAabPathIconClick: () -> Unit,
-    onOutputPathIconClick: () -> Unit
+    onAabPathIconClick: () -> Unit
 ) {
     val inputModifier = Modifier.fillMaxWidth()
 
@@ -426,29 +377,7 @@ fun OutputForm(
             }
         )
 
-        OutlinedTextField(
-            modifier = inputModifier
-                .padding(top = MarginPaddingSizeSmall),
-            value = extractorFormData.outputApksPath,
-            enabled = !isLoading,
-            onValueChange = {
-                onFormDataChange(extractorFormData.copy(outputApksPath = it))
-            },
-            label = {
-                Text("Output Dir Path (apks)")
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (!isLoading) {
-                            onOutputPathIconClick()
-                        }
-                    },
-                    imageVector = Icons.Rounded.FolderOpen,
-                    contentDescription = null
-                )
-            }
-        )
+
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -470,17 +399,6 @@ fun OutputForm(
 
 @Composable
 @Preview
-private fun AdbFormPreview() {
-    AdbForm(
-        onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
-        onAdbPathIconClick = {},
-        isLoading = false
-    )
-}
-
-@Composable
-@Preview
 private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
         onFormDataChange = {},
@@ -497,7 +415,6 @@ private fun OutputFormPreview() {
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onAabPathIconClick = {},
-        onOutputPathIconClick = {},
         isLoading = false
     )
 }

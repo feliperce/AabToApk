@@ -11,8 +11,8 @@ actual class PlatformModule {
     actual val module: Module = module {
         single { dataStore() }
 
-        single { ExtractorViewModel() }
-        single { SettingsViewModel(get()) }
-        single { NavViewModel(get()) }
+        factory { ExtractorViewModel() }
+        factory { SettingsViewModel(get()) }
+        factory { NavViewModel(get()) }
     }
 }

@@ -12,8 +12,6 @@ data class ExtractorFormData(
 )
 
 data class ExtractorFormDataCallback(
-    val onAdbPathIconClick: () -> Unit,
     val onKeystorePathIconClick: () -> Unit,
-    val onAabPathIconClick: () -> Unit,
-    val onOutputPathIconClick: () -> Unit
+    val onAabPathIconClick: () -> Unit
 )
