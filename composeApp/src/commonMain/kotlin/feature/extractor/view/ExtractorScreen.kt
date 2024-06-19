@@ -166,6 +166,17 @@ fun ExtractorContent(
             .padding(MarginPaddingSizeMedium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        WarningCard(
+            msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
+        )
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = MarginPaddingSizeMedium)
+        )
+
         ExtractorForm(
             isLoading = isLoading,
             extractorFormData = extractorFormData,
