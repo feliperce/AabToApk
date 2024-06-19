@@ -2,7 +2,9 @@ package feature.extractor.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
+import feature.extractor.repository.ExtractorRepository
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.state.ExtractorUiState
 import feature.settings.repository.SettingsRepository
@@ -13,6 +15,7 @@ import utils.*
 import java.io.File
 
 class ExtractorViewModel(
+    private val extractorRepository: ExtractorRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
@@ -46,8 +49,17 @@ class ExtractorViewModel(
                     is ExtractorIntent.GetSettingsData -> {
                         getSettingsData()
                     }
+                    is ExtractorIntent.SaveKeystore -> {
+                        saveKeystore(intent.keystoreDto)
+                    }
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private fun saveKeystore(keystoreDto: KeystoreDto) {
+        viewModelScope.launch {
+            extractorRepository.insertOrUpdateKeystore(keystoreDto)
+        }
     }
 
     private fun getSettingsData() {

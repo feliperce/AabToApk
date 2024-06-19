@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
 import feature.extractor.state.ExtractorIntent
@@ -147,6 +148,12 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
                 extractorViewModel.sendIntent(
                     ExtractorIntent.ExtractAab(
                         extractorFormData = extractorFormData
+                    )
+                )
+
+                extractorViewModel.sendIntent(
+                    ExtractorIntent.SaveKeystore(
+                        keystoreDto = KeystoreDto(name = "dasdasdasdasda")
                     )
                 )
             }

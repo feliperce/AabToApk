@@ -1,5 +1,6 @@
 package feature.extractor.state
 
+import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import shared.settings.SettingsData
 import utils.ErrorMsg
@@ -16,5 +17,6 @@ data class ExtractorUiState (
 sealed class ExtractorIntent {
     class ExtractAab(val extractorFormData: ExtractorFormData) : ExtractorIntent()
     class InstallApks(val extractorFormData: ExtractorFormData) : ExtractorIntent()
+    class SaveKeystore(val keystoreDto: KeystoreDto) : ExtractorIntent()
     data object GetSettingsData : ExtractorIntent()
 }

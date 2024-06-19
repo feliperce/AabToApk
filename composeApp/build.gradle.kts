@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
 
@@ -19,6 +20,10 @@ kotlin {
     jvm("desktop")
     
     sourceSets {
+        sourceSets.commonMain {
+            kotlin.srcDir("build/generated/ksp/metadata")
+        }
+
         val desktopMain by getting
         
         androidMain.dependencies {
@@ -106,7 +111,7 @@ android {
     }
 }
 dependencies {
-    //implementation(libs.androidx.material3.desktop)
+    add("kspCommonMainMetadata", libs.androidx.room.compiler)
 }
 
 compose.desktop {

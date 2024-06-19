@@ -1,5 +1,6 @@
 package shared.di
 
+import data.local.db.ExtractorDatabase
 import data.local.db.getRoomDatabase
 import feature.extractor.viewmodel.ExtractorViewModel
 import feature.settings.viewmodel.SettingsViewModel
@@ -14,7 +15,11 @@ actual class PlatformModule {
         single { dataStore(get()) }
         single { getRoomDatabase(getDatabaseBuilder(get())) }
 
-        viewModel { ExtractorViewModel(get()) }
+        single {
+            val db = get<ExtractorDatabase>()
+            db.extractorDao()
+        }
+        viewModel { ExtractorViewModel(get(), get()) }
         viewModel { SettingsViewModel(get()) }
     }
 }

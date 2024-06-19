@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.0"
+ksp = "2.0.0-1.0.21"
 android-compileSdk = "34"
 android-minSdk = "26"
 android-targetSdk = "34"
@@ -61,3 +62,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 room = { id = "androidx.room", version.ref = "androidxRoom" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
