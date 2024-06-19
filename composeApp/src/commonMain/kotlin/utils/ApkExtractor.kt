@@ -10,7 +10,8 @@ import java.util.*
 
 class ApkExtractor(
     private val aabPath: String,
-    private val outputApksPath: String
+    private val outputApksPath: String,
+    private val buildToolsPath: String
 ) {
 
     private var signingConfig: SigningConfiguration? = null
@@ -57,12 +58,15 @@ class ApkExtractor(
                     val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
                         .plus("/$newApksFileName.apks")
 
+                    val aapt2Path = buildToolsPath.dropLastWhile { it == '/' }
+                        .plus("/aapt2")
+
                     BuildApksCommand.builder()
                         .setBundlePath(Paths.get(aabPath))
                         .setSigningConfiguration(
                             signingConfig
                         )
-                        .setVerbose(true)
+                        .setAapt2Command(Aapt2Command.createFromExecutablePath(Paths.get(aapt2Path)))
                         .setOverwriteOutput(overwriteApks)
                         .setOutputFile(Paths.get(formattedOutputPath))
                         .build()

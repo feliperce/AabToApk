@@ -71,7 +71,8 @@ class ExtractorViewModel(
             viewModelScope.launch {
                 apkExtractor = ApkExtractor(
                     aabPath = extractorFormData.aabPath,
-                    outputApksPath = settingsData.outputPath
+                    outputApksPath = settingsData.outputPath,
+                    buildToolsPath = settingsData.buildToolsPath
                 ).apply {
                     setSignConfig(
                         keystorePath = extractorFormData.keystorePath,
