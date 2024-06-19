@@ -168,13 +168,13 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
                 extractorFormData.keystoreDto.let { keystoreDto ->
                     println("ID FORA -> ${keystoreDto?.id}")
-                    //if (keystoreDto.name.isNotEmpty()) {
+                    if (keystoreDto.name.isNotEmpty()) {
                         extractorViewModel.sendIntent(
                             ExtractorIntent.SaveKeystore(
                                 keystoreDto = keystoreDto
                             )
                         )
-                    //}
+                    }
                 }
             }
         )
@@ -313,15 +313,20 @@ fun KeystoreSignForm(
             items = spinnerItems,
             supportingText = "Select a name to save keystore information, leave it empty to not save",
             onItemChanged = { spinnerItem: SpinnerItem ->
-                val keystoreDto = (spinnerItem.data as KeystoreDto?)?.copy(
-                    name = spinnerItem.name,
-                    id = if (spinnerItem.name.isEmpty()) {
-                        null
-                    } else {
-                        spinnerItem.data?.id
-                    }
-                )
-                keystoreDto?.let { onItemChanged(it) }
+                println("ONITEM CHANGED -> ${spinnerItem.toString()}")
+
+                var keystoreDto: KeystoreDto? = (spinnerItem.data as KeystoreDto?)
+
+                if (keystoreDto == null) {
+                    keystoreDto = KeystoreDto(
+                        name = spinnerItem.name,
+                        path = extractorFormData.keystoreDto.path,
+                        password = extractorFormData.keystoreDto.password,
+                        keyAlias = extractorFormData.keystoreDto.keyAlias,
+                        keyPassword = extractorFormData.keystoreDto.keyPassword
+                    )
+                }
+                onItemChanged(keystoreDto)
             }
         )
 

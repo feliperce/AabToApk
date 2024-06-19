@@ -15,18 +15,13 @@ fun SpinnerTextInput(
     title: String,
     supportingText: String? = null,
     items: List<SpinnerItem>,
-    onTextChanged: (text: String) -> Unit = {},
     onItemChanged: (item: SpinnerItem) -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("") }
 
-    var selectedItem by remember {
-        if (items.isEmpty()) {
-            mutableStateOf(SpinnerItem("", null))
-        } else {
-            mutableStateOf(items[0])
-        }
+    var selectedItem by remember(items) {
+        mutableStateOf(items.firstOrNull() ?: SpinnerItem("", null))
     }
 
     ExposedDropdownMenuBox(
@@ -37,8 +32,13 @@ fun SpinnerTextInput(
             modifier = modifier.menuAnchor(),
             value = selectedOptionText,
             onValueChange = {
+                selectedItem = if (it.isBlank()) {
+                    SpinnerItem("", null) // Create new empty item if text is blank
+                } else {
+                    selectedItem.copy(name = it) // Update existing item
+                }
                 selectedOptionText = it
-                onTextChanged(it)
+                onItemChanged(selectedItem)
             },
             label = { Text(title) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -53,9 +53,7 @@ fun SpinnerTextInput(
             }
         )
 
-        val filteringOptions = items.filter { it.name.contains(selectedOptionText, ignoreCase = true) }
-
-        if (filteringOptions.isNotEmpty()) {
+        if (items.isNotEmpty()) {
             DropdownMenu(
                 modifier = Modifier
                     .background(Color.White)
@@ -64,7 +62,7 @@ fun SpinnerTextInput(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
             ) {
-                filteringOptions.forEach { selectionOption ->
+                items.forEach { selectionOption ->
                     DropdownMenuItem(
                         text = { Text(selectionOption.name) },
                         onClick = {
@@ -81,7 +79,7 @@ fun SpinnerTextInput(
     }
 }
 
-data class  SpinnerItem(
+data class SpinnerItem(
     val name: String,
     val data: Any?
 )
