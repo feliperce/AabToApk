@@ -1,10 +1,17 @@
+![Kotlin Badge](https://img.shields.io/badge/kotlin-v2.0.0-%237F52FF?logo=kotlin)
+![Compose Badge](https://img.shields.io/badge/compose_multiplatform-v1.6.10-%234285F4?logo=jetpackcompose)
+![Platform Windows Badge](https://img.shields.io/badge/platform-windows-%230078D4?logo=windows)
+![Platform Linux Badge](https://img.shields.io/badge/platform-Linux-%23FCC624?logo=linux)
+![Android Badge](https://img.shields.io/badge/platform-Android-%2334A853?logo=android)
+
+
 # AabToApk - Extract .aab from .apk
 
 This is a Kotlin Multiplatform project targeting Android, Desktop.
 
 Built with:
 * Kotlin Multiplatform
-* Jeptack Compose
+* Compose Multiplatform
 * Room
 * DataStore
 * MVI
