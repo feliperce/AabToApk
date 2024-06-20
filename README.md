@@ -14,6 +14,7 @@ Built with:
 * Compose Multiplatform
 * Room
 * DataStore
+* Koin
 * MVI
 
 Desktop:
