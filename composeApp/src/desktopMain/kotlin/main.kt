@@ -1,8 +1,11 @@
+import aabtoapk.composeapp.generated.resources.Res
+import aabtoapk.composeapp.generated.resources.ic_aabtoapk
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import di.initKoin
 import feature.nav.view.NavScreen
+import org.jetbrains.compose.resources.painterResource
 import shared.di.PlatformModule
 
 fun main() = application {
@@ -19,7 +22,8 @@ fun main() = application {
         Window(
             onCloseRequest = ::exitApplication,
             title = "AabToApk",
-            state = state
+            state = state,
+            icon = painterResource(Res.drawable.ic_aabtoapk)
         ) {
             NavScreen()
         }

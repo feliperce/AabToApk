@@ -34,5 +34,4 @@ interface ExtractorDao {
             update(keystoreEntity)
         }
     }
-
 }
