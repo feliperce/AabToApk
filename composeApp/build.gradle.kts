@@ -28,7 +28,6 @@ kotlin {
         val desktopMain by getting
         
         androidMain.dependencies {
-            //implementation(compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
         }
@@ -48,8 +47,6 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
-            //implementation(libs.androidx.material3.desktop)
-
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
 
@@ -59,17 +56,7 @@ kotlin {
 
             //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-            implementation("com.android.tools.build:bundletool:1.16.0")
-            implementation("com.android.tools.build:aapt2:8.4.2-11315950")
-            implementation("com.android.tools.build:aaptcompiler:8.4.2")
-            implementation("com.android.tools.build:aapt2-proto:7.3.1-8691043")
-            implementation("com.android.tools:common:31.4.2")
-            implementation("com.android.tools:r8:8.3.37")
-            implementation("com.android.tools.build:apksig:4.2.2")
-            implementation("com.android.tools.ddms:ddmlib:31.4.2")
-            implementation("com.android:zipflinger:8.4.2")
-
-
+            implementation(libs.bundletool)
 
         }
         desktopMain.dependencies {

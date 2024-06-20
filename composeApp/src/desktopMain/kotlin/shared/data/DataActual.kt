@@ -11,7 +11,7 @@ import java.io.File
 
 fun dataStore(): DataStore<Preferences> =
     createDataStore(
-        producePath = { AppSettings.DATA_STORE_FILE }
+        producePath = { System.getProperty("java.io.tmpdir")+"/"+AppSettings.DATA_STORE_FILE }
     )
 
 fun getDatabaseBuilder(): RoomDatabase.Builder<ExtractorDatabase> {
