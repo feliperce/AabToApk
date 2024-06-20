@@ -107,9 +107,25 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "br.com.mobileti.aabtoapk"
+            modules("jdk.unsupported")
+
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
+            packageName = "AabToApk"
+            description = "Extract .apk from .aab"
             packageVersion = "1.0.0"
+            macOS {
+                iconFile.set(project.file("icons/ic_aabtoapk.icns"))
+            }
+            windows {
+                dirChooser = true
+                upgradeUuid = "9de4a6b7-827d-4328-82a6-650d92aa325a"
+                iconFile.set(project.file("icons/ic_aabtoapk.ico"))
+            }
+            linux {
+                menuGroup = "tools"
+                appCategory = "tools"
+                iconFile.set(project.file("icons/ic_aabtoapk.png"))
+            }
         }
     }
 }
