@@ -1,4 +1,4 @@
-### AabToApk - Extract .aab from .apk
+# AabToApk - Extract .aab from .apk
 
 This is a Kotlin Multiplatform project targeting Android, Desktop.
 
