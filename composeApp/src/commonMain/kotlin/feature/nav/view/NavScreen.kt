@@ -13,25 +13,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import feature.extractor.view.ExtractorScreen
-import feature.nav.state.NavIntent
-import feature.nav.viewmodel.NavViewModel
 import feature.settings.view.SettingsScreen
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NavScreen() {
-    val navViewModel: NavViewModel = koinViewModel<NavViewModel>()
     val navController = rememberNavController()
-
-    val navUiState by navViewModel.navState.collectAsState()
     var currentScreen: Screen? by remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        navViewModel.sendIntent(
-            NavIntent.GetIsFirstAccess
-        )
-    }
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -92,7 +80,6 @@ fun DefaultBottomNavigation(navController: NavHostController) {
                 selected = currentRoute == bottomNavigationItem.route,
                 onClick = {
                     navController.navigate(bottomNavigationItem.route) {
-                        //popUpTo(bottomNavigationItem.route)
                         launchSingleTop = true
                     }
                 }

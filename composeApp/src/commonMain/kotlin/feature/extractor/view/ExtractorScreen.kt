@@ -10,40 +10,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.viewmodel.ExtractorViewModel
 import utils.InputPathType
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import ui.components.ErrorDialog
+import org.koin.compose.viewmodel.koinViewModel
+import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import utils.SuccessMsgType
 
 @Composable
-fun ExtractorScreen(
-    extractorViewModel: ExtractorViewModel = viewModel { ExtractorViewModel() },
-    snackbarHostState: SnackbarHostState
-) {
+fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
+    val extractorViewModel: ExtractorViewModel = koinViewModel()
+
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var showFilePicker by remember { mutableStateOf(false) }
-    var showDirPicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
+    var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
     val showErrorDialog = remember { mutableStateOf(false) }
     var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
+    }
+
+    SideEffect {
+        extractorViewModel.sendIntent(
+            ExtractorIntent.GetSettingsData
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        extractorViewModel.sendIntent(
+            ExtractorIntent.GetKeystoreData
+        )
     }
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
@@ -81,16 +94,18 @@ fun ExtractorScreen(
         }
     }
 
+    LaunchedEffect(extractorUiState.settingsData) {
+        extractorFormData = extractorFormData.copy(
+            settingsData = extractorUiState.settingsData
+        )
+    }
+
     ErrorDialog(
         showDialog = showErrorDialog,
         errorMsg = extractorUiState.errorMsg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
-        onAdbPathIconClick = {
-            showDirPicker = true
-            inputType = InputPathType.ADB_DIR_PATH
-        },
         onKeystorePathIconClick = {
             showFilePicker = true
             inputType = InputPathType.KEYSTORE_PATH
@@ -101,28 +116,25 @@ fun ExtractorScreen(
             inputType = InputPathType.AAB_PATH
             fileType = listOf("aab")
         },
-        onOutputPathIconClick = {
-            showDirPicker = true
-            inputType = InputPathType.OUTPUT_DIR_PATH
+        onKeystoreSpinnerItemChanged = { keystoreDto ->
+            extractorFormData = extractorFormData.copy(
+                keystoreDto = keystoreDto
+            )
+        },
+        onKeystoreRemoveClick = {
+            showKeystoreRemoveDialog = true
         }
-    )
-
-    extractorFormData = extractorFormData.copy(
-        adbPath = "/home/felipe/Development/Android/Sdk/platform-tools/adb",
-        keystorePath = "/home/felipe/Downloads/teste.jks",
-        keystorePassword = "testeteste",
-        keystoreAlias = "teste",
-        keyPassword = "testeteste",
-        aabPath = "/home/felipe/Downloads/8.6.0-1939.aab",
-        outputApksPath = "/home/felipe/Downloads",
-        isOverwriteApks = true
     )
 
     FilePicker(show = showFilePicker, fileExtensions = fileType) { platformFile ->
         showFilePicker = false
         when (inputType) {
             InputPathType.KEYSTORE_PATH ->
-                extractorFormData = extractorFormData.copy(keystorePath = platformFile?.path ?: "")
+                extractorFormData = extractorFormData.copy(
+                    keystoreDto = extractorFormData.keystoreDto.copy(
+                        path = platformFile?.path ?: ""
+                    )
+                )
             InputPathType.AAB_PATH ->
                 extractorFormData = extractorFormData.copy(aabPath = platformFile?.path ?: "")
             else -> {}
@@ -130,16 +142,20 @@ fun ExtractorScreen(
         inputType = InputPathType.NONE
     }
 
-    DirectoryPicker(showDirPicker) { path ->
-        showDirPicker = false
-        when (inputType) {
-            InputPathType.ADB_DIR_PATH ->
-                extractorFormData = extractorFormData.copy(adbPath = path ?: "")
-            InputPathType.OUTPUT_DIR_PATH ->
-                extractorFormData = extractorFormData.copy(outputApksPath = path ?: "")
-            else -> {}
-        }
-        inputType = InputPathType.NONE
+    if (showKeystoreRemoveDialog) {
+        KeystoreRemovalDialog(
+            keystoreName = extractorFormData.keystoreDto.name,
+            onDismiss = { showKeystoreRemoveDialog = false },
+            onPositiveButtonClick = {
+                extractorViewModel.sendIntent(
+                    ExtractorIntent.RemoveKeystore(extractorFormData.keystoreDto)
+                )
+
+                extractorFormData = extractorFormData.copy(
+                    keystoreDto = KeystoreDto()
+                )
+            }
+        )
     }
 
     Column(
@@ -148,6 +164,7 @@ fun ExtractorScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ExtractorContent(
+            keystoreDtoList = extractorUiState.keystoreDtoList,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange,
@@ -158,6 +175,16 @@ fun ExtractorScreen(
                         extractorFormData = extractorFormData
                     )
                 )
+
+                extractorFormData.keystoreDto.let { keystoreDto ->
+                    if (keystoreDto.name.isNotEmpty()) {
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.SaveKeystore(
+                                keystoreDto = keystoreDto
+                            )
+                        )
+                    }
+                }
             }
         )
     }
@@ -175,6 +202,7 @@ fun ExtractorScreen(
 @Composable
 fun ExtractorContent(
     extractorFormData: ExtractorFormData,
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
@@ -185,7 +213,23 @@ fun ExtractorContent(
             .padding(MarginPaddingSizeMedium),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        extractorFormData.settingsData?.let {
+            if (it.adbPath.isEmpty() || it.outputPath.isEmpty() || it.buildToolsPath.isEmpty()) {
+                WarningCard(
+                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = MarginPaddingSizeMedium)
+        )
+
         ExtractorForm(
+            keystoreDtoList = keystoreDtoList,
             isLoading = isLoading,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
@@ -207,21 +251,13 @@ fun ExtractorContent(
             Spacer(
                 modifier = Modifier.width(MarginPaddingSizeSmall)
             )
-
-            /*Button(
-                modifier = Modifier.weight(1f),
-                content = {
-                    Text("INSTALL EXTRACTED APKS")
-                },
-                onClick = onInstallExtractedApksButtonClick,
-                enabled = !isLoading
-            )*/
         }
     }
 }
 
 @Composable
 fun ExtractorForm(
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
     isLoading: Boolean,
@@ -232,84 +268,90 @@ fun ExtractorForm(
         .padding(top = MarginPaddingSizeMedium)
 
     Column {
-        AdbForm(
-            extractorFormData = extractorFormData,
-            onFormDataChange = onFormDataChange,
-            isLoading = isLoading,
-            onAdbPathIconClick = extractorFormDataCallback.onAdbPathIconClick
-        )
-        Spacer(modifier = spacerModifier)
         KeystoreSignForm(
+            keystoreDtoList = keystoreDtoList,
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
-            onKeystorePathIconClick = extractorFormDataCallback.onKeystorePathIconClick
+            onKeystorePathIconClick = extractorFormDataCallback.onKeystorePathIconClick,
+            onItemChanged = extractorFormDataCallback.onKeystoreSpinnerItemChanged,
+            onKeystoreRemoveIconClick = extractorFormDataCallback.onKeystoreRemoveClick
         )
         Spacer(modifier = spacerModifier)
         OutputForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
-            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick,
-            onOutputPathIconClick = extractorFormDataCallback.onOutputPathIconClick
-        )
-    }
-}
-
-@Composable
-fun AdbForm(
-    extractorFormData: ExtractorFormData,
-    onFormDataChange: (ExtractorFormData) -> Unit,
-    isLoading: Boolean,
-    onAdbPathIconClick: () -> Unit
-) {
-    FormCard(
-        title = "ADB"
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = extractorFormData.adbPath,
-            enabled = !isLoading,
-            onValueChange = {
-                onFormDataChange(extractorFormData.copy(adbPath = it))
-            },
-            label = {
-                Text("ADB Dir Path")
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (!isLoading) {
-                            onAdbPathIconClick()
-                        }
-                    },
-                    imageVector = Icons.Rounded.FolderOpen,
-                    contentDescription = null
-                )
-            }
+            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick
         )
     }
 }
 
 @Composable
 fun KeystoreSignForm(
+    keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    onItemChanged: (keystoreDto: KeystoreDto) -> Unit,
+    onKeystoreRemoveIconClick: () -> Unit,
     isLoading: Boolean,
     onKeystorePathIconClick: () -> Unit
 ) {
     val inputModifier = Modifier.fillMaxWidth()
 
+    val spinnerItems = keystoreDtoList.map {
+        SpinnerItem(
+            name = it.name,
+            data = it
+        )
+    }
+
     FormCard(
         modifier = Modifier.fillMaxWidth(),
-        title = "Kesytore Sign"
+        title = "Kesytore Sign",
+        actionIcon = if (extractorFormData.keystoreDto.id == null) {
+            null
+        } else {
+            Icons.Rounded.Delete
+        },
+        onActionClick = onKeystoreRemoveIconClick
     ) {
-        OutlinedTextField(
+        SpinnerTextInput(
             modifier = inputModifier,
-            value = extractorFormData.keystorePath,
+            title = "Name",
+            items = spinnerItems,
+            supportingText = "Select a name to save keystore information, leave it empty to not save",
+            onItemChanged = { spinnerItem: SpinnerItem ->
+                var keystoreDto: KeystoreDto? = (spinnerItem.data as KeystoreDto?)
+                println("ITEMCHANGE SPINNER -> $spinnerItem")
+
+                keystoreDto = keystoreDto?.copy(
+                    name = spinnerItem.name
+                )?: KeystoreDto(
+                    name = spinnerItem.name,
+                    path = extractorFormData.keystoreDto.path,
+                    password = extractorFormData.keystoreDto.password,
+                    keyAlias = extractorFormData.keystoreDto.keyAlias,
+                    keyPassword = extractorFormData.keystoreDto.keyPassword
+                )
+
+                println("ITEMCHANGE DPS -> $keystoreDto")
+                onItemChanged(keystoreDto)
+            }
+        )
+
+        OutlinedTextField(
+            modifier = inputModifier.padding(top = MarginPaddingSizeMedium),
+            value = extractorFormData.keystoreDto.path,
             enabled = !isLoading,
             onValueChange = {
-                onFormDataChange(extractorFormData.copy(keystorePath = it))
+                onFormDataChange(
+                    extractorFormData.copy(
+                        keystoreDto = extractorFormData.keystoreDto.copy(
+                            path = it
+                        )
+                    )
+                )
             },
             label = {
                 Text("Keystore Path")
@@ -326,10 +368,16 @@ fun KeystoreSignForm(
         OutlinedTextField(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
-            value = extractorFormData.keystorePassword,
+            value = extractorFormData.keystoreDto.password,
             enabled = !isLoading,
             onValueChange = {
-                onFormDataChange(extractorFormData.copy(keystorePassword = it))
+                onFormDataChange(
+                    extractorFormData.copy(
+                        keystoreDto = extractorFormData.keystoreDto.copy(
+                            password = it
+                        )
+                    )
+                )
             },
             label = {
                 Text("Keystore Password")
@@ -339,10 +387,16 @@ fun KeystoreSignForm(
         OutlinedTextField(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
-            value = extractorFormData.keystoreAlias,
+            value = extractorFormData.keystoreDto.keyAlias,
             enabled = !isLoading,
             onValueChange = {
-                onFormDataChange(extractorFormData.copy(keystoreAlias = it))
+                onFormDataChange(
+                    extractorFormData.copy(
+                        keystoreDto = extractorFormData.keystoreDto.copy(
+                            keyAlias = it
+                        )
+                    )
+                )
             },
             label = {
                 Text("Alias")
@@ -352,10 +406,16 @@ fun KeystoreSignForm(
         OutlinedTextField(
             modifier = inputModifier
                 .padding(top = MarginPaddingSizeSmall),
-            value = extractorFormData.keyPassword,
+            value = extractorFormData.keystoreDto.keyPassword,
             enabled = !isLoading,
             onValueChange = {
-                onFormDataChange(extractorFormData.copy(keyPassword = it))
+                onFormDataChange(
+                    extractorFormData.copy(
+                        keystoreDto = extractorFormData.keystoreDto.copy(
+                            keyPassword = it
+                        )
+                    )
+                )
             },
             label = {
                 Text("Key Password")
@@ -368,6 +428,8 @@ fun KeystoreSignForm(
 fun FormCard(
     modifier: Modifier = Modifier,
     title: String,
+    actionIcon: ImageVector? = null,
+    onActionClick: () -> Unit = {},
     formCardContent: @Composable () -> Unit
 ) {
     Card(
@@ -378,12 +440,29 @@ fun FormCard(
                 .fillMaxWidth()
                 .padding(MarginPaddingSizeMedium)
         ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                fontWeight = FontWeight.W500,
-                text = title
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = MarginPaddingSizeSmall)
+                        .fillMaxWidth(),
+                    fontWeight = FontWeight.W500,
+                    text = title
+                )
+                actionIcon?.let {
+                    IconButton(
+                        onClick = onActionClick
+                    ) {
+                        Icon(
+                            imageVector = it,
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+
             formCardContent()
         }
     }
@@ -394,8 +473,7 @@ fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
     isLoading: Boolean,
-    onAabPathIconClick: () -> Unit,
-    onOutputPathIconClick: () -> Unit
+    onAabPathIconClick: () -> Unit
 ) {
     val inputModifier = Modifier.fillMaxWidth()
 
@@ -426,30 +504,6 @@ fun OutputForm(
             }
         )
 
-        OutlinedTextField(
-            modifier = inputModifier
-                .padding(top = MarginPaddingSizeSmall),
-            value = extractorFormData.outputApksPath,
-            enabled = !isLoading,
-            onValueChange = {
-                onFormDataChange(extractorFormData.copy(outputApksPath = it))
-            },
-            label = {
-                Text("Output Dir Path (apks)")
-            },
-            trailingIcon = {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (!isLoading) {
-                            onOutputPathIconClick()
-                        }
-                    },
-                    imageVector = Icons.Rounded.FolderOpen,
-                    contentDescription = null
-                )
-            }
-        )
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
@@ -469,13 +523,30 @@ fun OutputForm(
 }
 
 @Composable
-@Preview
-private fun AdbFormPreview() {
-    AdbForm(
-        onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
-        onAdbPathIconClick = {},
-        isLoading = false
+fun KeystoreRemovalDialog(
+    keystoreName: String,
+    onPositiveButtonClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("REMOVE KEYSTORE DATA")
+        },
+        text = {
+            Text("Remove $keystoreName?")
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onPositiveButtonClick()
+                    onDismiss()
+                },
+                content = {
+                    Text("REMOVE")
+                }
+            )
+        }
     )
 }
 
@@ -483,10 +554,13 @@ private fun AdbFormPreview() {
 @Preview
 private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
+        keystoreDtoList = emptyList(),
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onKeystorePathIconClick = {},
-        isLoading = false
+        isLoading = false,
+        onItemChanged = {},
+        onKeystoreRemoveIconClick = {}
     )
 }
 
@@ -497,7 +571,6 @@ private fun OutputFormPreview() {
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onAabPathIconClick = {},
-        onOutputPathIconClick = {},
         isLoading = false
     )
 }

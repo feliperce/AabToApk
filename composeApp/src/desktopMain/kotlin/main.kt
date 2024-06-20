@@ -22,8 +22,6 @@ fun main() = application {
             state = state
         ) {
             NavScreen()
-            //SettingsScreen()
-            //HomeScreen()
         }
     }
 }

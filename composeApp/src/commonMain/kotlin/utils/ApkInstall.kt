@@ -16,11 +16,14 @@ class ApkInstall(
         onSuccess: () -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
-        println(apksPath)
+
+        val formattedAdbPath = adbPath.dropLastWhile { it == '/' }
+            .plus("/adb")
+
         async {
             runCatching {
                 InstallApksCommand.builder()
-                    .setAdbPath(Path.of(adbPath))
+                    .setAdbPath(Path.of(formattedAdbPath))
                     .setAdbServer(DdmlibAdbServer.getInstance())
                     .setApksArchivePath(Path.of(apksPath))
                     .build().execute()

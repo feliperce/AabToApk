@@ -61,7 +61,7 @@ fun SettingsScreen(
 
     LaunchedEffect(settingsUiState.successMsg.id) {
         val successMsg = settingsUiState.successMsg
-        println("SUCCCCCCCESS ID -> ${successMsg.id}")
+
         if (successMsg.msg.isNotEmpty()) {
             snackbarHostState.showSnackbar(
                 message = successMsg.msg,
@@ -207,7 +207,7 @@ fun SettingsContent(
 
 @Preview
 @Composable
-fun SettingsContentPreview() {
+private fun SettingsContentPreview() {
     SettingsContent(
         settingsFormData = SettingsFormData(),
         settingsFormDataCallback = SettingsFormDataCallback({},{},{},{}),
