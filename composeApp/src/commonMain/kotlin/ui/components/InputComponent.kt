@@ -14,6 +14,7 @@ fun SpinnerTextInput(
     modifier: Modifier = Modifier,
     title: String,
     supportingText: String? = null,
+    isEnabled: Boolean = false,
     items: List<SpinnerItem>,
     onItemChanged: (item: SpinnerItem) -> Unit = {}
 ) {
@@ -50,7 +51,8 @@ fun SpinnerTextInput(
                         it
                     )
                 }
-            }
+            },
+            enabled = isEnabled
         )
 
         if (items.isNotEmpty()) {
@@ -64,6 +66,7 @@ fun SpinnerTextInput(
             ) {
                 items.forEach { selectionOption ->
                     DropdownMenuItem(
+                        enabled = isEnabled,
                         text = { Text(selectionOption.name) },
                         onClick = {
                             selectedItem = selectionOption
