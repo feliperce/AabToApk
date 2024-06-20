@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.0"
+bundletool = "1.16.0"
 ksp = "2.0.0-1.0.21"
 android-compileSdk = "34"
 android-minSdk = "26"
@@ -28,6 +29,7 @@ datastore = "1.1.1"
 material3Android = "1.2.1"
 
 [libraries]
+bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
