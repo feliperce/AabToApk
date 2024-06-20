@@ -1,11 +1,23 @@
+### AabToApk - Extract .aab from .apk
+
 This is a Kotlin Multiplatform project targeting Android, Desktop.
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+Built with:
+* Kotlin Multiplatform
+* Jeptack Compose
+* Room
+* DataStore
+* MVI
+
+Desktop:
+
+<p align="center">
+  <img src="https://github.com/feliperce/AabToApk/assets/6944875/8fad0c90-14f4-4c9a-831b-b2a2433dbf76" width=50% height=50%>
+</p>
 
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+Android: (Extractor not working, Work in progress...)
+
+<p align="center">
+  <img src="https://github.com/feliperce/AabToApk/assets/6944875/f329cb8c-043a-4623-897f-411d7bb9985e" width=50% height=50%>
+</p>
