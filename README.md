@@ -5,7 +5,7 @@
 ![Android Badge](https://img.shields.io/badge/platform-Android-%2334A853?logo=android)
 
 
-# AabToApk - Extract .aab from .apk
+# AabToApk - Extract .apk from .aab
 
 This is a Kotlin Multiplatform project targeting Android, Desktop.
 
