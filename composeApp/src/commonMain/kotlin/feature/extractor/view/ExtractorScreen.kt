@@ -314,12 +314,14 @@ fun KeystoreSignForm(
         } else {
             Icons.Rounded.Delete
         },
+        isActionButtonEnabled = !isLoading,
         onActionClick = onKeystoreRemoveIconClick
     ) {
         SpinnerTextInput(
             modifier = inputModifier,
             title = "Name",
             items = spinnerItems,
+            isEnabled = !isLoading,
             supportingText = "Select a name to save keystore information, leave it empty to not save",
             onItemChanged = { spinnerItem: SpinnerItem ->
                 var keystoreDto: KeystoreDto? = (spinnerItem.data as KeystoreDto?)
@@ -428,6 +430,7 @@ fun FormCard(
     title: String,
     actionIcon: ImageVector? = null,
     onActionClick: () -> Unit = {},
+    isActionButtonEnabled: Boolean = false,
     formCardContent: @Composable () -> Unit
 ) {
     Card(
@@ -451,7 +454,8 @@ fun FormCard(
                 )
                 actionIcon?.let {
                     IconButton(
-                        onClick = onActionClick
+                        onClick = onActionClick,
+                        enabled = isActionButtonEnabled
                     ) {
                         Icon(
                             imageVector = it,
