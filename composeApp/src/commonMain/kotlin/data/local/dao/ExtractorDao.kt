@@ -11,9 +11,10 @@ interface ExtractorDao {
     @Insert
     suspend fun insert(keystoreEntity: KeystoreEntity): Long
 
-    @Transaction
+    // Upsert not working on JVM!!!
+    /*@Transaction
     @Upsert
-    suspend fun insertOrUpdate(keystoreEntity: KeystoreEntity): Long
+    suspend fun insertOrUpdate(keystoreEntity: KeystoreEntity)*/
 
     @Query("SELECT * FROM Keystore")
     fun getAll(): Flow<List<KeystoreEntity>>
@@ -24,5 +25,14 @@ interface ExtractorDao {
 
     @Delete
     suspend fun delete(keystoreEntity: KeystoreEntity)
+
+    @Transaction
+    suspend fun insertOrUpdate(keystoreEntity: KeystoreEntity) {
+        if (keystoreEntity.id == null) {
+            insert(keystoreEntity)
+        } else {
+            update(keystoreEntity)
+        }
+    }
 
 }

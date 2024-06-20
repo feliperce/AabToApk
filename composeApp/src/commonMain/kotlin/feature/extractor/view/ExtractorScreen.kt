@@ -176,6 +176,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
                     )
                 )
 
+                println("KEYSTORE -> ${extractorFormData.keystoreDto}")
                 extractorFormData.keystoreDto.let { keystoreDto ->
                     if (keystoreDto.name.isNotEmpty()) {
                         extractorViewModel.sendIntent(
