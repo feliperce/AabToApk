@@ -21,7 +21,7 @@ fun SpinnerTextInput(
     var selectedOptionText by remember { mutableStateOf("") }
 
     var selectedItem by remember(items) {
-        mutableStateOf(items.firstOrNull() ?: SpinnerItem("", null))
+        mutableStateOf(SpinnerItem("", null))
     }
 
     ExposedDropdownMenuBox(
@@ -33,9 +33,9 @@ fun SpinnerTextInput(
             value = selectedOptionText,
             onValueChange = {
                 selectedItem = if (it.isBlank()) {
-                    SpinnerItem("", null) // Create new empty item if text is blank
+                    SpinnerItem("", null)
                 } else {
-                    selectedItem.copy(name = it) // Update existing item
+                    selectedItem.copy(name = it)
                 }
                 selectedOptionText = it
                 onItemChanged(selectedItem)

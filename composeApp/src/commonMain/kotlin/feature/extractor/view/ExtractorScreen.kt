@@ -323,6 +323,7 @@ fun KeystoreSignForm(
             supportingText = "Select a name to save keystore information, leave it empty to not save",
             onItemChanged = { spinnerItem: SpinnerItem ->
                 var keystoreDto: KeystoreDto? = (spinnerItem.data as KeystoreDto?)
+                println("ITEMCHANGE SPINNER -> $spinnerItem")
 
                 keystoreDto = keystoreDto?.copy(
                     name = spinnerItem.name
@@ -334,6 +335,7 @@ fun KeystoreSignForm(
                     keyPassword = extractorFormData.keystoreDto.keyPassword
                 )
 
+                println("ITEMCHANGE DPS -> $keystoreDto")
                 onItemChanged(keystoreDto)
             }
         )
