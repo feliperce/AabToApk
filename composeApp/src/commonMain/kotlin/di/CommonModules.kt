@@ -1,6 +1,8 @@
 package di
 
-import feature.nav.repository.NavRepository
+import data.local.dao.ExtractorDao
+import data.local.db.getRoomDatabase
+import feature.extractor.repository.ExtractorRepository
 import feature.settings.repository.SettingsRepository
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -15,7 +17,7 @@ fun initKoin(
     startKoin {
         appDeclarations()
         modules(
-            listOf(dataModule, settingsModule, navModule) + actualModules
+            listOf(dataModule, settingsModule, extractorModule) + actualModules
         )
     }
 
@@ -27,6 +29,6 @@ internal val settingsModule = module {
     single { SettingsRepository(get()) }
 }
 
-internal val navModule = module {
-    single { NavRepository(get()) }
+internal val extractorModule = module {
+    single { ExtractorRepository(get()) }
 }

@@ -2,19 +2,22 @@ package feature.extractor.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
+import feature.extractor.repository.ExtractorRepository
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.state.ExtractorUiState
+import feature.settings.repository.SettingsRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import utils.ApkExtractor
-import utils.ApkInstall
-import utils.SuccessMsg
-import utils.SuccessMsgType
+import utils.*
 import java.io.File
 
-class ExtractorViewModel : ViewModel() {
+class ExtractorViewModel(
+    private val extractorRepository: ExtractorRepository,
+    private val settingsRepository: SettingsRepository
+) : ViewModel() {
 
     private val intentChannel = Channel<ExtractorIntent>(Channel.UNLIMITED)
     private var apkExtractor: ApkExtractor? = null
@@ -43,10 +46,53 @@ class ExtractorViewModel : ViewModel() {
                     is ExtractorIntent.InstallApks -> {
                         installApks(intent.extractorFormData)
                     }
+                    is ExtractorIntent.GetSettingsData -> {
+                        getSettingsData()
+                    }
+                    is ExtractorIntent.SaveKeystore -> {
+                        saveKeystore(intent.keystoreDto)
+                    }
+                    is ExtractorIntent.GetKeystoreData -> {
+                        getKeystoreData()
+                    }
+                    is ExtractorIntent.RemoveKeystore -> {
+                        removeKeystore(intent.keystoreDto)
+                    }
                 }
             }.launchIn(viewModelScope)
     }
 
+    private fun removeKeystore(keystoreDto: KeystoreDto) {
+        viewModelScope.launch {
+            extractorRepository.deleteKeystore(keystoreDto)
+        }
+    }
+
+    private fun saveKeystore(keystoreDto: KeystoreDto) {
+        viewModelScope.launch {
+            extractorRepository.insertOrUpdateKeystore(keystoreDto)
+        }
+    }
+
+    private fun getKeystoreData() {
+        viewModelScope.launch {
+            extractorRepository.getKeystoreAll().collect { keystoreList ->
+                _extractorState.update {
+                    it.copy(keystoreDtoList = keystoreList)
+                }
+            }
+        }
+    }
+
+    private fun getSettingsData() {
+        viewModelScope.launch {
+            settingsRepository.getSettings().collect { settings ->
+                _extractorState.update {
+                    it.copy(settingsData = settings)
+                }
+            }
+        }
+    }
 
     private fun extractAab(extractorFormData: ExtractorFormData) {
         _extractorState.update {
@@ -55,16 +101,46 @@ class ExtractorViewModel : ViewModel() {
             )
         }
 
-        viewModelScope.launch {
-            apkExtractor = ApkExtractor(
-                aabPath = extractorFormData.aabPath,
-                outputApksPath = extractorFormData.outputApksPath
-            ).apply {
-                setSignConfig(
-                    keystorePath = extractorFormData.keystorePath,
-                    keyAlias = extractorFormData.keystoreAlias,
-                    keystorePassword = extractorFormData.keystorePassword,
-                    keyPassword = extractorFormData.keyPassword,
+        extractorFormData.settingsData?.let { settingsData ->
+            viewModelScope.launch {
+                val keystoreDto = extractorFormData.keystoreDto
+
+                apkExtractor = ApkExtractor(
+                    aabPath = extractorFormData.aabPath,
+                    outputApksPath = settingsData.outputPath,
+                    buildToolsPath = settingsData.buildToolsPath
+                ).apply {
+                    setSignConfig(
+                        keystorePath = keystoreDto.path,
+                        keyAlias = keystoreDto.keyAlias,
+                        keystorePassword = keystoreDto.password,
+                        keyPassword = keystoreDto.keyPassword,
+                        onFailure = { errorMsg ->
+                            _extractorState.update {
+                                it.copy(
+                                    loading = false,
+                                    errorMsg = errorMsg
+                                )
+                            }
+                        }
+                    )
+                }
+
+                apkExtractor?.aabToApks(
+                    apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                    overwriteApks = extractorFormData.isOverwriteApks,
+                    onSuccess = { output ->
+                        _extractorState.update {
+                            it.copy(
+                                loading = false,
+                                successMsg = SuccessMsg(
+                                    msg = "Apks extracted with success: $output",
+                                    type = SuccessMsgType.EXTRACT_AAB
+                                ),
+                                extractedApksPath = output
+                            )
+                        }
+                    },
                     onFailure = { errorMsg ->
                         _extractorState.update {
                             it.copy(
@@ -75,31 +151,16 @@ class ExtractorViewModel : ViewModel() {
                     }
                 )
             }
-
-            apkExtractor?.aabToApks(
-                apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                overwriteApks = extractorFormData.isOverwriteApks,
-                onSuccess = { output ->
-                    _extractorState.update {
-                        it.copy(
-                            loading = false,
-                            successMsg = SuccessMsg(
-                                msg = "Apks extracted with success: $output",
-                                type = SuccessMsgType.EXTRACT_AAB
-                            ),
-                            extractedApksPath = output
-                        )
-                    }
-                },
-                onFailure = { errorMsg ->
-                    _extractorState.update {
-                        it.copy(
-                            loading = false,
-                            errorMsg = errorMsg
-                        )
-                    }
-                }
-            )
+        } ?: run {
+            _extractorState.update {
+                it.copy(
+                    loading = false,
+                    errorMsg = ErrorMsg(
+                        title = "INVALID SETTINGS",
+                        msg = "Go to the settings menu and check"
+                    )
+                )
+            }
         }
     }
 
@@ -110,31 +171,43 @@ class ExtractorViewModel : ViewModel() {
             )
         }
 
-        val apkInstall = ApkInstall(extractorFormData.adbPath)
+        extractorFormData.settingsData?.let { settingsData ->
+            val apkInstall = ApkInstall(settingsData.adbPath)
 
-        viewModelScope.launch {
-            apkInstall.installApks(
-                apksPath = _extractorState.value.extractedApksPath,
-                onSuccess = {
-                    _extractorState.update {
-                        it.copy(
-                            loading = false,
-                            successMsg = SuccessMsg(
-                                msg = "Apks installed with success!",
-                                type = SuccessMsgType.INSTALL_APKS
+            viewModelScope.launch {
+                apkInstall.installApks(
+                    apksPath = _extractorState.value.extractedApksPath,
+                    onSuccess = {
+                        _extractorState.update {
+                            it.copy(
+                                loading = false,
+                                successMsg = SuccessMsg(
+                                    msg = "Apks installed with success!",
+                                    type = SuccessMsgType.INSTALL_APKS
+                                )
                             )
-                        )
+                        }
+                    },
+                    onFailure = { errorMsg ->
+                        _extractorState.update {
+                            it.copy(
+                                loading = false,
+                                errorMsg = errorMsg
+                            )
+                        }
                     }
-                },
-                onFailure = { errorMsg ->
-                    _extractorState.update {
-                        it.copy(
-                            loading = false,
-                            errorMsg = errorMsg
-                        )
-                    }
-                }
-            )
+                )
+            }
+        } ?: run {
+            _extractorState.update {
+                it.copy(
+                    loading = false,
+                    errorMsg = ErrorMsg(
+                        title = "INVALID SETTINGS",
+                        msg = "Go to the settings menu and check"
+                    )
+                )
+            }
         }
     }
 }

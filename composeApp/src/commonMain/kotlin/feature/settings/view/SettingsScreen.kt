@@ -23,7 +23,7 @@ import utils.InputPathType
 
 @Composable
 fun SettingsScreen(
-    navHostController: NavHostController
+    snackbarHostState: SnackbarHostState
 ) {
     val settingsViewModel = koinViewModel<SettingsViewModel>()
 
@@ -59,6 +59,17 @@ fun SettingsScreen(
         }
     }
 
+    LaunchedEffect(settingsUiState.successMsg.id) {
+        val successMsg = settingsUiState.successMsg
+
+        if (successMsg.msg.isNotEmpty()) {
+            snackbarHostState.showSnackbar(
+                message = successMsg.msg,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     val settingsFormDataCallback = SettingsFormDataCallback(
         onAdbPathIconClick = {
             inputType = InputPathType.ADB_DIR_PATH
@@ -79,9 +90,6 @@ fun SettingsScreen(
             settingsViewModel.sendIntent(
                 SettingsIntent.SaveIsFirstAccess(false)
             )
-            if (!settingsUiState.isFirstAccess) {
-                navHostController.navigate(Screen.ExtractorScreen.route)
-            }
         }
     )
 
@@ -102,28 +110,14 @@ fun SettingsScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Settings")
-                }
-            )
-        },
-        content = {
-            Column(
-                modifier = Modifier.padding(it)
-            ) {
-                SettingsContent(
-                    settingsFormData = settingsFormData,
-                    settingsFormDataCallback = settingsFormDataCallback,
-                    isFormValid = settingsUiState.isFormValid,
-                    onSettingsFormChange = onFormDataChange
-                )
-            }
-        }
-    )
-
+    Column() {
+        SettingsContent(
+            settingsFormData = settingsFormData,
+            settingsFormDataCallback = settingsFormDataCallback,
+            isFormValid = settingsUiState.isFormValid,
+            onSettingsFormChange = onFormDataChange
+        )
+    }
 }
 
 @Composable
@@ -213,7 +207,7 @@ fun SettingsContent(
 
 @Preview
 @Composable
-fun SettingsContentPreview() {
+private fun SettingsContentPreview() {
     SettingsContent(
         settingsFormData = SettingsFormData(),
         settingsFormDataCallback = SettingsFormDataCallback({},{},{},{}),

@@ -1,30 +1,32 @@
 package feature.nav.view
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val title: String, val route: String) {
-    data object ExtractorScreen : Screen("AarToApk", "extractor")
+    data object ExtractorScreen : Screen("AabToApk", "extractor")
     data object SettingsScreen : Screen("Settings", "settings")
 }
 
 data class BottomNavigationItem(
     val route: String,
     val icon: ImageVector,
-    val iconContentDescription: String
+    val iconContentDescription: String,
+    val label: String
 )
 
 val bottomNavigationItems = listOf(
     BottomNavigationItem(
-        Screen.ExtractorScreen.route,
-        Icons.Default.Person,
-        "Extractor"
+        route = Screen.ExtractorScreen.route,
+        icon = Icons.Default.SwapHoriz,
+        iconContentDescription = "Extractor",
+        label = "Extractor"
     ),
     BottomNavigationItem(
-        Screen.SettingsScreen.route,
-        Icons.Filled.DateRange,
-        "Settings"
+        route = Screen.SettingsScreen.route,
+        icon = Icons.Filled.Settings,
+        iconContentDescription = "Settings",
+        label = "Settings"
     )
 )
