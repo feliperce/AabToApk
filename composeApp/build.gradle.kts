@@ -57,6 +57,7 @@ kotlin {
             //implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
             implementation(libs.bundletool)
+            implementation(libs.kotlin.multiplatform.appdirs)
 
         }
         desktopMain.dependencies {
