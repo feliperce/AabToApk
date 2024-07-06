@@ -67,7 +67,7 @@ kotlin {
 }
 
 android {
-    namespace = "br.com.mobileti.aabtoapk"
+    namespace = "io.github.feliperce.aabtoapk"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -75,11 +75,11 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "br.com.mobileti.aabtoapk"
+        applicationId = "io.github.feliperce.aabtoapk"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "0.5"
+        versionCode = 2
+        versionName = "0.5.1"
     }
     packaging {
         resources {
@@ -113,7 +113,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }

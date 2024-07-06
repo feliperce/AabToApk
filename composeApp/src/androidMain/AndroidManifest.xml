@@ -16,7 +16,7 @@
 
         <provider
                 android:name="androidx.core.content.FileProvider"
-                android:authorities="br.com.mobileti.aabtoapk.fileprovider"
+                android:authorities="io.github.feliperce.aabtoapk.fileprovider"
                 android:exported="false"
                 android:grantUriPermissions="true">
             <meta-data

@@ -1,4 +1,4 @@
-package br.com.mobileti.aabtoapk
+package io.github.feliperce.aabtoapk
 
 import android.app.Application
 import di.initKoin
