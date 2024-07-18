@@ -2,6 +2,7 @@
 ![Compose Badge](https://img.shields.io/badge/compose_multiplatform-v1.6.10-%234285F4?logo=jetpackcompose)
 ![Platform Windows Badge](https://img.shields.io/badge/platform-windows-%230078D4?logo=windows)
 ![Platform Linux Badge](https://img.shields.io/badge/platform-Linux-%23FCC624?logo=linux)
+![Platform MacOS Badge](https://img.shields.io/badge/platform-macOS-%23000000?logo=macos)
 ![Android Badge](https://img.shields.io/badge/platform-Android-%2334A853?logo=android)
 
 
@@ -14,6 +15,7 @@ Built with:
 * Compose Multiplatform
 * Room
 * DataStore
+* Koin
 * MVI
 
 Desktop:
