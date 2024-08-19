@@ -506,21 +506,19 @@ fun OutputForm(
             }
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Checkbox(
-                checked = extractorFormData.isOverwriteApks,
-                onCheckedChange = {
-                    onFormDataChange(extractorFormData.copy(isOverwriteApks = it))
-                },
-                enabled = !isLoading
-            )
-            Text(
-                text = "Overwrite APKS"
-            )
-        }
+        RadioGroup(
+            radioOptions = listOf(
+                RadioItem(
+                    text = "APKS",
+                    isSelected = true
+                ),
+                RadioItem(
+                    text = "Universal APK"
+                )
+            ),
+            isEnabled = !isLoading,
+            onItemSelected = {}
+        )
     }
 }
 
