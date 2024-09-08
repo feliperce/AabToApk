@@ -93,23 +93,18 @@ fun SpinnerTextInput(
 @Composable
 fun RadioGroup(
     radioOptions: List<RadioItem>,
+    selectedOption: RadioItem,
     isEnabled: Boolean = true,
     onItemSelected: (radioItem: RadioItem) -> Unit
 ) {
-    val (currentSelection, setCurrentSelection) = rememberSaveable() {
-        mutableStateOf(radioOptions.find { it.isSelected })
-    }
-
     Row(Modifier.selectableGroup()) {
         radioOptions.forEach { item ->
             Row(
                 Modifier
                     .height(56.dp)
                     .selectable(
-                        selected = item.isSelected,
+                        selected = item == selectedOption,
                         onClick = {
-                            setCurrentSelection(item)
-                            radioOptions.forEach { it.isSelected = it == item }
                             onItemSelected(item)
                         },
                         role = Role.RadioButton
@@ -118,7 +113,7 @@ fun RadioGroup(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(
-                    selected = item.isSelected,
+                    selected = item == selectedOption,
                     onClick = null,
                     enabled = isEnabled
                 )
@@ -160,6 +155,7 @@ private fun RadioGroupPreview() {
             RadioItem(text = "APKS"),
             RadioItem(text = "Universal APK")
         ),
-        onItemSelected = {}
+        onItemSelected = {},
+        selectedOption = RadioItem(text = "APKS")
     )
 }

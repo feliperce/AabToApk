@@ -50,7 +50,6 @@ class ApkExtractor(
 
     suspend fun aabToApks(
         apksFileName: String = "",
-        overwriteApks: Boolean,
         onSuccess: (output: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
@@ -73,7 +72,7 @@ class ApkExtractor(
                             signingConfig
                         )
                         .setAapt2Command(Aapt2Command.createFromExecutablePath(Paths.get(aapt2Path)))
-                        .setOverwriteOutput(overwriteApks)
+                        .setOverwriteOutput(true)
                         .setOutputFile(Paths.get(formattedOutputPath))
                         .setApkBuildMode(BuildApksCommand.ApkBuildMode.UNIVERSAL)
                         .build()
@@ -123,5 +122,10 @@ class ApkExtractor(
 
             return@withContext ""
         }
+    }
+
+    enum class ExtractorOption {
+        APKS,
+        UNIVERSAL_APK
     }
 }

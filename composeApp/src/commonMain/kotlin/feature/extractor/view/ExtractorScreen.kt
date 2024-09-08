@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import utils.ApkExtractor
 import utils.SuccessMsgType
 
 @Composable
@@ -41,11 +42,40 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
     var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
     val showErrorDialog = remember { mutableStateOf(false) }
-    var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
+    var extractorFormData by remember { mutableStateOf(
+        ExtractorFormData(
+            extractOptions = listOf(
+                RadioItem(
+                    id = ApkExtractor.ExtractorOption.APKS.name,
+                    text = "APKS",
+                    isSelected = true
+                ),
+                RadioItem(
+                    id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
+                    text = "Universal APK"
+                )
+            )
+        )
+    )
+    }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
     }
+
+    /*var extractOptions by remember { mutableStateOf<List<RadioItem>>(listOf(
+        RadioItem(
+            id = ApkExtractor.ExtractorOption.APKS.name,
+            text = "APKS",
+            isSelected = true
+        ),
+        RadioItem(
+            id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
+            text = "Universal APK"
+        )
+    )) }*/
+
+    var selectedExtractOption by remember { mutableStateOf<RadioItem>(extractorFormData.extractOptions[0]) }
 
     SideEffect {
         extractorViewModel.sendIntent(
@@ -123,6 +153,9 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
         },
         onKeystoreRemoveClick = {
             showKeystoreRemoveDialog = true
+        },
+        onItemSelected = { item ->
+            selectedExtractOption = item
         }
     )
 
@@ -169,6 +202,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange,
             isLoading = extractorUiState.loading,
+            selectedExtractOption = selectedExtractOption,
             onExtractApksButtonClick = {
                 extractorViewModel.sendIntent(
                     ExtractorIntent.ExtractAab(
@@ -204,6 +238,7 @@ fun ExtractorContent(
     extractorFormData: ExtractorFormData,
     keystoreDtoList: List<KeystoreDto>,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
     onExtractApksButtonClick: () -> Unit
@@ -233,7 +268,8 @@ fun ExtractorContent(
             isLoading = isLoading,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
-            onFormDataChange = onFormDataChange
+            onFormDataChange = onFormDataChange,
+            selectedExtractOption = selectedExtractOption
         )
 
         Row(
@@ -260,6 +296,7 @@ fun ExtractorForm(
     keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
 ) {
@@ -282,7 +319,9 @@ fun ExtractorForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
-            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick
+            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick,
+            selectedExtractOption = selectedExtractOption,
+            onItemSelected = extractorFormDataCallback.onItemSelected
         )
     }
 }
@@ -474,6 +513,8 @@ fun FormCard(
 fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    onItemSelected: (item: RadioItem) -> Unit,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onAabPathIconClick: () -> Unit
 ) {
@@ -506,18 +547,12 @@ fun OutputForm(
             }
         )
 
+
         RadioGroup(
-            radioOptions = listOf(
-                RadioItem(
-                    text = "APKS",
-                    isSelected = true
-                ),
-                RadioItem(
-                    text = "Universal APK"
-                )
-            ),
+            radioOptions = extractorFormData.extractOptions,
             isEnabled = !isLoading,
-            onItemSelected = {}
+            onItemSelected = onItemSelected,
+            selectedOption = selectedExtractOption
         )
     }
 }
@@ -571,6 +606,8 @@ private fun OutputFormPreview() {
         onFormDataChange = {},
         extractorFormData = ExtractorFormData(),
         onAabPathIconClick = {},
-        isLoading = false
+        isLoading = false,
+        selectedExtractOption = RadioItem(text = "aaaa"),
+        onItemSelected = {}
     )
 }

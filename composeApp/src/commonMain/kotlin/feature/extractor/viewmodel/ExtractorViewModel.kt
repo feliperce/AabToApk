@@ -128,7 +128,6 @@ class ExtractorViewModel(
 
                 apkExtractor?.aabToApks(
                     apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                    overwriteApks = extractorFormData.isOverwriteApks,
                     onSuccess = { output ->
                         _extractorState.update {
                             it.copy(
