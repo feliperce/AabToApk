@@ -3,7 +3,6 @@ package feature.extractor.model
 import feature.extractor.mapper.KeystoreDto
 import shared.settings.SettingsData
 import ui.components.RadioItem
-import utils.ApkExtractor
 
 data class ExtractorFormData(
     val settingsData: SettingsData? = null,

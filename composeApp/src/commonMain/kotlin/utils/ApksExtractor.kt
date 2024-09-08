@@ -7,14 +7,12 @@ import com.android.tools.build.bundletool.model.SigningConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.file.Paths
 import java.util.*
 import java.util.zip.ZipFile
 
-class ApkExtractor(
+class ApksExtractor(
     private val aabPath: String,
     private val outputApksPath: String,
     private val buildToolsPath: String

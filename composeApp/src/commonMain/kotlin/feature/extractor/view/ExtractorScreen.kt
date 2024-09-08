@@ -27,7 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
-import utils.ApkExtractor
+import utils.ApksExtractor
 import utils.SuccessMsgType
 
 @Composable
@@ -38,14 +38,14 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val extractorOptionsList = listOf(
         RadioItem(
-            id = ApkExtractor.ExtractorOption.APKS.name,
+            id = ApksExtractor.ExtractorOption.APKS.name,
             text = "APKS",
-            data = ApkExtractor.ExtractorOption.APKS,
+            data = ApksExtractor.ExtractorOption.APKS,
             isSelected = true
         ),
         RadioItem(
-            id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
-            data = ApkExtractor.ExtractorOption.UNIVERSAL_APK,
+            id = ApksExtractor.ExtractorOption.UNIVERSAL_APK.name,
+            data = ApksExtractor.ExtractorOption.UNIVERSAL_APK,
             text = "Universal APK"
         )
     )
@@ -93,16 +93,24 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
                 val result = snackbarHostState
                     .showSnackbar(
                         message = successMsg.msg,
-                        actionLabel = "INSTALL APKS",
+                        actionLabel = "INSTALL",
                         duration = SnackbarDuration.Indefinite
                     )
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
-                        extractorViewModel.sendIntent(
-                            ExtractorIntent.InstallApks(
-                                extractorFormData = extractorFormData
+                        if (extractorFormData.selectedExtractOption.data == ApksExtractor.ExtractorOption.APKS) {
+                            extractorViewModel.sendIntent(
+                                ExtractorIntent.InstallApks(
+                                    extractorFormData = extractorFormData
+                                )
                             )
-                        )
+                        } else {
+                            extractorViewModel.sendIntent(
+                                ExtractorIntent.InstallApk(
+                                    extractorFormData = extractorFormData
+                                )
+                            )
+                        }
                     }
                     SnackbarResult.Dismissed -> { }
                 }
