@@ -128,12 +128,13 @@ class ExtractorViewModel(
 
                 apkExtractor?.aabToApks(
                     apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                    extractorOption = extractorFormData.selectedExtractOption.data as ApkExtractor.ExtractorOption,
                     onSuccess = { output ->
                         _extractorState.update {
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
-                                    msg = "Apks extracted with success: $output",
+                                    msg = "Extracted with success: $output",
                                     type = SuccessMsgType.EXTRACT_AAB
                                 ),
                                 extractedApksPath = output

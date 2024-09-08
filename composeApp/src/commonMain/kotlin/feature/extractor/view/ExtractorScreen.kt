@@ -36,46 +36,38 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
+    val extractorOptionsList = listOf(
+        RadioItem(
+            id = ApkExtractor.ExtractorOption.APKS.name,
+            text = "APKS",
+            data = ApkExtractor.ExtractorOption.APKS,
+            isSelected = true
+        ),
+        RadioItem(
+            id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
+            data = ApkExtractor.ExtractorOption.UNIVERSAL_APK,
+            text = "Universal APK"
+        )
+    )
+
     var showFilePicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
     var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
     val showErrorDialog = remember { mutableStateOf(false) }
-    var extractorFormData by remember { mutableStateOf(
-        ExtractorFormData(
-            extractOptions = listOf(
-                RadioItem(
-                    id = ApkExtractor.ExtractorOption.APKS.name,
-                    text = "APKS",
-                    isSelected = true
-                ),
-                RadioItem(
-                    id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
-                    text = "Universal APK"
-                )
+    var extractorFormData by remember {
+        mutableStateOf(
+            ExtractorFormData(
+                extractOptions = extractorOptionsList,
+                selectedExtractOption = extractorOptionsList[0]
             )
         )
-    )
     }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
     }
-
-    /*var extractOptions by remember { mutableStateOf<List<RadioItem>>(listOf(
-        RadioItem(
-            id = ApkExtractor.ExtractorOption.APKS.name,
-            text = "APKS",
-            isSelected = true
-        ),
-        RadioItem(
-            id = ApkExtractor.ExtractorOption.UNIVERSAL_APK.name,
-            text = "Universal APK"
-        )
-    )) }*/
-
-    var selectedExtractOption by remember { mutableStateOf<RadioItem>(extractorFormData.extractOptions[0]) }
 
     SideEffect {
         extractorViewModel.sendIntent(
@@ -155,7 +147,9 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             showKeystoreRemoveDialog = true
         },
         onItemSelected = { item ->
-            selectedExtractOption = item
+            extractorFormData = extractorFormData.copy(
+                selectedExtractOption = item
+            )
         }
     )
 
@@ -202,7 +196,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange,
             isLoading = extractorUiState.loading,
-            selectedExtractOption = selectedExtractOption,
+            selectedExtractOption = extractorFormData.selectedExtractOption,
             onExtractApksButtonClick = {
                 extractorViewModel.sendIntent(
                     ExtractorIntent.ExtractAab(
@@ -591,7 +585,7 @@ private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
         keystoreDtoList = emptyList(),
         onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
+        extractorFormData = ExtractorFormData(selectedExtractOption = RadioItem(text = "aaaa")),
         onKeystorePathIconClick = {},
         isLoading = false,
         onItemChanged = {},
@@ -604,7 +598,7 @@ private fun KeystoreSignFormPreview() {
 private fun OutputFormPreview() {
     OutputForm(
         onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
+        extractorFormData = ExtractorFormData(selectedExtractOption = RadioItem(text = "aaaa")),
         onAabPathIconClick = {},
         isLoading = false,
         selectedExtractOption = RadioItem(text = "aaaa"),

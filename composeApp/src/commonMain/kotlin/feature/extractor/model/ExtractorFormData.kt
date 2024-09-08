@@ -9,8 +9,8 @@ data class ExtractorFormData(
     val settingsData: SettingsData? = null,
     val keystoreDto: KeystoreDto = KeystoreDto(),
     val aabPath: String = "",
-    val extractorOption: ApkExtractor.ExtractorOption = ApkExtractor.ExtractorOption.APKS,
     val extractOptions: List<RadioItem> = listOf(),
+    val selectedExtractOption: RadioItem
 )
 
 data class ExtractorFormDataCallback(

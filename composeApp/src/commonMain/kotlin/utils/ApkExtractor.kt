@@ -50,6 +50,7 @@ class ApkExtractor(
 
     suspend fun aabToApks(
         apksFileName: String = "",
+        extractorOption: ExtractorOption,
         onSuccess: (output: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
@@ -74,16 +75,20 @@ class ApkExtractor(
                         .setAapt2Command(Aapt2Command.createFromExecutablePath(Paths.get(aapt2Path)))
                         .setOverwriteOutput(true)
                         .setOutputFile(Paths.get(formattedOutputPath))
-                        .setApkBuildMode(BuildApksCommand.ApkBuildMode.UNIVERSAL)
+                        .setApkBuildMode(extractorOption.toApkBuildMode())
                         .build()
                         .execute()
 
-                    unzipUniversalApks(
-                        formattedOutputPath,
-                        newApksFileName
-                    )
+                    val absolutPath = if (extractorOption == ExtractorOption.UNIVERSAL_APK) {
+                        unzipUniversalApks(
+                            formattedOutputPath,
+                            newApksFileName
+                        )
+                    } else {
+                        formattedOutputPath
+                    }
 
-                    onSuccess(formattedOutputPath)
+                    onSuccess(absolutPath)
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
@@ -128,4 +133,12 @@ class ApkExtractor(
         APKS,
         UNIVERSAL_APK
     }
+
+    private fun ExtractorOption.toApkBuildMode() =
+        when (this) {
+            ExtractorOption.UNIVERSAL_APK -> {
+                BuildApksCommand.ApkBuildMode.UNIVERSAL
+            }
+            else -> BuildApksCommand.ApkBuildMode.DEFAULT
+        }
 }

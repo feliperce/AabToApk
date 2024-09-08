@@ -135,6 +135,7 @@ data class SpinnerItem(
 data class RadioItem(
     val id: String = UUID.randomUUID().toString(),
     val text: String,
+    val data: Any? = null,
     var isSelected: Boolean = false
 )
 
