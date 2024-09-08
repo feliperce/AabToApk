@@ -20,7 +20,7 @@ class ExtractorViewModel(
 ) : ViewModel() {
 
     private val intentChannel = Channel<ExtractorIntent>(Channel.UNLIMITED)
-    private var apkExtractor: ApkExtractor? = null
+    private var apksExtractor: ApksExtractor? = null
 
     private val _extractorState = MutableStateFlow(ExtractorUiState(loading = false))
     val extractorState: StateFlow<ExtractorUiState> = _extractorState.asStateFlow()
@@ -45,6 +45,9 @@ class ExtractorViewModel(
                     }
                     is ExtractorIntent.InstallApks -> {
                         installApks(intent.extractorFormData)
+                    }
+                    is ExtractorIntent.InstallApk -> {
+                        installApk(intent.extractorFormData)
                     }
                     is ExtractorIntent.GetSettingsData -> {
                         getSettingsData()
@@ -105,7 +108,7 @@ class ExtractorViewModel(
             viewModelScope.launch {
                 val keystoreDto = extractorFormData.keystoreDto
 
-                apkExtractor = ApkExtractor(
+                apksExtractor = ApksExtractor(
                     aabPath = extractorFormData.aabPath,
                     outputApksPath = settingsData.outputPath,
                     buildToolsPath = settingsData.buildToolsPath
@@ -126,15 +129,15 @@ class ExtractorViewModel(
                     )
                 }
 
-                apkExtractor?.aabToApks(
+                apksExtractor?.aabToApks(
                     apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
-                    overwriteApks = extractorFormData.isOverwriteApks,
+                    extractorOption = extractorFormData.selectedExtractOption.data as ApksExtractor.ExtractorOption,
                     onSuccess = { output ->
                         _extractorState.update {
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
-                                    msg = "Apks extracted with success: $output",
+                                    msg = "Extracted with success: $output",
                                     type = SuccessMsgType.EXTRACT_AAB
                                 ),
                                 extractedApksPath = output
@@ -172,10 +175,10 @@ class ExtractorViewModel(
         }
 
         extractorFormData.settingsData?.let { settingsData ->
-            val apkInstall = ApkInstall(settingsData.adbPath)
+            val apksInstall = ApksInstall(settingsData.adbPath)
 
             viewModelScope.launch {
-                apkInstall.installApks(
+                apksInstall.installApks(
                     apksPath = _extractorState.value.extractedApksPath,
                     onSuccess = {
                         _extractorState.update {
@@ -183,6 +186,53 @@ class ExtractorViewModel(
                                 loading = false,
                                 successMsg = SuccessMsg(
                                     msg = "Apks installed with success!",
+                                    type = SuccessMsgType.INSTALL_APKS
+                                )
+                            )
+                        }
+                    },
+                    onFailure = { errorMsg ->
+                        _extractorState.update {
+                            it.copy(
+                                loading = false,
+                                errorMsg = errorMsg
+                            )
+                        }
+                    }
+                )
+            }
+        } ?: run {
+            _extractorState.update {
+                it.copy(
+                    loading = false,
+                    errorMsg = ErrorMsg(
+                        title = "INVALID SETTINGS",
+                        msg = "Go to the settings menu and check"
+                    )
+                )
+            }
+        }
+    }
+
+    private fun installApk(extractorFormData: ExtractorFormData) {
+        _extractorState.update {
+            it.copy(
+                loading = true
+            )
+        }
+
+        extractorFormData.settingsData?.let { settingsData ->
+            val apkInstall = ApkInstall(settingsData.adbPath)
+
+            viewModelScope.launch {
+                apkInstall.installApk(
+                    apkPath = _extractorState.value.extractedApksPath,
+                    onSuccess = {
+                        _extractorState.update {
+                            it.copy(
+                                loading = false,
+                                successMsg = SuccessMsg(
+                                    msg = "APK installed with success!",
                                     type = SuccessMsgType.INSTALL_APKS
                                 )
                             )

@@ -18,6 +18,7 @@ data class ExtractorUiState (
 sealed class ExtractorIntent {
     class ExtractAab(val extractorFormData: ExtractorFormData) : ExtractorIntent()
     class InstallApks(val extractorFormData: ExtractorFormData) : ExtractorIntent()
+    class InstallApk(val extractorFormData: ExtractorFormData) : ExtractorIntent()
     class SaveKeystore(val keystoreDto: KeystoreDto) : ExtractorIntent()
     class RemoveKeystore(val keystoreDto: KeystoreDto) : ExtractorIntent()
     data object GetSettingsData : ExtractorIntent()

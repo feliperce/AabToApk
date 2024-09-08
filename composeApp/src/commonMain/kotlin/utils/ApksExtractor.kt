@@ -4,11 +4,15 @@ import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.nio.file.Paths
 import java.util.*
+import java.util.zip.ZipFile
 
-class ApkExtractor(
+class ApksExtractor(
     private val aabPath: String,
     private val outputApksPath: String,
     private val buildToolsPath: String
@@ -44,7 +48,7 @@ class ApkExtractor(
 
     suspend fun aabToApks(
         apksFileName: String = "",
-        overwriteApks: Boolean,
+        extractorOption: ExtractorOption,
         onSuccess: (output: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
@@ -52,7 +56,7 @@ class ApkExtractor(
             if (signingConfig != null) {
                 runCatching {
                     val newApksFileName = apksFileName.ifEmpty {
-                        "extracted.apks"
+                        "extracted"
                     }
 
                     val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
@@ -67,12 +71,22 @@ class ApkExtractor(
                             signingConfig
                         )
                         .setAapt2Command(Aapt2Command.createFromExecutablePath(Paths.get(aapt2Path)))
-                        .setOverwriteOutput(overwriteApks)
+                        .setOverwriteOutput(true)
                         .setOutputFile(Paths.get(formattedOutputPath))
+                        .setApkBuildMode(extractorOption.toApkBuildMode())
                         .build()
                         .execute()
 
-                    onSuccess(formattedOutputPath)
+                    val absolutPath = if (extractorOption == ExtractorOption.UNIVERSAL_APK) {
+                        unzipUniversalApks(
+                            formattedOutputPath,
+                            newApksFileName
+                        )
+                    } else {
+                        formattedOutputPath
+                    }
+
+                    onSuccess(absolutPath)
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
@@ -84,4 +98,45 @@ class ApkExtractor(
             }
         }.await()
     }
+
+    private suspend fun unzipUniversalApks(
+        apksPath: String,
+        apksFileName: String
+    ): String {
+        return withContext(Dispatchers.IO) {
+            val zipFile = ZipFile(apksPath)
+            val universalApkEntry = zipFile.entries().asSequence()
+                .find { it.name == "universal.apk" }
+
+            universalApkEntry?.let { entry ->
+                zipFile.getInputStream(entry).use { input ->
+                    val outputFilePath = outputApksPath.trimEnd('/') + "/$apksFileName-(universal).apk"
+                    val outputFile = File(outputFilePath)
+
+                    outputFile.outputStream().buffered().use { output ->
+                        input.copyTo(output, bufferSize = 4096)
+                    }
+
+                    File(apksPath).delete()
+
+                    return@withContext outputFile.absolutePath
+                }
+            }
+
+            return@withContext ""
+        }
+    }
+
+    enum class ExtractorOption {
+        APKS,
+        UNIVERSAL_APK
+    }
+
+    private fun ExtractorOption.toApkBuildMode() =
+        when (this) {
+            ExtractorOption.UNIVERSAL_APK -> {
+                BuildApksCommand.ApkBuildMode.UNIVERSAL
+            }
+            else -> BuildApksCommand.ApkBuildMode.DEFAULT
+        }
 }

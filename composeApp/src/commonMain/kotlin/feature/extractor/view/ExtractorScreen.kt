@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import utils.ApksExtractor
 import utils.SuccessMsgType
 
 @Composable
@@ -35,13 +36,34 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
+    val extractorOptionsList = listOf(
+        RadioItem(
+            id = ApksExtractor.ExtractorOption.APKS.name,
+            text = "APKS",
+            data = ApksExtractor.ExtractorOption.APKS,
+            isSelected = true
+        ),
+        RadioItem(
+            id = ApksExtractor.ExtractorOption.UNIVERSAL_APK.name,
+            data = ApksExtractor.ExtractorOption.UNIVERSAL_APK,
+            text = "Universal APK"
+        )
+    )
+
     var showFilePicker by remember { mutableStateOf(false) }
     var inputType by remember { mutableStateOf(InputPathType.NONE) }
     var fileType by remember { mutableStateOf(listOf("")) }
     var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
     val showErrorDialog = remember { mutableStateOf(false) }
-    var extractorFormData by remember { mutableStateOf(ExtractorFormData()) }
+    var extractorFormData by remember {
+        mutableStateOf(
+            ExtractorFormData(
+                extractOptions = extractorOptionsList,
+                selectedExtractOption = extractorOptionsList[0]
+            )
+        )
+    }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
         extractorFormData = newFormData
@@ -71,16 +93,24 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
                 val result = snackbarHostState
                     .showSnackbar(
                         message = successMsg.msg,
-                        actionLabel = "INSTALL APKS",
+                        actionLabel = "INSTALL",
                         duration = SnackbarDuration.Indefinite
                     )
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
-                        extractorViewModel.sendIntent(
-                            ExtractorIntent.InstallApks(
-                                extractorFormData = extractorFormData
+                        if (extractorFormData.selectedExtractOption.data == ApksExtractor.ExtractorOption.APKS) {
+                            extractorViewModel.sendIntent(
+                                ExtractorIntent.InstallApks(
+                                    extractorFormData = extractorFormData
+                                )
                             )
-                        )
+                        } else {
+                            extractorViewModel.sendIntent(
+                                ExtractorIntent.InstallApk(
+                                    extractorFormData = extractorFormData
+                                )
+                            )
+                        }
                     }
                     SnackbarResult.Dismissed -> { }
                 }
@@ -123,6 +153,11 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
         },
         onKeystoreRemoveClick = {
             showKeystoreRemoveDialog = true
+        },
+        onItemSelected = { item ->
+            extractorFormData = extractorFormData.copy(
+                selectedExtractOption = item
+            )
         }
     )
 
@@ -169,6 +204,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             extractorFormDataCallback = extractorFormDataCallback,
             onFormDataChange = onFormDataChange,
             isLoading = extractorUiState.loading,
+            selectedExtractOption = extractorFormData.selectedExtractOption,
             onExtractApksButtonClick = {
                 extractorViewModel.sendIntent(
                     ExtractorIntent.ExtractAab(
@@ -204,6 +240,7 @@ fun ExtractorContent(
     extractorFormData: ExtractorFormData,
     keystoreDtoList: List<KeystoreDto>,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
     onExtractApksButtonClick: () -> Unit
@@ -233,7 +270,8 @@ fun ExtractorContent(
             isLoading = isLoading,
             extractorFormData = extractorFormData,
             extractorFormDataCallback = extractorFormDataCallback,
-            onFormDataChange = onFormDataChange
+            onFormDataChange = onFormDataChange,
+            selectedExtractOption = selectedExtractOption
         )
 
         Row(
@@ -260,6 +298,7 @@ fun ExtractorForm(
     keystoreDtoList: List<KeystoreDto>,
     extractorFormData: ExtractorFormData,
     extractorFormDataCallback: ExtractorFormDataCallback,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onFormDataChange: (ExtractorFormData) -> Unit,
 ) {
@@ -282,7 +321,9 @@ fun ExtractorForm(
             extractorFormData = extractorFormData,
             onFormDataChange = onFormDataChange,
             isLoading = isLoading,
-            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick
+            onAabPathIconClick = extractorFormDataCallback.onAabPathIconClick,
+            selectedExtractOption = selectedExtractOption,
+            onItemSelected = extractorFormDataCallback.onItemSelected
         )
     }
 }
@@ -474,6 +515,8 @@ fun FormCard(
 fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
+    onItemSelected: (item: RadioItem) -> Unit,
+    selectedExtractOption: RadioItem,
     isLoading: Boolean,
     onAabPathIconClick: () -> Unit
 ) {
@@ -506,21 +549,13 @@ fun OutputForm(
             }
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Checkbox(
-                checked = extractorFormData.isOverwriteApks,
-                onCheckedChange = {
-                    onFormDataChange(extractorFormData.copy(isOverwriteApks = it))
-                },
-                enabled = !isLoading
-            )
-            Text(
-                text = "Overwrite APKS"
-            )
-        }
+
+        RadioGroup(
+            radioOptions = extractorFormData.extractOptions,
+            isEnabled = !isLoading,
+            onItemSelected = onItemSelected,
+            selectedOption = selectedExtractOption
+        )
     }
 }
 
@@ -558,7 +593,7 @@ private fun KeystoreSignFormPreview() {
     KeystoreSignForm(
         keystoreDtoList = emptyList(),
         onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
+        extractorFormData = ExtractorFormData(selectedExtractOption = RadioItem(text = "aaaa")),
         onKeystorePathIconClick = {},
         isLoading = false,
         onItemChanged = {},
@@ -571,8 +606,10 @@ private fun KeystoreSignFormPreview() {
 private fun OutputFormPreview() {
     OutputForm(
         onFormDataChange = {},
-        extractorFormData = ExtractorFormData(),
+        extractorFormData = ExtractorFormData(selectedExtractOption = RadioItem(text = "aaaa")),
         onAabPathIconClick = {},
-        isLoading = false
+        isLoading = false,
+        selectedExtractOption = RadioItem(text = "aaaa"),
+        onItemSelected = {}
     )
 }
