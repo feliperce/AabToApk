@@ -5,11 +5,13 @@ import com.android.tools.build.bundletool.device.DdmlibAdbServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import shared.utils.PlatformUtils
 import java.nio.file.Path
 
 class ApksInstall(
     private val adbPath: String
 ) {
+    private val platformUtils = PlatformUtils()
 
     suspend fun installApks(
         apksPath: String,
@@ -18,7 +20,7 @@ class ApksInstall(
     ) = withContext(Dispatchers.IO) {
 
         val formattedAdbPath = adbPath.dropLastWhile { it == '/' }
-            .plus("/adb")
+            .plus("/adb${platformUtils.getPlatformExtension()}")
 
         async {
             runCatching {
