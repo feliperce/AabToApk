@@ -7,6 +7,7 @@ import com.android.tools.build.bundletool.model.SigningConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import shared.utils.PlatformUtils
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -19,6 +20,7 @@ class ApksExtractor(
 ) {
 
     private var signingConfig: SigningConfiguration? = null
+    private val platformUtils = PlatformUtils()
 
     suspend fun setSignConfig(
         keystorePath: String,
@@ -63,7 +65,7 @@ class ApksExtractor(
                         .plus("/$newApksFileName.apks")
 
                     val aapt2Path = buildToolsPath.dropLastWhile { it == '/' }
-                        .plus("/aapt2")
+                        .plus("/aapt2${platformUtils.getPlatformExtension()}")
 
                     BuildApksCommand.builder()
                         .setBundlePath(Paths.get(aabPath))
