@@ -1,9 +1,12 @@
 package ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,6 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.mohamedrejeb.calf.core.LocalPlatformContext
+import com.mohamedrejeb.calf.io.KmpFile
+import com.mohamedrejeb.calf.io.getName
+import com.mohamedrejeb.calf.io.readByteArray
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.util.UUID
 
@@ -127,6 +138,52 @@ fun RadioGroup(
     }
 }
 
+@Composable
+fun FilePickerTextField(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onTextChange: (text: String) -> Unit = {},
+    onFileResult: (fileResult: KmpFile) -> Unit = {},
+    fileType: FilePickerFileType = FilePickerFileType.All,
+    selectionMode: FilePickerSelectionMode = FilePickerSelectionMode.Single
+) {
+    var text by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val context = LocalPlatformContext.current
+
+    val pickerLauncher = rememberFilePickerLauncher(
+        type = fileType,
+        selectionMode = selectionMode,
+        onResult = { files ->
+            files.firstOrNull()?.let { file ->
+                text = file.getName(context) ?: ""
+                onFileResult(file)
+            }
+        }
+    )
+
+    OutlinedTextField(
+        modifier = modifier,
+        value = text,
+        onValueChange = {
+            text = it
+            onTextChange(text)
+        },
+        maxLines = 1,
+        singleLine = true,
+        enabled = enabled,
+        trailingIcon = {
+            Icon(
+                modifier = Modifier.clickable {
+                    pickerLauncher.launch()
+                },
+                imageVector = Icons.Default.FolderOpen,
+                contentDescription = null
+            )
+        }
+    )
+}
+
 data class SpinnerItem(
     val name: String,
     val data: Any?
@@ -158,5 +215,13 @@ private fun RadioGroupPreview() {
         ),
         onItemSelected = {},
         selectedOption = RadioItem(text = "APKS")
+    )
+}
+
+@Preview
+@Composable
+private fun FilePickerTextFieldPreview() {
+    FilePickerTextField(
+        onTextChange = {}
     )
 }

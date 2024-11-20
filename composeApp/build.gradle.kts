@@ -59,6 +59,8 @@ kotlin {
             implementation(libs.bundletool)
             implementation(libs.kotlin.multiplatform.appdirs)
 
+            implementation(libs.calf.ui)
+            implementation(libs.calf.file.picker)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

@@ -198,6 +198,9 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        FilePickerTextField(
+            modifier = Modifier.fillMaxWidth()
+        )
         ExtractorContent(
             keystoreDtoList = extractorUiState.keystoreDtoList,
             extractorFormData = extractorFormData,
