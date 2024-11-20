@@ -18,9 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformDirectory
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.util.UUID
@@ -172,16 +174,66 @@ fun FilePickerTextField(
         }
     }
 
+    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+}
+
+@Composable
+fun DirectoryPickerTextField(
+    modifier: Modifier = Modifier,
+    initialText: String = "",
+    label: String? = null,
+    enabled: Boolean = true,
+    onDirectoryResult: (fileResult: PlatformDirectory) -> Unit = {},
+    fileType: PickerType = PickerType.File(),
+    selectionMode: PickerMode<PlatformFile> = PickerMode.Single,
+    pickerTitle: String? = null
+) {
+    var text by remember { mutableStateOf(initialText) }
+
+    LaunchedEffect(initialText) {
+        withMutableSnapshot {
+            text = initialText
+        }
+    }
+
+    val pickerLauncher = rememberDirectoryPickerLauncher(
+        title = pickerTitle
+    ) { directory ->
+        directory?.let {
+            onDirectoryResult(it)
+            text = it.path ?: ""
+        }
+    }
+
+    val clickAction = {
+        if (enabled) {
+            pickerLauncher.launch()
+        }
+    }
+
+    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+}
+
+@Composable
+private fun PickerOutlineTextField(
+    modifier: Modifier,
+    text: String,
+    label: String?,
+    enabled: Boolean,
+    clickAction: () -> Unit
+) {
+    var pickerText = text
+
     OutlinedTextField(
         modifier = modifier,
-        value = text,
+        value = pickerText,
         label = {
             label?.let {
                 Text(it)
             }
         },
         onValueChange = {
-            text = it
+            pickerText = it
         },
         maxLines = 1,
         singleLine = true,
