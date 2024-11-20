@@ -59,8 +59,7 @@ kotlin {
             implementation(libs.bundletool)
             implementation(libs.kotlin.multiplatform.appdirs)
 
-            implementation(libs.calf.ui)
-            implementation(libs.calf.file.picker)
+            implementation(libs.filekit.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -128,6 +127,7 @@ compose.desktop {
                 menuGroup = "tools"
                 appCategory = "tools"
                 iconFile.set(project.file("icons/ic_aabtoapk.png"))
+                modules("jdk.security.auth")
             }
         }
     }
