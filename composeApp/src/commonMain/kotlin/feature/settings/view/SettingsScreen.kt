@@ -1,17 +1,14 @@
 package feature.settings.view
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material3.Button
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
-import feature.nav.view.Screen
 import feature.settings.model.SettingsFormData
 import feature.settings.model.SettingsFormDataCallback
 import feature.settings.state.SettingsIntent
@@ -20,7 +17,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.DirectoryPickerTextField
 import ui.theme.MarginPaddingSizeMedium
-import utils.InputPathType
 
 @Composable
 fun SettingsScreen(

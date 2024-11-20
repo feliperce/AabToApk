@@ -43,7 +43,6 @@ kotlin {
             implementation(libs.koin.test)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.mpfilepicker)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 

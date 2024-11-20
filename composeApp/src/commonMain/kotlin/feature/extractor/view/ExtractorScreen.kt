@@ -1,27 +1,23 @@
 package feature.extractor.view
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material3.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.viewmodel.ExtractorViewModel
-import utils.InputPathType
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
@@ -436,7 +432,9 @@ fun FormCard(
     formCardContent: @Composable () -> Unit
 ) {
     Card(
-        elevation = 8.dp
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        )
     ) {
         Column(
             modifier = modifier

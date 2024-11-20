@@ -2,9 +2,7 @@ package feature.nav.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -15,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import feature.extractor.view.ExtractorScreen
 import feature.settings.view.SettingsScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavScreen() {
     val navController = rememberNavController()
@@ -22,7 +21,6 @@ fun NavScreen() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        scaffoldState = rememberScaffoldState(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             currentScreen?.let {
