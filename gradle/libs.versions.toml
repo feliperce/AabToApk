@@ -1,36 +1,36 @@
 [versions]
-agp = "8.2.0"
+agp = "8.2.2"
 bundletool = "1.16.0"
+filekit = "0.8.7"
 kotlinMultiplatformAppdirs = "1.1.1"
-ksp = "2.0.0-1.0.21"
+ksp = "2.0.0-1.0.22"
 android-compileSdk = "34"
 android-minSdk = "26"
 android-targetSdk = "34"
-androidx-activityCompose = "1.9.0"
+androidx-activityCompose = "1.9.3"
 androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.13.1"
-androidx-espresso-core = "3.5.1"
+androidx-constraintlayout = "2.2.0"
+androidx-core-ktx = "1.15.0"
+androidx-espresso-core = "3.6.1"
 androidx-material = "1.12.0"
-androidx-test-junit = "1.1.5"
-compose = "1.6.11"
-compose-plugin = "1.6.10"
+androidx-test-junit = "1.2.1"
+compose-plugin = "1.7.0"
 junit = "4.13.2"
 koin = "3.5.6"
 koinCompose = "1.2.0-Beta4"
 kotlin = "2.0.0"
-kotlinxCoroutinesSwing = "1.8.1"
-lifecycleViewmodelCompose = "2.8.0"
-material3Desktop = "1.2.1"
-mpfilepicker = "3.1.0"
+kotlinxCoroutinesSwing = "1.9.0"
+lifecycleViewmodelCompose = "2.8.2"
+material3Desktop = "1.3.1"
 androidxRoom = "2.7.0-alpha04"
 navigationCompose = "2.7.0-alpha07"
 sqlite = "2.5.0-SNAPSHOT"
 datastore = "1.1.1"
-material3Android = "1.2.1"
+material3Android = "1.3.1"
 
 [libraries]
 bundletool = { module = "com.android.tools.build:bundletool", version.ref = "bundletool" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
@@ -52,7 +52,6 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-material3-desktop = { group = "androidx.compose.material3", name = "material3-desktop", version.ref = "material3Desktop" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesSwing" }
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
-mpfilepicker = { module = "com.darkrockstudios:mpfilepicker", version.ref = "mpfilepicker" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidxRoom" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }

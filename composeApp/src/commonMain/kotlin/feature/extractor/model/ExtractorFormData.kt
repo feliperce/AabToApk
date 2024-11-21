@@ -13,8 +13,6 @@ data class ExtractorFormData(
 )
 
 data class ExtractorFormDataCallback(
-    val onKeystorePathIconClick: () -> Unit,
-    val onAabPathIconClick: () -> Unit,
     val onKeystoreSpinnerItemChanged: (KeystoreDto) -> Unit,
     val onKeystoreRemoveClick: () -> Unit,
     val onItemSelected: (radioItem: RadioItem) -> Unit

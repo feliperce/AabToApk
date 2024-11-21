@@ -43,7 +43,6 @@ kotlin {
             implementation(libs.koin.test)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.mpfilepicker)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
@@ -59,6 +58,7 @@ kotlin {
             implementation(libs.bundletool)
             implementation(libs.kotlin.multiplatform.appdirs)
 
+            implementation(libs.filekit.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -126,6 +126,7 @@ compose.desktop {
                 menuGroup = "tools"
                 appCategory = "tools"
                 iconFile.set(project.file("icons/ic_aabtoapk.png"))
+                modules("jdk.security.auth")
             }
         }
     }

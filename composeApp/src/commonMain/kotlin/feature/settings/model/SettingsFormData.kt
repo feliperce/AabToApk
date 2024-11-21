@@ -7,8 +7,5 @@ data class SettingsFormData(
 )
 
 data class SettingsFormDataCallback(
-    val onAdbPathIconClick: () -> Unit,
-    val onBuildToolsPathIconClick: () -> Unit,
-    val onOutputPathIconClick: () -> Unit,
     val onSaveButtonClick: () -> Unit
 )

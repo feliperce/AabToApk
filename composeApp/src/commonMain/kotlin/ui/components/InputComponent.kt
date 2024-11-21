@@ -1,18 +1,29 @@
 package ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import io.github.vinceglb.filekit.compose.rememberDirectoryPickerLauncher
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
+import io.github.vinceglb.filekit.core.PlatformDirectory
+import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import java.util.UUID
 
@@ -127,6 +138,127 @@ fun RadioGroup(
     }
 }
 
+@Composable
+fun FilePickerTextField(
+    modifier: Modifier = Modifier,
+    initialText: String = "",
+    label: String? = null,
+    enabled: Boolean = true,
+    onFileResult: (fileResult: PlatformFile) -> Unit = {},
+    fileType: PickerType = PickerType.File(),
+    selectionMode: PickerMode<PlatformFile> = PickerMode.Single,
+    pickerTitle: String? = null
+) {
+    var text by remember { mutableStateOf(initialText) }
+
+    LaunchedEffect(initialText) {
+        withMutableSnapshot {
+            text = initialText
+        }
+    }
+
+    val pickerLauncher = rememberFilePickerLauncher(
+        mode = selectionMode,
+        type = fileType,
+        title = pickerTitle
+    ) { file ->
+        file?.let{
+            onFileResult(it)
+            text = it.path ?: it.name
+        }
+    }
+
+    val clickAction = {
+        if (enabled) {
+            pickerLauncher.launch()
+        }
+    }
+
+    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+}
+
+@Composable
+fun DirectoryPickerTextField(
+    modifier: Modifier = Modifier,
+    initialText: String = "",
+    label: String? = null,
+    enabled: Boolean = true,
+    onDirectoryResult: (fileResult: PlatformDirectory) -> Unit = {},
+    fileType: PickerType = PickerType.File(),
+    selectionMode: PickerMode<PlatformFile> = PickerMode.Single,
+    pickerTitle: String? = null
+) {
+    var text by remember { mutableStateOf(initialText) }
+
+    LaunchedEffect(initialText) {
+        withMutableSnapshot {
+            text = initialText
+        }
+    }
+
+    val pickerLauncher = rememberDirectoryPickerLauncher(
+        title = pickerTitle
+    ) { directory ->
+        directory?.let {
+            onDirectoryResult(it)
+            text = it.path ?: ""
+        }
+    }
+
+    val clickAction = {
+        if (enabled) {
+            pickerLauncher.launch()
+        }
+    }
+
+    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+}
+
+@Composable
+private fun PickerOutlineTextField(
+    modifier: Modifier,
+    text: String,
+    label: String?,
+    enabled: Boolean,
+    clickAction: () -> Unit
+) {
+    var pickerText = text
+
+    OutlinedTextField(
+        modifier = modifier,
+        value = pickerText,
+        label = {
+            label?.let {
+                Text(it)
+            }
+        },
+        onValueChange = {
+            pickerText = it
+        },
+        maxLines = 1,
+        singleLine = true,
+        enabled = enabled,
+        readOnly = true,
+        trailingIcon = {
+            Icon(
+                modifier = Modifier.clickable { clickAction() },
+                imageVector = Icons.Default.FolderOpen,
+                contentDescription = null
+            )
+        },
+        interactionSource = remember { MutableInteractionSource() }
+            .also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions.collect {
+                        if (it is PressInteraction.Release) {
+                            clickAction()
+                        }
+                    }
+                }
+            }
+    )
+}
+
 data class SpinnerItem(
     val name: String,
     val data: Any?
@@ -137,6 +269,14 @@ data class RadioItem(
     val text: String,
     val data: Any? = null,
     var isSelected: Boolean = false
+)
+
+val aabInputType: PickerType = PickerType.File(
+    extensions = listOf("aab")
+)
+
+val keystoreInputType: PickerType = PickerType.File(
+    extensions = listOf("keystore", "jks")
 )
 
 @Preview
@@ -158,5 +298,13 @@ private fun RadioGroupPreview() {
         ),
         onItemSelected = {},
         selectedOption = RadioItem(text = "APKS")
+    )
+}
+
+@Preview
+@Composable
+private fun FilePickerTextFieldPreview() {
+    FilePickerTextField(
+        onFileResult = {}
     )
 }
