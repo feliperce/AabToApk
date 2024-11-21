@@ -1,6 +1,4 @@
-package shared.utils
-
-import shared.utils.PlatformType.*
+package io.github.feliperce.aabtoapk.utils.platform
 
 enum class PlatformType {
     LINUX,

@@ -13,7 +13,7 @@ buildConfig {
     buildConfigField("API_KEY", apiKey)
 }*/
 
-group = "io.github.feliperce.cryptonews"
+group = "io.github.feliperce.aabtoapk"
 version = "1.0.0"
 application {
     mainClass.set("io.github.feliperce.cryptonews.ApplicationKt")
@@ -28,11 +28,4 @@ dependencies {
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.cors)
     testImplementation(libs.kotlin.test.junit)
-
-    // client
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.json)
-    implementation(libs.ktor.client.cio)
 }

@@ -1,30 +1,28 @@
 package io.github.feliperce.aabtoapk
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
+import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.Json
+import io.ktor.utils.io.*
+import kotlinx.io.readByteArray
+import java.io.File
 
 fun main() {
-    embeddedServer(Netty, port = ServerConstants.SERVER_PORT, host = ServerConstants.SERVER_HOST, module = Application::module)
+    File(ServerConstants.CACHE_PATH).mkdirs()
+    File(ServerConstants.EXTRACTOR_PATH).mkdirs()
+
+    embeddedServer(Netty, port = ServerConstants.PORT, host = ServerConstants.HOST, module = Application::module)
         .start(wait = true)
 }
 
 fun Application.module() {
-    install(ContentNegotiation) {
-        json()
-    }
 
     install(CORS) {
         allowHeader(HttpHeaders.ContentType)
@@ -41,25 +39,39 @@ fun Application.module() {
         anyHost()
     }
 
-    val client = HttpClient(CIO) {
-        install(Logging) {
-            level = LogLevel.ALL
-        }
-        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
-        }
-        defaultRequest {
-            header("Content-Type", ContentType.Application.Json)
-        }
-        expectSuccess = true
-    }
-
-
     routing {
         get("/") {
             this.call.respond("aaa")
+        }
+
+        post("/uploadAab") {
+            var fileDescription = ""
+            var fileName = ""
+
+            val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
+
+            multipartData.forEachPart { part ->
+                when (part) {
+                    is PartData.FormItem -> {
+                        fileDescription = part.value
+                    }
+
+                    is PartData.FileItem -> {
+                        fileName = part.originalFileName as String
+                        val fileBytes = part.provider().readRemaining().readByteArray()
+
+                        val uploadDir = File(ServerConstants.CACHE_PATH)
+
+                        val cachedAab = File("${uploadDir.path}$fileName")
+                        cachedAab.writeBytes(fileBytes)
+                    }
+
+                    else -> {}
+                }
+                part.dispose()
+            }
+
+            call.respondText("$fileDescription is uploaded to 'uploads/$fileName'")
         }
     }
 }

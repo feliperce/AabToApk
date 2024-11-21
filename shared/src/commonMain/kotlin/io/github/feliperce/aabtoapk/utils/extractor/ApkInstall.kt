@@ -1,10 +1,11 @@
-package utils
+package io.github.feliperce.aabtoapk.utils.extractor
 
+import io.github.feliperce.aabtoapk.utils.platform.execAndWait
+import io.github.feliperce.aabtoapk.utils.platform.PlatformType
+import io.github.feliperce.aabtoapk.utils.platform.PlatformUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import shared.utils.PlatformType
-import shared.utils.PlatformUtils
 import java.io.File
 
 class ApkInstall(

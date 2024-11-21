@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.FontWeight
 import ui.theme.Red800
-import utils.ErrorMsg
+import io.github.feliperce.aabtoapk.utils.extractor.ErrorMsg
 
 @Composable
 fun ErrorDialog(

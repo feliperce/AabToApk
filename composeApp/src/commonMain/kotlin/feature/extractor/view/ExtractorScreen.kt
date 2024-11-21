@@ -23,8 +23,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
-import utils.ApksExtractor
-import utils.SuccessMsgType
+import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
 
 @Composable
 fun ExtractorScreen(snackbarHostState: SnackbarHostState) {

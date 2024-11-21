@@ -26,6 +26,8 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.json)
+
+            implementation(libs.bundletool)
         }
     }
 }

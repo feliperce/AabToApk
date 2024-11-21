@@ -1,13 +1,13 @@
-package utils
+package io.github.feliperce.aabtoapk.utils.extractor
 
 import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
+import io.github.feliperce.aabtoapk.utils.platform.PlatformUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import shared.utils.PlatformUtils
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
