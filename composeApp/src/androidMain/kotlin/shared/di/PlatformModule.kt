@@ -6,6 +6,7 @@ import feature.extractor.viewmodel.ExtractorViewModel
 import feature.settings.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import shared.data.dataStore
 import shared.data.getDatabaseBuilder
@@ -19,7 +20,7 @@ actual class PlatformModule {
             val db = get<ExtractorDatabase>()
             db.extractorDao()
         }
-        viewModel { ExtractorViewModel(get(), get()) }
-        viewModel { SettingsViewModel(get()) }
+        viewModelOf(::ExtractorViewModel)
+        viewModelOf(::SettingsViewModel)
     }
 }
