@@ -1,6 +1,8 @@
 package io.github.feliperce.aabtoapk
 
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
+import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
+import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -13,10 +15,10 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
 import java.io.File
+import java.util.*
 
 fun main() {
-    File(ServerConstants.CACHE_PATH).mkdirs()
-    File(ServerConstants.EXTRACTOR_PATH).mkdirs()
+    ServerConstants.PathConf.mkdirs()
 
     embeddedServer(Netty, port = ServerConstants.PORT, host = ServerConstants.HOST, module = Application::module)
         .start(wait = true)
@@ -47,6 +49,7 @@ fun Application.module() {
         post("/uploadAab") {
             var fileDescription = ""
             var fileName = ""
+            var resultPath = ""
 
             val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
 
@@ -60,10 +63,42 @@ fun Application.module() {
                         fileName = part.originalFileName as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
-                        val uploadDir = File(ServerConstants.CACHE_PATH)
+                        val uploadDir = File(ServerConstants.PathConf.CACHE_PATH)
 
-                        val cachedAab = File("${uploadDir.path}$fileName")
+                        val cachedAab = File("${uploadDir.absolutePath}/$fileName")
                         cachedAab.writeBytes(fileBytes)
+
+                        println("FILE CREATED -> $fileName")
+
+                        val extractor = ApksExtractor(
+                            aabPath = cachedAab.absolutePath,
+                            outputApksPath = ServerConstants.PathConf.OUTPUT_EXTRACT_PATH,
+                            buildToolsPath = ServerConstants.PathConf.BUILD_TOOLS_PATH
+                        )
+
+                        extractor.setSignConfig(
+                            keystorePath = ServerConstants.DebugKeystore.PATH,
+                            keystorePassword = ServerConstants.DebugKeystore.STORE_PASSWORD,
+                            keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
+                            keyAlias = ServerConstants.DebugKeystore.ALIAS,
+                            onFailure = {
+
+                            }
+                        )
+
+                        println("SET KEYSTORE")
+                        extractor.aabToApks(
+                            extractorOption = ApksExtractor.ExtractorOption.APKS,
+                            onSuccess =  { path, name ->
+                                resultPath = path
+                                fileName = "${name}.apks"
+                            },
+                            onFailure = {
+
+                            }
+                        )
+
+                        println("extracted")
                     }
 
                     else -> {}
@@ -71,7 +106,15 @@ fun Application.module() {
                 part.dispose()
             }
 
-            call.respondText("$fileDescription is uploaded to 'uploads/$fileName'")
+            call.respond(
+                AabConvertResponse(
+                    fileName = fileName,
+                    fileType = "apks",
+                    downloadUrl = "da",
+                    date = Date().time,
+                    debugKeystore = true
+                )
+            )
         }
     }
 }

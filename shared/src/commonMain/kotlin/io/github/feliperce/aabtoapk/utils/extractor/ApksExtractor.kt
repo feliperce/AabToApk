@@ -51,7 +51,7 @@ class ApksExtractor(
     suspend fun aabToApks(
         apksFileName: String = "",
         extractorOption: ExtractorOption,
-        onSuccess: (output: String) -> Unit,
+        onSuccess: (output: String, fileName: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
@@ -88,7 +88,7 @@ class ApksExtractor(
                         formattedOutputPath
                     }
 
-                    onSuccess(absolutPath)
+                    onSuccess(absolutPath, newApksFileName)
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
