@@ -2,6 +2,8 @@ package io.github.feliperce.aabtoapk
 
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
+import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
+import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -17,6 +19,7 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
 import java.io.File
+import java.net.URLEncoder
 import java.util.*
 
 fun main() {
@@ -56,6 +59,8 @@ fun Application.module() {
             var fileDescription = ""
             var fileName = ""
             var resultPath = ""
+            var encodedDownloadUrl = ""
+            var errorResponse: ErrorResponse? = null
 
             val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
 
@@ -69,6 +74,7 @@ fun Application.module() {
 
                     is PartData.FileItem -> {
                         println("upload start")
+
                         fileName = part.originalFileName?.substringBeforeLast(".") as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
@@ -91,6 +97,11 @@ fun Application.module() {
                             keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
                             keyAlias = ServerConstants.DebugKeystore.ALIAS,
                             onFailure = {
+                                call.response.status(HttpStatusCode.NotAcceptable)
+                                errorResponse = ErrorResponse(
+                                    code = ErrorResponseType.KEYSTORE.code,
+                                    message = it.msg
+                                )
                                 println("SET KEYSTORE FAIL -> ${it.msg}")
                             }
                         )
@@ -100,12 +111,19 @@ fun Application.module() {
                             apksFileName = fileName,
                             extractorOption = ApksExtractor.ExtractorOption.APKS,
                             onSuccess =  { path, name ->
-                                println("AAB TO APKS success!!! -> ${path} || $fileName")
+                                println("AAB TO APKS success!!! -> ${path} || $name")
 
                                 resultPath = path
                                 fileName = "${name}.apks"
+                                encodedDownloadUrl =
+                                    "${ServerConstants.BASE_URL}/download/${URLEncoder.encode(fileName, "UTF-8")}"
                             },
                             onFailure = {
+                                call.response.status(HttpStatusCode.NotAcceptable)
+                                errorResponse = ErrorResponse(
+                                    code = ErrorResponseType.EXTRACT.code,
+                                    message = it.msg
+                                )
                                 println("AAB TO APKS FAIL -> ${it.msg}")
                             }
                         )
@@ -122,15 +140,53 @@ fun Application.module() {
 
             println("SAIU")
 
-            call.respond(
-                AabConvertResponse(
-                    fileName = fileName,
-                    fileType = "apks",
-                    downloadUrl = "da",
-                    date = Date().time,
-                    debugKeystore = true
+            errorResponse?.let {
+                call.respond(it)
+            } ?: run {
+                call.respond(
+                    AabConvertResponse(
+                        fileName = fileName,
+                        fileType = "apks",
+                        downloadUrl = encodedDownloadUrl,
+                        date = Date().time,
+                        debugKeystore = true
+                    )
                 )
-            )
+            }
+        }
+
+        get("/download/{fileName}") {
+            val fileName = call.parameters["fileName"]
+
+            if (fileName != null) {
+                val file = File("${ServerConstants.PathConf.OUTPUT_EXTRACT_PATH}/$fileName")
+                if (file.exists()) {
+                    call.response.header(
+                        HttpHeaders.ContentDisposition,
+                        ContentDisposition.Attachment.withParameter(
+                            ContentDisposition.Parameters.FileName, fileName
+                        ).toString()
+                    )
+                    call.respondFile(file)
+                    file.delete()
+                } else {
+                    call.response.status(HttpStatusCode.NotFound)
+                    call.respond(
+                        ErrorResponse(
+                            code = ErrorResponseType.DOWNLOAD_NOT_FOUND.code,
+                            message = ErrorResponseType.DOWNLOAD_NOT_FOUND.msg
+                        )
+                    )
+                }
+            } else {
+                call.response.status(HttpStatusCode.NotAcceptable)
+                call.respond(
+                    ErrorResponse(
+                        code = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.code,
+                        message = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.msg
+                    )
+                )
+            }
         }
     }
 }
