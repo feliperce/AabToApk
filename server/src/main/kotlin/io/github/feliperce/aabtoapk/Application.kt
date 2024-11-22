@@ -5,9 +5,11 @@ import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -25,6 +27,10 @@ fun main() {
 }
 
 fun Application.module() {
+
+    install(ContentNegotiation) {
+        json()
+    }
 
     install(CORS) {
         allowHeader(HttpHeaders.ContentType)
@@ -53,6 +59,8 @@ fun Application.module() {
 
             val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
 
+            println("upload init")
+
             multipartData.forEachPart { part ->
                 when (part) {
                     is PartData.FormItem -> {
@@ -60,6 +68,7 @@ fun Application.module() {
                     }
 
                     is PartData.FileItem -> {
+                        println("upload start")
                         fileName = part.originalFileName as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
@@ -103,10 +112,14 @@ fun Application.module() {
                         println("extracted -- $fileName")
                     }
 
-                    else -> {}
+                    else -> {
+                        println("ELSE -0-")
+                    }
                 }
                 part.dispose()
             }
+
+            println("SAIU")
 
             call.respond(
                 AabConvertResponse(
