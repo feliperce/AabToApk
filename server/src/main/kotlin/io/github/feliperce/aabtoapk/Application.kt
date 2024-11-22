@@ -63,12 +63,12 @@ fun Application.module() {
                         fileName = part.originalFileName as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
-                        val uploadDir = File(ServerConstants.PathConf.CACHE_PATH)
+                        val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
 
                         val cachedAab = File("${uploadDir.absolutePath}/$fileName")
                         cachedAab.writeBytes(fileBytes)
 
-                        println("FILE CREATED -> $fileName")
+                        println("FILE CREATED -> ${cachedAab.absolutePath}")
 
                         val extractor = ApksExtractor(
                             aabPath = cachedAab.absolutePath,
@@ -82,7 +82,7 @@ fun Application.module() {
                             keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
                             keyAlias = ServerConstants.DebugKeystore.ALIAS,
                             onFailure = {
-
+                                println("SET KEYSTORE FAIL -> ${it.msg}")
                             }
                         )
 
@@ -90,15 +90,17 @@ fun Application.module() {
                         extractor.aabToApks(
                             extractorOption = ApksExtractor.ExtractorOption.APKS,
                             onSuccess =  { path, name ->
+                                println("AAB TO APKS success!!! -> ${path} || $fileName")
+
                                 resultPath = path
                                 fileName = "${name}.apks"
                             },
                             onFailure = {
-
+                                println("AAB TO APKS FAIL -> ${it.msg}")
                             }
                         )
 
-                        println("extracted")
+                        println("extracted -- $fileName")
                     }
 
                     else -> {}

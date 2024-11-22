@@ -10,7 +10,7 @@ object ServerConstants {
     object PathConf {
         const val CACHE_PATH = "/tmp/AabToApk"
         const val OUTPUT_EXTRACT_PATH = "/tmp/AabToApk/extracted"
-        const val BUILD_TOOLS_PATH = "~/Development/Android/Sdk/build-tools/35.0.0"
+        const val BUILD_TOOLS_PATH = "/home/felipe/Development/Android/Sdk/build-tools/35.0.0"
 
         fun mkdirs() {
             File(CACHE_PATH).mkdirs()
@@ -19,7 +19,7 @@ object ServerConstants {
     }
 
     object DebugKeystore {
-        const val PATH = "~/.android/debug.keystore"
+        const val PATH = "/home/felipe/.android/debug.keystore"
         const val ALIAS = "androiddebugkey"
         const val STORE_PASSWORD = "android"
         const val KEY_PASSWORD = "android"
