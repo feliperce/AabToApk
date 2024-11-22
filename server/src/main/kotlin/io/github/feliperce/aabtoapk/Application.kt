@@ -69,7 +69,7 @@ fun Application.module() {
 
                     is PartData.FileItem -> {
                         println("upload start")
-                        fileName = part.originalFileName as String
+                        fileName = part.originalFileName?.substringBeforeLast(".") as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
                         val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
@@ -97,6 +97,7 @@ fun Application.module() {
 
                         println("SET KEYSTORE")
                         extractor.aabToApks(
+                            apksFileName = fileName,
                             extractorOption = ApksExtractor.ExtractorOption.APKS,
                             onSuccess =  { path, name ->
                                 println("AAB TO APKS success!!! -> ${path} || $fileName")
