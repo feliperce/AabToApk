@@ -22,6 +22,8 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
 import java.io.File
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 fun main() {
     ServerConstants.PathConf.mkdirs()
@@ -76,7 +78,7 @@ fun Application.module() {
                     is PartData.FileItem -> {
                         println("upload start")
 
-                        val fileName = part.originalFileName?.substringBeforeLast(".") as String
+                        val fileName = part.originalFileName as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
                         viewModel.uploadAab(
@@ -119,7 +121,7 @@ fun Application.module() {
         }
 
         get("/download/{fileName}") {
-            val fileName = call.parameters["fileName"]
+            val fileName = URLDecoder.decode(call.parameters["fileName"], "UTF-8")
 
             if (fileName != null) {
                 val file = File("${ServerConstants.PathConf.OUTPUT_EXTRACT_PATH}/$fileName")

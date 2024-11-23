@@ -4,13 +4,10 @@ import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
-import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
-import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
 import java.io.File
-import java.net.URLEncoder
 
 class AabExtractorViewModel(
     private val aabExtractorRepository: AabExtractorRepository

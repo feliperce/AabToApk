@@ -49,7 +49,7 @@ class ApksExtractor(
     }
 
     suspend fun aabToApks(
-        apksFileName: String = "",
+        aabFileName: String = "",
         extractorOption: ExtractorOption,
         onSuccess: (output: String, fileName: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
@@ -57,12 +57,15 @@ class ApksExtractor(
         async {
             if (signingConfig != null) {
                 runCatching {
-                    val newApksFileName = apksFileName.ifEmpty {
+                    val newApksFileName = aabFileName.ifEmpty {
                         "extracted"
-                    }
+                    }.substringBeforeLast(".")
+                        .plus(".apks")
+
+                    val formattedAabFileName = aabFileName.substringBeforeLast(".")
 
                     val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
-                        .plus("/$newApksFileName.apks")
+                        .plus("/$newApksFileName")
 
                     val aapt2Path = buildToolsPath.dropLastWhile { it == '/' }
                         .plus("/aapt2${platformUtils.getPlatformExtension()}")
@@ -82,7 +85,7 @@ class ApksExtractor(
                     val absolutPath = if (extractorOption == ExtractorOption.UNIVERSAL_APK) {
                         unzipUniversalApks(
                             formattedOutputPath,
-                            newApksFileName
+                            formattedAabFileName
                         )
                     } else {
                         formattedOutputPath

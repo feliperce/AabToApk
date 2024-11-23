@@ -130,7 +130,7 @@ class ExtractorViewModel(
                 }
 
                 apksExtractor?.aabToApks(
-                    apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
+                    aabFileName = File(extractorFormData.aabPath).nameWithoutExtension,
                     extractorOption = extractorFormData.selectedExtractOption.data as ApksExtractor.ExtractorOption,
                     onSuccess = { output, _ ->
                         _extractorState.update {
