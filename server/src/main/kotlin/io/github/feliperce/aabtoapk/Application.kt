@@ -1,10 +1,13 @@
 package io.github.feliperce.aabtoapk
 
+import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
+import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.json.*
@@ -19,8 +22,6 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
 import java.io.File
-import java.net.URLEncoder
-import java.util.*
 
 fun main() {
     ServerConstants.PathConf.mkdirs()
@@ -30,6 +31,10 @@ fun main() {
 }
 
 fun Application.module() {
+
+    val viewModel by lazy {
+        AabExtractorViewModel(AabExtractorRepository())
+    }
 
     install(ContentNegotiation) {
         json()
@@ -57,10 +62,6 @@ fun Application.module() {
 
         post("/uploadAab") {
             var fileDescription = ""
-            var fileName = ""
-            var resultPath = ""
-            var encodedDownloadUrl = ""
-            var errorResponse: ErrorResponse? = null
 
             val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
 
@@ -75,60 +76,38 @@ fun Application.module() {
                     is PartData.FileItem -> {
                         println("upload start")
 
-                        fileName = part.originalFileName?.substringBeforeLast(".") as String
+                        val fileName = part.originalFileName?.substringBeforeLast(".") as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
-                        val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
-
-                        val cachedAab = File("${uploadDir.absolutePath}/$fileName")
-                        cachedAab.writeBytes(fileBytes)
-
-                        println("FILE CREATED -> ${cachedAab.absolutePath}")
-
-                        val extractor = ApksExtractor(
-                            aabPath = cachedAab.absolutePath,
-                            outputApksPath = ServerConstants.PathConf.OUTPUT_EXTRACT_PATH,
-                            buildToolsPath = ServerConstants.PathConf.BUILD_TOOLS_PATH
-                        )
-
-                        extractor.setSignConfig(
-                            keystorePath = ServerConstants.DebugKeystore.PATH,
-                            keystorePassword = ServerConstants.DebugKeystore.STORE_PASSWORD,
-                            keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
-                            keyAlias = ServerConstants.DebugKeystore.ALIAS,
-                            onFailure = {
-                                call.response.status(HttpStatusCode.NotAcceptable)
-                                errorResponse = ErrorResponse(
-                                    code = ErrorResponseType.KEYSTORE.code,
-                                    message = it.msg
-                                )
-                                println("SET KEYSTORE FAIL -> ${it.msg}")
+                        viewModel.uploadAab(
+                            fileName = fileName,
+                            fileBytes = fileBytes
+                        ).collect { res ->
+                            when (res) {
+                                is Resource.Success -> {
+                                    res.data?.let { data ->
+                                        call.respond(data)
+                                    } ?: run {
+                                        val errorMsg =
+                                            "Something unexpected occurred while extracting, please try again later"
+                                        call.respond(
+                                            ErrorResponseType.EXTRACT.toErrorResponse(errorMsg)
+                                        )
+                                    }
+                                }
+                                is Resource.Error -> {
+                                    res.error?.let { error ->
+                                        call.response.status(HttpStatusCode.NotAcceptable)
+                                        call.respond(error)
+                                    } ?: run {
+                                        call.respond(
+                                            ErrorResponseType.UNKNOWN.toErrorResponse()
+                                        )
+                                    }
+                                }
+                                is Resource.Loading -> {}
                             }
-                        )
-
-                        println("SET KEYSTORE")
-                        extractor.aabToApks(
-                            apksFileName = fileName,
-                            extractorOption = ApksExtractor.ExtractorOption.APKS,
-                            onSuccess =  { path, name ->
-                                println("AAB TO APKS success!!! -> ${path} || $name")
-
-                                resultPath = path
-                                fileName = "${name}.apks"
-                                encodedDownloadUrl =
-                                    "${ServerConstants.BASE_URL}/download/${URLEncoder.encode(fileName, "UTF-8")}"
-                            },
-                            onFailure = {
-                                call.response.status(HttpStatusCode.NotAcceptable)
-                                errorResponse = ErrorResponse(
-                                    code = ErrorResponseType.EXTRACT.code,
-                                    message = it.msg
-                                )
-                                println("AAB TO APKS FAIL -> ${it.msg}")
-                            }
-                        )
-
-                        println("extracted -- $fileName")
+                        }
                     }
 
                     else -> {
@@ -136,22 +115,6 @@ fun Application.module() {
                     }
                 }
                 part.dispose()
-            }
-
-            println("SAIU")
-
-            errorResponse?.let {
-                call.respond(it)
-            } ?: run {
-                call.respond(
-                    AabConvertResponse(
-                        fileName = fileName,
-                        fileType = "apks",
-                        downloadUrl = encodedDownloadUrl,
-                        date = Date().time,
-                        debugKeystore = true
-                    )
-                )
             }
         }
 
@@ -171,21 +134,11 @@ fun Application.module() {
                     file.delete()
                 } else {
                     call.response.status(HttpStatusCode.NotFound)
-                    call.respond(
-                        ErrorResponse(
-                            code = ErrorResponseType.DOWNLOAD_NOT_FOUND.code,
-                            message = ErrorResponseType.DOWNLOAD_NOT_FOUND.msg
-                        )
-                    )
+                    call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())
                 }
             } else {
                 call.response.status(HttpStatusCode.NotAcceptable)
-                call.respond(
-                    ErrorResponse(
-                        code = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.code,
-                        message = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.msg
-                    )
-                )
+                call.respond(ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.toErrorResponse())
             }
         }
     }
