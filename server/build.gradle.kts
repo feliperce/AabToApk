@@ -8,11 +8,13 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "5.5.0"
 }
 
-/*val apiKey: String = gradleLocalProperties(rootDir).getProperty("apiKey")
+val dbUser: String = gradleLocalProperties(rootDir).getProperty("sv.dbUser")
+val dbPassword: String = gradleLocalProperties(rootDir).getProperty("sv.dbPassword")
 
 buildConfig {
-    buildConfigField("API_KEY", apiKey)
-}*/
+    buildConfigField("DB_USER", dbUser)
+    buildConfigField("DB_PASSWORD", dbPassword)
+}
 
 group = "io.github.feliperce.aabtoapk"
 version = "1.0.0"
@@ -31,4 +33,12 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 
     implementation(libs.ktor.serialization.json)
+
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
+    implementation(libs.exposed.json)
+
+    implementation(libs.koin.ktor)
 }

@@ -1,5 +1,6 @@
 package io.github.feliperce.aabtoapk.repository
 
+import io.github.feliperce.aabtoapk.data.local.dao.ExtractorDao
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
@@ -11,7 +12,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import java.net.URLEncoder
 import java.util.*
 
-class AabExtractorRepository() {
+class AabExtractorRepository(
+    private val extractorDao: ExtractorDao
+) {
 
     fun uploadAab(
         fileName: String,

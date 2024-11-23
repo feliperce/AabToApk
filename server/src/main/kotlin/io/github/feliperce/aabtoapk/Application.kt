@@ -5,6 +5,8 @@ import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
+import io.github.feliperce.aabtoapk.di.dataModule
+import io.github.feliperce.aabtoapk.di.extractorModule
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
@@ -21,9 +23,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
+import org.koin.core.context.startKoin
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
 import java.io.File
 import java.net.URLDecoder
-import java.net.URLEncoder
 
 fun main() {
     ServerConstants.PathConf.mkdirs()
@@ -34,8 +38,10 @@ fun main() {
 
 fun Application.module() {
 
-    val viewModel by lazy {
-        AabExtractorViewModel(AabExtractorRepository())
+    install(Koin) {
+        modules(
+            dataModule, extractorModule
+        )
     }
 
     install(ContentNegotiation) {
@@ -57,7 +63,11 @@ fun Application.module() {
         anyHost()
     }
 
+    val viewModel by inject<AabExtractorViewModel>()
+
     routing {
+
+
         get("/") {
             this.call.respond("aaa")
         }
