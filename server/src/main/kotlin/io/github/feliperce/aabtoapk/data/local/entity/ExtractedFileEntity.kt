@@ -10,7 +10,8 @@ class ExtractedFileEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var name by ExtractorDb.ExtractedFiles.name
     var path by ExtractorDb.ExtractedFiles.path
-    var fileType by ExtractorDb.ExtractedFiles.fileType
+    var fileType by ExtractorDb.ExtractedFiles.fileExtension
+    var formattedName by ExtractorDb.ExtractedFiles.formattedName
     var isDebugKeystore by ExtractorDb.ExtractedFiles.isDebugKeystore
     var extractedDate by ExtractorDb.ExtractedFiles.extractedDate
     var downloadUrl by ExtractorDb.ExtractedFiles.downloadUrl

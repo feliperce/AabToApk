@@ -7,7 +7,6 @@ data class AabConvertResponse(
     val fileName: String,
     val fileType: String,
     val downloadUrl: String,
-    val debugKeystore: Boolean,
-    val date: Long
+    val debugKeystore: Boolean
 )
 

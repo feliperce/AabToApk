@@ -7,7 +7,8 @@ data class ExtractedFilesDto(
     val uploadedFileId: Int,
     val name: String,
     val path: String,
-    val fileType: String,
+    val fileExtension: String,
+    val formattedName: String,
     val isDebugKeystore: Boolean,
     val extractedDate: LocalDateTime,
     val downloadUrl: String

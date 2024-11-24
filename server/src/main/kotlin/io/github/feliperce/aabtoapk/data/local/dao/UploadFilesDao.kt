@@ -12,6 +12,7 @@ class UploadFilesDao {
             UploadedFilesEntity.new {
                 name = uploadedFilesDto.name
                 path = uploadedFilesDto.path
+                formattedName = uploadedFilesDto.formattedName
                 uploadedDate = uploadedFilesDto.uploadedDate
             }
         }.toUploadFilesDto()

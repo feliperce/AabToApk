@@ -12,13 +12,15 @@ class ExtractorDb(
     object UploadedFiles : IntIdTable() {
         val name = varchar("name", length = 200)
         val path = varchar("path", length = 2000)
+        val formattedName = varchar("formatted_name", length = 300).uniqueIndex()
         val uploadDate = datetime("upload_date")
     }
 
     object ExtractedFiles : IntIdTable() {
         val name = varchar("name", length = 200)
         val path = varchar("path", length = 2000)
-        val fileType = varchar("file_type", length = 4)
+        val formattedName = varchar("formatted_name", length = 300).uniqueIndex()
+        val fileExtension = varchar("file_extension", length = 5)
         val isDebugKeystore = bool("is_debug_keystore")
         val extractedDate = datetime("extracted_date")
         val downloadUrl = varchar("download_url", length = 200)
@@ -28,7 +30,6 @@ class ExtractorDb(
     init {
         transaction(database) {
             addLogger(StdOutSqlLogger)
-
             SchemaUtils.create(UploadedFiles, ExtractedFiles)
         }
     }

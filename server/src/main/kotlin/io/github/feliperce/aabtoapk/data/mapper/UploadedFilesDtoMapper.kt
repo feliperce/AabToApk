@@ -10,7 +10,8 @@ fun UploadedFilesEntity.toUploadFilesDto() =
         id = id.value,
         name = name,
         path = path,
-        uploadedDate = uploadedDate
+        uploadedDate = uploadedDate,
+        formattedName = formattedName
     )
 
 fun ExtractedFileEntity.toExtractedFilesDto(uploadedFileId: Int) =
@@ -19,8 +20,9 @@ fun ExtractedFileEntity.toExtractedFilesDto(uploadedFileId: Int) =
         uploadedFileId = uploadedFileId,
         name = name,
         path = path,
-        fileType = fileType,
+        fileExtension = fileType,
         isDebugKeystore = isDebugKeystore,
         extractedDate = extractedDate,
-        downloadUrl = downloadUrl
+        downloadUrl = downloadUrl,
+        formattedName = formattedName
     )
