@@ -1,8 +1,10 @@
 package io.github.feliperce.aabtoapk.di
 
 import io.github.feliperce.aabtoapk.data.local.ExtractorDb
-import io.github.feliperce.aabtoapk.data.local.dao.ExtractorDao
+import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
+import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
+import io.github.feliperce.aabtoapk.server.BuildConfig
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import org.jetbrains.exposed.sql.Database
 import org.koin.dsl.module
@@ -10,20 +12,20 @@ import org.koin.dsl.module
 val dataModule = module {
     single {
         Database.connect(
-            url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
-            user = "root",
-            driver = "org.h2.Driver",
-            password = ""
+            "jdbc:postgresql://localhost:5432/AabToApk",
+            user = BuildConfig.DB_USER,
+            password = BuildConfig.DB_PASSWORD
         )
     }
 
-    single { ExtractorDb(get()) }
-    single { ExtractorDao(get()) }
+    single(createdAtStart = true) { ExtractorDb(get()) }
+    single { UploadFilesDao() }
+    single { ExtractedFilesDao() }
 }
 
 val extractorModule = module {
     single {
-        AabExtractorRepository(get())
+        AabExtractorRepository(get(), get())
     }
 
     factory {

@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.kotlin.datetime)
     implementation(libs.exposed.json)
+    implementation(libs.postgresql)
 
     implementation(libs.koin.ktor)
 }

@@ -1,23 +1,51 @@
 package io.github.feliperce.aabtoapk.repository
 
-import io.github.feliperce.aabtoapk.data.local.dao.ExtractorDao
+import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
+import io.github.feliperce.aabtoapk.data.dto.UploadedFilesDto
+import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
+import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
+import io.github.feliperce.aabtoapk.utils.date.getCurrentDateTime
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.net.URLEncoder
 import java.util.*
 
 class AabExtractorRepository(
-    private val extractorDao: ExtractorDao
+    private val uploadFilesDao: UploadFilesDao,
+    private val extractedFilesDao: ExtractedFilesDao
 ) {
 
-    fun uploadAab(
+    suspend fun uploadAab(
         fileName: String,
+        fileBytes: ByteArray
+    ): UploadedFilesDto {
+        return withContext(Dispatchers.IO) {
+            val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
+
+            val cachedAab = File("${uploadDir.absolutePath}/$fileName")
+            cachedAab.writeBytes(fileBytes)
+
+            uploadFilesDao.insert(
+                UploadedFilesDto(
+                    name = fileName,
+                    path = cachedAab.absolutePath,
+                    uploadedDate = getCurrentDateTime()
+                )
+            )
+        }
+    }
+
+    fun extract(
+        uploadedFilesDto: UploadedFilesDto,
         extractor: ApksExtractor
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
 
@@ -38,13 +66,26 @@ class AabExtractorRepository(
 
         println("SET KEYSTORE")
         extractor.aabToApks(
-            aabFileName = fileName,
+            aabFileName = uploadedFilesDto.name,
             extractorOption = ApksExtractor.ExtractorOption.APKS,
             onSuccess =  { path, name ->
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
                     "${ServerConstants.BASE_URL}/download/${URLEncoder.encode(name, "UTF-8")}"
+
+                extractedFilesDao.insert(
+                    extractedFilesDto = ExtractedFilesDto(
+                        uploadedFileId = uploadedFilesDto.id,
+                        name = name,
+                        fileType = "apks",
+                        isDebugKeystore = true,
+                        extractedDate = getCurrentDateTime(),
+                        downloadUrl = encodedDownloadUrl,
+                        path = path
+                    )
+                )
+
                 trySend(
                     Resource.Success(
                         data = AabConvertResponse(

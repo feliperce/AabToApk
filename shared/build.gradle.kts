@@ -28,6 +28,8 @@ kotlin {
             implementation(libs.ktor.serialization.json)
 
             implementation(libs.bundletool)
+
+            implementation(libs.kotlinx.datetime)
         }
     }
 }

@@ -2,13 +2,9 @@ package io.github.feliperce.aabtoapk
 
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
-import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
-import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
-import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
-import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -23,7 +19,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
-import org.koin.core.context.startKoin
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import java.io.File
@@ -91,7 +86,7 @@ fun Application.module() {
                         val fileName = part.originalFileName as String
                         val fileBytes = part.provider().readRemaining().readByteArray()
 
-                        viewModel.uploadAab(
+                        viewModel.extract(
                             fileName = fileName,
                             fileBytes = fileBytes
                         ).collect { res ->

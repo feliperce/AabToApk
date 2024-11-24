@@ -12,7 +12,7 @@ class ExtractedFileEntity(id: EntityID<Int>) : IntEntity(id) {
     var path by ExtractorDb.ExtractedFiles.path
     var fileType by ExtractorDb.ExtractedFiles.fileType
     var isDebugKeystore by ExtractorDb.ExtractedFiles.isDebugKeystore
-    var uploadedDate by ExtractorDb.ExtractedFiles.extractedDate
+    var extractedDate by ExtractorDb.ExtractedFiles.extractedDate
     var downloadUrl by ExtractorDb.ExtractedFiles.downloadUrl
-    val aabFile by UploadedFilesEntity referrersOn ExtractorDb.ExtractedFiles.aabFile
+    var aabFile by UploadedFilesEntity referencedOn ExtractorDb.ExtractedFiles.aabFile
 }
