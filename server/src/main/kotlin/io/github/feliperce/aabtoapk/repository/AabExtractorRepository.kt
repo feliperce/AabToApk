@@ -1,6 +1,7 @@
 package io.github.feliperce.aabtoapk.repository
 
 import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
+import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.dto.UploadedFilesDto
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
@@ -16,23 +17,19 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 class AabExtractorRepository(
     private val uploadFilesDao: UploadFilesDao,
     private val extractedFilesDao: ExtractedFilesDao
 ) {
 
-    @OptIn(ExperimentalUuidApi::class)
     suspend fun uploadAab(
         fileName: String,
+        hash: String,
         fileBytes: ByteArray
     ): UploadedFilesDto {
         return withContext(Dispatchers.IO) {
             val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
-
-            val hash = Uuid.random().toHexString()
 
             val cachedAab = File("${uploadDir.absolutePath}/${hash}.aab")
             cachedAab.writeBytes(fileBytes)
@@ -48,15 +45,47 @@ class AabExtractorRepository(
         }
     }
 
+    suspend fun uploadKeystore(
+        keystoreInfoDto: KeystoreInfoDto,
+        hash: String
+    ): KeystoreInfoDto {
+        return withContext(Dispatchers.IO) {
+            val uploadDir = File(ServerConstants.PathConf.KEYSTORE_PATH)
+
+            val cachedKeystore = File("${uploadDir.absolutePath}/${hash}${keystoreInfoDto.fileExtension}")
+            cachedKeystore.writeBytes(keystoreInfoDto.fileBytes)
+
+            return@withContext keystoreInfoDto.copy(path = cachedKeystore.absolutePath)
+        }
+    }
+
     fun extract(
         uploadedFilesDto: UploadedFilesDto,
+        keystoreInfoDto: KeystoreInfoDto?,
         extractor: ApksExtractor
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
+
+        val isDebugKeystore = keystoreInfoDto == null
+
+        val keystore = if (isDebugKeystore) {
+            KeystoreInfoDto(
+                path = ServerConstants.DebugKeystore.PATH,
+                fileExtension = ".keystore",
+                keyAlias = ServerConstants.DebugKeystore.ALIAS,
+                password = ServerConstants.DebugKeystore.STORE_PASSWORD,
+                keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
+                name = "",
+                fileBytes = ByteArray(0)
+            )
+        } else {
+            keystoreInfoDto!!
+        }
+
         extractor.setSignConfig(
-            keystorePath = ServerConstants.DebugKeystore.PATH,
-            keystorePassword = ServerConstants.DebugKeystore.STORE_PASSWORD,
-            keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
-            keyAlias = ServerConstants.DebugKeystore.ALIAS,
+            keystorePath = keystore.path,
+            keystorePassword = keystore.password,
+            keyPassword = keystore.keyPassword,
+            keyAlias = keystore.keyAlias,
             onFailure = {
                 trySend(
                     Resource.Error(
@@ -82,7 +111,7 @@ class AabExtractorRepository(
                         uploadedFileId = uploadedFilesDto.id,
                         name = uploadedFilesDto.name,
                         fileExtension = ".apks",
-                        isDebugKeystore = true,
+                        isDebugKeystore = isDebugKeystore,
                         extractedDate = getCurrentDateTime(),
                         downloadUrl = encodedDownloadUrl,
                         path = path,
@@ -96,7 +125,7 @@ class AabExtractorRepository(
                             fileName = name,
                             fileType = ".apks",
                             downloadUrl = encodedDownloadUrl,
-                            debugKeystore = true
+                            debugKeystore = isDebugKeystore
                         )
                     )
                 )

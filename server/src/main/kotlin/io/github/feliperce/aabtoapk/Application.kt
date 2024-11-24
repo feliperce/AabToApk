@@ -1,5 +1,6 @@
 package io.github.feliperce.aabtoapk
 
+import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
@@ -19,6 +20,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
@@ -69,7 +71,10 @@ fun Application.module() {
         }
 
         post("/uploadAab") {
-            var fileDescription = ""
+            var alias = ""
+            var keystorePassword = ""
+            var keyPassword = ""
+            var keystoreInfoDto: KeystoreInfoDto? = null
 
             val multipartData = call.receiveMultipart(formFieldLimit = 400.convertMegaByteToBytesLong())
 
@@ -78,42 +83,66 @@ fun Application.module() {
             multipartData.forEachPart { part ->
                 when (part) {
                     is PartData.FormItem -> {
-                        fileDescription = part.value
+                        when (part.name) {
+                            "alias" -> alias = part.value
+                            "keystorePassword" -> keystorePassword = part.value
+                            "keyPassword" -> keyPassword = part.value
+                        }
                     }
 
                     is PartData.FileItem -> {
-                        println("upload start")
+                        println("upload start ${part.name}")
 
-                        val fileName = part.originalFileName as String
-                        val fileBytes = part.provider().readRemaining().readByteArray()
+                        when (part.name) {
+                            "keystore" -> {
+                                println("START SEND KEYSTORE")
+                                val fileName = part.originalFileName as String
+                                println("KEYSTORE NAME $fileName")
+                                val fileBytes = part.provider().readRemaining().readByteArray()
 
-                        viewModel.extract(
-                            fileName = fileName,
-                            fileBytes = fileBytes
-                        ).collect { res ->
-                            when (res) {
-                                is Resource.Success -> {
-                                    res.data?.let { data ->
-                                        call.respond(data)
-                                    } ?: run {
-                                        val errorMsg =
-                                            "Something unexpected occurred while extracting, please try again later"
-                                        call.respond(
-                                            ErrorResponseType.EXTRACT.toErrorResponse(errorMsg)
-                                        )
+                                keystoreInfoDto = KeystoreInfoDto(
+                                    keyAlias = alias,
+                                    password = keystorePassword,
+                                    keyPassword = keyPassword,
+                                    name = fileName,
+                                    fileBytes = fileBytes,
+                                    fileExtension = ".${fileName.substringAfterLast(".")}"
+                                )
+                            }
+                            "aab" -> {
+                                val fileName = part.originalFileName as String
+                                val fileBytes = part.provider().readRemaining().readByteArray()
+
+                                viewModel.extract(
+                                    fileName = fileName,
+                                    fileBytes = fileBytes,
+                                    keystoreInfoDto = keystoreInfoDto
+                                ).collect { res ->
+                                    when (res) {
+                                        is Resource.Success -> {
+                                            res.data?.let { data ->
+                                                call.respond(data)
+                                            } ?: run {
+                                                val errorMsg =
+                                                    "Something unexpected occurred while extracting, please try again later"
+                                                call.respond(
+                                                    ErrorResponseType.EXTRACT.toErrorResponse(errorMsg)
+                                                )
+                                            }
+                                        }
+                                        is Resource.Error -> {
+                                            res.error?.let { error ->
+                                                call.response.status(HttpStatusCode.NotAcceptable)
+                                                call.respond(error)
+                                            } ?: run {
+                                                call.respond(
+                                                    ErrorResponseType.UNKNOWN.toErrorResponse()
+                                                )
+                                            }
+                                        }
+                                        is Resource.Loading -> {}
                                     }
                                 }
-                                is Resource.Error -> {
-                                    res.error?.let { error ->
-                                        call.response.status(HttpStatusCode.NotAcceptable)
-                                        call.respond(error)
-                                    } ?: run {
-                                        call.respond(
-                                            ErrorResponseType.UNKNOWN.toErrorResponse()
-                                        )
-                                    }
-                                }
-                                is Resource.Loading -> {}
                             }
                         }
                     }
