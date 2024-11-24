@@ -5,6 +5,7 @@ import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
+import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -70,7 +71,7 @@ fun Application.module() {
         post("/uploadAab") {
             var fileDescription = ""
 
-            val multipartData = call.receiveMultipart(formFieldLimit = Long.MAX_VALUE)
+            val multipartData = call.receiveMultipart(formFieldLimit = 400.convertMegaByteToBytesLong())
 
             println("upload init")
 
@@ -126,7 +127,7 @@ fun Application.module() {
         }
 
         get("/download/{fileName}") {
-            val fileName = URLDecoder.decode(call.parameters["fileName"], "UTF-8")
+            val fileName = call.parameters["fileName"]
 
             if (fileName != null) {
                 val file = File("${ServerConstants.PathConf.OUTPUT_EXTRACT_PATH}/$fileName")
@@ -138,7 +139,6 @@ fun Application.module() {
                         ).toString()
                     )
                     call.respondFile(file)
-                    file.delete()
                 } else {
                     call.response.status(HttpStatusCode.NotFound)
                     call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())

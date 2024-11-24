@@ -16,7 +16,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -113,12 +112,6 @@ class AabExtractorRepository(
         )
 
         awaitClose { close() }
-    }
-
-    fun download(
-        hash: String
-    ) {
-
     }
 
 }
