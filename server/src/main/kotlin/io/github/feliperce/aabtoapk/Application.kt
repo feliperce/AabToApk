@@ -153,20 +153,27 @@ fun Application.module() {
             }
         }
 
-        get("/download/{hash}/{fileName}") {
+        get("/download/{hash}") {
             val hash = call.parameters["hash"]
-            val fileName = call.parameters["fileName"]
 
-            if (hash != null && fileName != null) {
-                val file = File("${ServerConstants.PathConf.CACHE_PATH}/$hash/$fileName")
-                if (file.exists()) {
-                    call.response.header(
-                        HttpHeaders.ContentDisposition,
-                        ContentDisposition.Attachment.withParameter(
-                            ContentDisposition.Parameters.FileName, hash
-                        ).toString()
-                    )
-                    call.respondFile(file)
+            if (hash != null) {
+                val extractedFileDto = viewModel.getExtractedFileByHash(hash)
+
+                if (extractedFileDto != null) {
+                    val file = File(extractedFileDto.path)
+
+                    if (file.exists()) {
+                        call.response.header(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition.Attachment.withParameter(
+                                ContentDisposition.Parameters.FileName, extractedFileDto.name
+                            ).toString()
+                        )
+                        call.respondFile(file)
+                    } else {
+                        call.response.status(HttpStatusCode.NotFound)
+                        call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())
+                    }
                 } else {
                     call.response.status(HttpStatusCode.NotFound)
                     call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())

@@ -7,5 +7,6 @@ data class UploadedFilesDto(
     val name: String,
     val path: String,
     val formattedName: String,
+    val hash: String,
     val uploadedDate: LocalDateTime
 )

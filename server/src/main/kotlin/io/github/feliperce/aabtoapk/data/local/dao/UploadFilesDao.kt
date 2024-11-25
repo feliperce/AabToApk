@@ -14,6 +14,7 @@ class UploadFilesDao {
                 path = uploadedFilesDto.path
                 formattedName = uploadedFilesDto.formattedName
                 uploadedDate = uploadedFilesDto.uploadedDate
+                hash = uploadedFilesDto.hash
             }
         }.toUploadFilesDto()
     }

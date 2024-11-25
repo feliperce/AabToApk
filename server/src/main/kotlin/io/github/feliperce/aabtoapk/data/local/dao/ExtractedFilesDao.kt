@@ -24,6 +24,7 @@ class ExtractedFilesDao {
                 path = extractedFilesDto.path
                 extractedDate = extractedFilesDto.extractedDate
                 formattedName = extractedFilesDto.formattedName
+                hash = extractedFilesDto.hash
                 aabFile = uploadedFile
             }.toExtractedFilesDto(extractedFilesDto.uploadedFileId)
         }
@@ -33,7 +34,7 @@ class ExtractedFilesDao {
         hash: String
     ): ExtractedFilesDto? {
         return transaction {
-            val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.formattedName eq hash }.firstOrNull()
+            val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.hash eq hash }.firstOrNull()
 
             extractedFile?.toExtractedFilesDto(extractedFile.aabFile.id.value)
         }

@@ -1,5 +1,6 @@
 package io.github.feliperce.aabtoapk.viewmodel
 
+import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
@@ -30,16 +31,15 @@ class AabExtractorViewModel(
         val keystore = keystoreInfoDto?.let {
             aabExtractorRepository.uploadKeystore(
                 keystoreInfoDto = it,
-                extractPath = extractsFolder.absolutePath,
-                hash = hash
+                extractPath = extractsFolder.absolutePath
             )
         }
 
         val uploadedFilesDto = aabExtractorRepository.uploadAab(
             fileName = fileName,
             extractPath = extractsFolder.absolutePath,
-            fileBytes = fileBytes,
-            hash = hash
+            folderHash = hash,
+            fileBytes = fileBytes
         )
 
         val extractor = ApksExtractor(
@@ -52,8 +52,12 @@ class AabExtractorViewModel(
             uploadedFilesDto = uploadedFilesDto,
             extractor = extractor,
             keystoreInfoDto = keystore,
-            hash = hash
+            folderHash = hash
         )
+    }
+
+    suspend fun getExtractedFileByHash(hash: String): ExtractedFilesDto? {
+        return aabExtractorRepository.getExtractedFileByHash(hash)
     }
 
 }

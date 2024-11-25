@@ -12,25 +12,31 @@ import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.utils.date.getCurrentDateTime
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import io.github.feliperce.aabtoapk.utils.format.replaceExtension
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class AabExtractorRepository(
     private val uploadFilesDao: UploadFilesDao,
     private val extractedFilesDao: ExtractedFilesDao
 ) {
 
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun uploadAab(
         fileName: String,
         extractPath: String,
-        hash: String,
+        folderHash: String,
         fileBytes: ByteArray
     ): UploadedFilesDto {
         return withContext(Dispatchers.IO) {
-            val cachedAab = File("${extractPath}/${hash}.aab")
+            val hash = Uuid.random().toHexString()
+
+            val cachedAab = File("${extractPath}/${hash}")
             cachedAab.writeBytes(fileBytes)
 
             uploadFilesDao.insert(
@@ -38,32 +44,37 @@ class AabExtractorRepository(
                     name = fileName,
                     path = cachedAab.absolutePath,
                     uploadedDate = getCurrentDateTime(),
-                    formattedName = cachedAab.name
+                    formattedName = cachedAab.name,
+                    hash = folderHash
                 )
             )
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun uploadKeystore(
         keystoreInfoDto: KeystoreInfoDto,
-        extractPath: String,
-        hash: String
+        extractPath: String
     ): KeystoreInfoDto {
         return withContext(Dispatchers.IO) {
-            val cachedKeystore = File("${extractPath}/${hash}${keystoreInfoDto.fileExtension}")
+            val hash = Uuid.random().toHexString()
+
+            val cachedKeystore = File("${extractPath}/${hash}")
             cachedKeystore.writeBytes(keystoreInfoDto.fileBytes)
 
             return@withContext keystoreInfoDto.copy(path = cachedKeystore.absolutePath)
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     fun extract(
         uploadedFilesDto: UploadedFilesDto,
         keystoreInfoDto: KeystoreInfoDto?,
-        hash: String,
+        folderHash: String,
         extractor: ApksExtractor
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
 
+        val hash = Uuid.random().toHexString()
         val isDebugKeystore = keystoreInfoDto == null
 
         val keystore = if (isDebugKeystore) {
@@ -97,23 +108,26 @@ class AabExtractorRepository(
 
         println("SET KEYSTORE")
         extractor.aabToApks(
-            aabFileName = uploadedFilesDto.formattedName,
+            apksFileName = hash,
             extractorOption = ApksExtractor.ExtractorOption.APKS,
             onSuccess =  { path, name ->
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
-                    "${ServerConstants.BASE_URL}/download/$hash/$name"
+                    "${ServerConstants.BASE_URL}/download/$folderHash"
+
+                val realName = uploadedFilesDto.name.replaceExtension(".apks")
 
                 extractedFilesDao.insert(
                     extractedFilesDto = ExtractedFilesDto(
                         uploadedFileId = uploadedFilesDto.id,
-                        name = uploadedFilesDto.name,
+                        name = realName,
                         fileExtension = ".apks",
                         isDebugKeystore = isDebugKeystore,
                         extractedDate = getCurrentDateTime(),
                         downloadUrl = encodedDownloadUrl,
                         path = path,
+                        hash = folderHash,
                         formattedName = uploadedFilesDto.formattedName
                     )
                 )
@@ -121,7 +135,7 @@ class AabExtractorRepository(
                 trySend(
                     Resource.Success(
                         data = AabConvertResponse(
-                            fileName = name,
+                            fileName = realName,
                             fileType = ".apks",
                             downloadUrl = encodedDownloadUrl,
                             debugKeystore = isDebugKeystore
@@ -140,6 +154,12 @@ class AabExtractorRepository(
         )
 
         awaitClose { close() }
+    }
+
+    suspend fun getExtractedFileByHash(hash: String): ExtractedFilesDto? {
+        return withContext(Dispatchers.IO) {
+            extractedFilesDao.getByHash(hash)
+        }
     }
 
 }

@@ -8,6 +8,7 @@ data class ExtractedFilesDto(
     val name: String,
     val path: String,
     val fileExtension: String,
+    val hash: String,
     val formattedName: String,
     val isDebugKeystore: Boolean,
     val extractedDate: LocalDateTime,

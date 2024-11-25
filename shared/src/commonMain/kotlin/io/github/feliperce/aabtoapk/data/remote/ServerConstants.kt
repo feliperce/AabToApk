@@ -9,14 +9,10 @@ object ServerConstants {
 
     object PathConf {
         const val CACHE_PATH = "/tmp/AabToApk"
-        const val OUTPUT_EXTRACT_PATH = "/tmp/AabToApk/extracted"
-        const val KEYSTORE_PATH = "/tmp/AabToApk/keystore"
         const val BUILD_TOOLS_PATH = "/home/felipe/Development/Android/Sdk/build-tools/35.0.0"
 
         fun mkdirs() {
             File(CACHE_PATH).mkdirs()
-            File(OUTPUT_EXTRACT_PATH).mkdirs()
-            File(KEYSTORE_PATH).mkdirs()
         }
     }
 
