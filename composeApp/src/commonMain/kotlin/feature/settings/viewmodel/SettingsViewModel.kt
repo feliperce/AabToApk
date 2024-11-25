@@ -10,7 +10,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import shared.settings.SettingsData
-import utils.SuccessMsg
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsg
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository
@@ -87,7 +87,8 @@ class SettingsViewModel(
             _settingsState.update {
                 it.copy(successMsg = SuccessMsg(
                     msg = "Settings changed with success!"
-                ))
+                )
+                )
             }
         }
     }

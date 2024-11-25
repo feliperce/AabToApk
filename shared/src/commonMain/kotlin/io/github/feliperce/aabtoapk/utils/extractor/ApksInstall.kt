@@ -1,11 +1,11 @@
-package utils
+package io.github.feliperce.aabtoapk.utils.extractor
 
 import com.android.tools.build.bundletool.commands.InstallApksCommand
 import com.android.tools.build.bundletool.device.DdmlibAdbServer
+import io.github.feliperce.aabtoapk.utils.platform.PlatformUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import shared.utils.PlatformUtils
 import java.nio.file.Path
 
 class ApksInstall(

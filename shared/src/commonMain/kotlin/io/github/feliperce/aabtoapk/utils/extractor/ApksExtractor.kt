@@ -1,13 +1,13 @@
-package utils
+package io.github.feliperce.aabtoapk.utils.extractor
 
 import com.android.tools.build.bundletool.androidtools.Aapt2Command
 import com.android.tools.build.bundletool.commands.BuildApksCommand
 import com.android.tools.build.bundletool.model.Password
 import com.android.tools.build.bundletool.model.SigningConfiguration
+import io.github.feliperce.aabtoapk.utils.platform.PlatformUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import shared.utils.PlatformUtils
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -51,7 +51,7 @@ class ApksExtractor(
     suspend fun aabToApks(
         apksFileName: String = "",
         extractorOption: ExtractorOption,
-        onSuccess: (output: String) -> Unit,
+        onSuccess: (output: String, fileName: String) -> Unit,
         onFailure: (errorMsg: ErrorMsg) -> Unit
     ) = withContext(Dispatchers.IO) {
         async {
@@ -59,10 +59,13 @@ class ApksExtractor(
                 runCatching {
                     val newApksFileName = apksFileName.ifEmpty {
                         "extracted"
-                    }
+                    }.substringBeforeLast(".")
+                        .plus(".apks")
+
+                    val formattedApksFileName = apksFileName.substringBeforeLast(".")
 
                     val formattedOutputPath = outputApksPath.dropLastWhile { it == '/' }
-                        .plus("/$newApksFileName.apks")
+                        .plus("/$newApksFileName")
 
                     val aapt2Path = buildToolsPath.dropLastWhile { it == '/' }
                         .plus("/aapt2${platformUtils.getPlatformExtension()}")
@@ -82,13 +85,13 @@ class ApksExtractor(
                     val absolutPath = if (extractorOption == ExtractorOption.UNIVERSAL_APK) {
                         unzipUniversalApks(
                             formattedOutputPath,
-                            newApksFileName
+                            formattedApksFileName
                         )
                     } else {
                         formattedOutputPath
                     }
 
-                    onSuccess(absolutPath)
+                    onSuccess(absolutPath, newApksFileName)
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
@@ -129,9 +132,9 @@ class ApksExtractor(
         }
     }
 
-    enum class ExtractorOption {
-        APKS,
-        UNIVERSAL_APK
+    enum class ExtractorOption(val extension: String) {
+        APKS(".apks"),
+        UNIVERSAL_APK(".apk");
     }
 
     private fun ExtractorOption.toApkBuildMode() =

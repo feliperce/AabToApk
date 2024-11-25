@@ -1,4 +1,4 @@
-package utils
+package io.github.feliperce.aabtoapk.utils.extractor
 
 import java.util.UUID
 

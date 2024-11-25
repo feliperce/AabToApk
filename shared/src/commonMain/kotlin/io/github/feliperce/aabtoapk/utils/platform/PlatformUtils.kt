@@ -1,6 +1,6 @@
-package shared.utils
+package io.github.feliperce.aabtoapk.utils.platform
 
-import shared.utils.PlatformType.*
+import io.github.feliperce.aabtoapk.utils.platform.PlatformType.*
 
 class PlatformUtils {
 
