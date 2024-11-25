@@ -1,9 +1,10 @@
 package io.github.feliperce.aabtoapk.utils.date
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 
 
-fun getCurrentDateTime() =
-    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+fun getCurrentInstant() =
+    Clock.System.now()
+
+fun Instant.addHour(hour: Int) =
+    plus(1, DateTimeUnit.HOUR)

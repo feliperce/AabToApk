@@ -12,6 +12,5 @@ class UploadedFilesEntity(id: EntityID<Int>) : IntEntity(id) {
     var name by ExtractorDb.UploadedFiles.name
     var path by ExtractorDb.UploadedFiles.path
     var formattedName by ExtractorDb.UploadedFiles.formattedName
-    var hash by ExtractorDb.UploadedFiles.hash
     var uploadedDate by ExtractorDb.UploadedFiles.uploadDate
 }

@@ -12,7 +12,8 @@ import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
-import io.github.feliperce.aabtoapk.utils.date.getCurrentDateTime
+import io.github.feliperce.aabtoapk.utils.date.addHour
+import io.github.feliperce.aabtoapk.utils.date.getCurrentInstant
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.replaceExtension
 import kotlinx.coroutines.Dispatchers
@@ -30,25 +31,45 @@ class AabExtractorRepository(
 ) {
 
     @OptIn(ExperimentalUuidApi::class)
+    suspend fun insertBasePath(): BasePathDto {
+        return withContext(Dispatchers.IO) {
+            val hash = Uuid.random().toHexString()
+
+            val extractsFolder = File("${ServerConstants.PathConf.CACHE_PATH}/$hash")
+            extractsFolder.mkdir()
+
+            val currentInstant = getCurrentInstant()
+
+            return@withContext basePathDao.insert(
+                BasePathDto(
+                    name = hash,
+                    path = extractsFolder.absolutePath,
+                    createdDate = currentInstant,
+                    dateToRemove = currentInstant.addHour(ServerConstants.REMOVE_UPLOAD_HOUR_TIME)
+                )
+            )
+        }
+    }
+
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun uploadAab(
         fileName: String,
-        extractPath: String,
-        folderHash: String,
+        basePathDto: BasePathDto,
         fileBytes: ByteArray
     ): UploadedFilesDto {
         return withContext(Dispatchers.IO) {
             val hash = Uuid.random().toHexString()
 
-            val cachedAab = File("${extractPath}/${hash}")
+            val cachedAab = File("${basePathDto.path}/${hash}")
             cachedAab.writeBytes(fileBytes)
 
             uploadFilesDao.insert(
                 UploadedFilesDto(
                     name = fileName,
                     path = cachedAab.absolutePath,
-                    uploadedDate = getCurrentDateTime(),
+                    uploadedDate = getCurrentInstant(),
                     formattedName = cachedAab.name,
-                    hash = folderHash
+                    basePathDto = basePathDto
                 )
             )
         }
@@ -73,8 +94,6 @@ class AabExtractorRepository(
     fun extract(
         uploadedFilesDto: UploadedFilesDto,
         keystoreInfoDto: KeystoreInfoDto?,
-        basePathDto: BasePathDto,
-        folderHash: String,
         extractor: ApksExtractor,
         extractorOption: ApksExtractor.ExtractorOption
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
@@ -119,21 +138,21 @@ class AabExtractorRepository(
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
-                    "${ServerConstants.BASE_URL}/download/$folderHash"
+                    "${ServerConstants.BASE_URL}/download/${uploadedFilesDto.basePathDto.name}"
 
                 val realName = uploadedFilesDto.name.replaceExtension(extractorOption.extension)
 
                 extractedFilesDao.insert(
                     extractedFilesDto = ExtractedFilesDto(
-                        uploadedFileId = uploadedFilesDto.id,
                         name = realName,
                         fileExtension = extractorOption.extension,
                         isDebugKeystore = isDebugKeystore,
-                        extractedDate = getCurrentDateTime(),
+                        extractedDate = getCurrentInstant(),
                         downloadUrl = encodedDownloadUrl,
                         path = path,
-                        hash = folderHash,
                         formattedName = uploadedFilesDto.formattedName,
+                        uploadedFilesDto = uploadedFilesDto,
+                        basePathDto = uploadedFilesDto.basePathDto
                     )
                 )
 
@@ -161,9 +180,15 @@ class AabExtractorRepository(
         awaitClose { close() }
     }
 
-    suspend fun getExtractedFileByHash(hash: String): ExtractedFilesDto? {
+    suspend fun getBasePathByName(name: String): BasePathDto? {
         return withContext(Dispatchers.IO) {
-            extractedFilesDao.getByHash(hash)
+            basePathDao.getByName(name)
+        }
+    }
+
+    suspend fun getExtractedFileByBasePath(basePathDto: BasePathDto): ExtractedFilesDto? {
+        return withContext(Dispatchers.IO) {
+            extractedFilesDao.getByBasePath(basePathDto)
         }
     }
 

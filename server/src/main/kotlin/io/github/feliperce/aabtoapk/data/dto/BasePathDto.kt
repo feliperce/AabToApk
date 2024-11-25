@@ -1,10 +1,11 @@
 package io.github.feliperce.aabtoapk.data.dto
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 
 data class BasePathDto(
-    val id: Int,
+    val id: Int = -1,
     val name: String,
-    val createdDate: LocalDateTime,
-    val dateToRemove: LocalDateTime
+    val path: String,
+    val createdDate: Instant,
+    val dateToRemove: Instant
 )

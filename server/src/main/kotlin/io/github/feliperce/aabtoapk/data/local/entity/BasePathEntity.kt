@@ -9,6 +9,7 @@ class BasePathEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<BasePathEntity>(ExtractorDb.BasePaths)
 
     var name by ExtractorDb.BasePaths.name
+    var path by ExtractorDb.BasePaths.path
     var createdDate by ExtractorDb.BasePaths.createdDate
     var dateToRemove by ExtractorDb.BasePaths.dateToRemove
 }

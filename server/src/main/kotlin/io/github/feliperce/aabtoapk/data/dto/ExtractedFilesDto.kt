@@ -1,17 +1,16 @@
 package io.github.feliperce.aabtoapk.data.dto
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 
 data class ExtractedFilesDto(
     val id: Int = -1,
-    val uploadedFileId: Int,
-    val basePathId: Int,
+    val basePathDto: BasePathDto,
+    val uploadedFilesDto: UploadedFilesDto,
     val name: String,
     val path: String,
     val fileExtension: String,
-    val hash: String,
     val formattedName: String,
     val isDebugKeystore: Boolean,
-    val extractedDate: LocalDateTime,
+    val extractedDate: Instant,
     val downloadUrl: String
 )

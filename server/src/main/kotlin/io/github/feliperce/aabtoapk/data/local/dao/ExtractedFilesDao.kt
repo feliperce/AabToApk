@@ -1,7 +1,9 @@
 package io.github.feliperce.aabtoapk.data.local.dao
 
+import io.github.feliperce.aabtoapk.data.dto.BasePathDto
 import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
 import io.github.feliperce.aabtoapk.data.local.ExtractorDb
+import io.github.feliperce.aabtoapk.data.local.entity.BasePathEntity
 import io.github.feliperce.aabtoapk.data.local.entity.ExtractedFileEntity
 import io.github.feliperce.aabtoapk.data.local.entity.UploadedFilesEntity
 import io.github.feliperce.aabtoapk.data.mapper.toExtractedFilesDto
@@ -13,7 +15,10 @@ class ExtractedFilesDao {
         extractedFilesDto: ExtractedFilesDto
     ): ExtractedFilesDto {
         return transaction {
-            val uploadedFile = UploadedFilesEntity.findById(extractedFilesDto.uploadedFileId)
+            val basePath = BasePathEntity.findById(extractedFilesDto.basePathDto.id)
+                ?: throw IllegalArgumentException("db BasePath not found")
+
+            val uploadedFile = UploadedFilesEntity.findById(extractedFilesDto.uploadedFilesDto.id)
                 ?: throw IllegalArgumentException("db Uploaded file not found")
 
             ExtractedFileEntity.new {
@@ -24,25 +29,22 @@ class ExtractedFilesDao {
                 path = extractedFilesDto.path
                 extractedDate = extractedFilesDto.extractedDate
                 formattedName = extractedFilesDto.formattedName
-                hash = extractedFilesDto.hash
                 aabFile = uploadedFile
-            }.toExtractedFilesDto(
-                uploadedFileId = extractedFilesDto.uploadedFileId,
-                basePathId = extractedFilesDto.basePathId
-            )
+                this.basePath = basePath
+            }.toExtractedFilesDto()
         }
     }
 
-    fun getByHash(
-        hash: String
+    fun getByBasePath(
+        basePathDto: BasePathDto
     ): ExtractedFilesDto? {
         return transaction {
-            val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.hash eq hash }.firstOrNull()
+            val basePath = BasePathEntity.findById(basePathDto.id)
+                ?: throw IllegalArgumentException("db BasePath not found")
 
-            extractedFile?.toExtractedFilesDto(
-                uploadedFileId = extractedFile.aabFile.id.value,
-                basePathId = extractedFile.basePath.id.value
-            )
+            val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.basePath eq basePath.id }.firstOrNull()
+
+            extractedFile?.toExtractedFilesDto()
         }
     }
 }

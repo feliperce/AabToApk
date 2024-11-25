@@ -13,6 +13,7 @@ class BasePathDao {
         return transaction {
             BasePathEntity.new {
                 name = basePathDto.name
+                path = basePathDto.path
                 createdDate = basePathDto.createdDate
                 dateToRemove = basePathDto.dateToRemove
             }.toBasePathDto()

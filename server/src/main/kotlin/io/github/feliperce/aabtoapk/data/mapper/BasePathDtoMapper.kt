@@ -7,6 +7,7 @@ fun BasePathEntity.toBasePathDto() =
     BasePathDto(
         id = id.value,
         name = name,
+        path = path,
         createdDate = createdDate,
         dateToRemove = dateToRemove
     )

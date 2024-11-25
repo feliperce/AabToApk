@@ -197,7 +197,12 @@ fun Application.module() {
                 errorResponseType = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME
             )
 
-            val extractedFileDto = viewModel.getExtractedFileByHash(hash) ?: return@get call.sendErrorResponse(
+            val basePathDto = viewModel.getBasePathByName(hash) ?: return@get call.sendErrorResponse(
+                httpStatusCode = HttpStatusCode.NotFound,
+                errorResponseType = ErrorResponseType.DOWNLOAD_NOT_FOUND
+            )
+
+            val extractedFileDto = viewModel.getExtractedByBasePath(basePathDto) ?: return@get call.sendErrorResponse(
                 httpStatusCode = HttpStatusCode.NotFound,
                 errorResponseType = ErrorResponseType.DOWNLOAD_NOT_FOUND
             )

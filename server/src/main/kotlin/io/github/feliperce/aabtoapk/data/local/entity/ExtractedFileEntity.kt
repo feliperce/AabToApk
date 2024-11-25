@@ -17,5 +17,4 @@ class ExtractedFileEntity(id: EntityID<Int>) : IntEntity(id) {
     var isDebugKeystore by ExtractorDb.ExtractedFiles.isDebugKeystore
     var extractedDate by ExtractorDb.ExtractedFiles.extractedDate
     var downloadUrl by ExtractorDb.ExtractedFiles.downloadUrl
-    var hash by ExtractorDb.ExtractedFiles.hash
 }
