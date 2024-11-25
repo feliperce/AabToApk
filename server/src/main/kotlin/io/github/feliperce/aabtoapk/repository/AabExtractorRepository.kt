@@ -25,13 +25,12 @@ class AabExtractorRepository(
 
     suspend fun uploadAab(
         fileName: String,
+        extractPath: String,
         hash: String,
         fileBytes: ByteArray
     ): UploadedFilesDto {
         return withContext(Dispatchers.IO) {
-            val uploadDir = File(ServerConstants.PathConf.OUTPUT_EXTRACT_PATH)
-
-            val cachedAab = File("${uploadDir.absolutePath}/${hash}.aab")
+            val cachedAab = File("${extractPath}/${hash}.aab")
             cachedAab.writeBytes(fileBytes)
 
             uploadFilesDao.insert(
@@ -47,12 +46,11 @@ class AabExtractorRepository(
 
     suspend fun uploadKeystore(
         keystoreInfoDto: KeystoreInfoDto,
+        extractPath: String,
         hash: String
     ): KeystoreInfoDto {
         return withContext(Dispatchers.IO) {
-            val uploadDir = File(ServerConstants.PathConf.KEYSTORE_PATH)
-
-            val cachedKeystore = File("${uploadDir.absolutePath}/${hash}${keystoreInfoDto.fileExtension}")
+            val cachedKeystore = File("${extractPath}/${hash}${keystoreInfoDto.fileExtension}")
             cachedKeystore.writeBytes(keystoreInfoDto.fileBytes)
 
             return@withContext keystoreInfoDto.copy(path = cachedKeystore.absolutePath)
@@ -62,6 +60,7 @@ class AabExtractorRepository(
     fun extract(
         uploadedFilesDto: UploadedFilesDto,
         keystoreInfoDto: KeystoreInfoDto?,
+        hash: String,
         extractor: ApksExtractor
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
 
@@ -104,7 +103,7 @@ class AabExtractorRepository(
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
-                    "${ServerConstants.BASE_URL}/download/$name"
+                    "${ServerConstants.BASE_URL}/download/$hash/$name"
 
                 extractedFilesDao.insert(
                     extractedFilesDto = ExtractedFilesDto(

@@ -20,12 +20,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import java.io.File
-import java.net.URLDecoder
 
 fun main() {
     ServerConstants.PathConf.mkdirs()
@@ -155,16 +153,17 @@ fun Application.module() {
             }
         }
 
-        get("/download/{fileName}") {
+        get("/download/{hash}/{fileName}") {
+            val hash = call.parameters["hash"]
             val fileName = call.parameters["fileName"]
 
-            if (fileName != null) {
-                val file = File("${ServerConstants.PathConf.OUTPUT_EXTRACT_PATH}/$fileName")
+            if (hash != null && fileName != null) {
+                val file = File("${ServerConstants.PathConf.CACHE_PATH}/$hash/$fileName")
                 if (file.exists()) {
                     call.response.header(
                         HttpHeaders.ContentDisposition,
                         ContentDisposition.Attachment.withParameter(
-                            ContentDisposition.Parameters.FileName, fileName
+                            ContentDisposition.Parameters.FileName, hash
                         ).toString()
                     )
                     call.respondFile(file)
