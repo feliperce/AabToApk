@@ -21,7 +21,8 @@ class AabExtractorViewModel(
     suspend fun extract(
         fileName: String,
         fileBytes: ByteArray,
-        keystoreInfoDto: KeystoreInfoDto?
+        keystoreInfoDto: KeystoreInfoDto?,
+        extractorOption: ApksExtractor.ExtractorOption
     ): Flow<Resource<AabConvertResponse, ErrorResponse>> {
         val hash = Uuid.random().toHexString()
 
@@ -52,7 +53,8 @@ class AabExtractorViewModel(
             uploadedFilesDto = uploadedFilesDto,
             extractor = extractor,
             keystoreInfoDto = keystore,
-            folderHash = hash
+            folderHash = hash,
+            extractorOption = extractorOption
         )
     }
 

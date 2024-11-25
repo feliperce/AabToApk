@@ -71,7 +71,8 @@ class AabExtractorRepository(
         uploadedFilesDto: UploadedFilesDto,
         keystoreInfoDto: KeystoreInfoDto?,
         folderHash: String,
-        extractor: ApksExtractor
+        extractor: ApksExtractor,
+        extractorOption: ApksExtractor.ExtractorOption
     ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
 
         val hash = Uuid.random().toHexString()
@@ -109,20 +110,20 @@ class AabExtractorRepository(
         println("SET KEYSTORE")
         extractor.aabToApks(
             apksFileName = hash,
-            extractorOption = ApksExtractor.ExtractorOption.APKS,
+            extractorOption = extractorOption,
             onSuccess =  { path, name ->
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
                     "${ServerConstants.BASE_URL}/download/$folderHash"
 
-                val realName = uploadedFilesDto.name.replaceExtension(".apks")
+                val realName = uploadedFilesDto.name.replaceExtension(extractorOption.extension)
 
                 extractedFilesDao.insert(
                     extractedFilesDto = ExtractedFilesDto(
                         uploadedFileId = uploadedFilesDto.id,
                         name = realName,
-                        fileExtension = ".apks",
+                        fileExtension = extractorOption.extension,
                         isDebugKeystore = isDebugKeystore,
                         extractedDate = getCurrentDateTime(),
                         downloadUrl = encodedDownloadUrl,
@@ -136,7 +137,7 @@ class AabExtractorRepository(
                     Resource.Success(
                         data = AabConvertResponse(
                             fileName = realName,
-                            fileType = ".apks",
+                            fileType = extractorOption.extension,
                             downloadUrl = encodedDownloadUrl,
                             debugKeystore = isDebugKeystore
                         )

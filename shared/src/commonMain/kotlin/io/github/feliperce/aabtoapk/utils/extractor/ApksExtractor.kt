@@ -132,9 +132,9 @@ class ApksExtractor(
         }
     }
 
-    enum class ExtractorOption {
-        APKS,
-        UNIVERSAL_APK
+    enum class ExtractorOption(val extension: String) {
+        APKS(".apks"),
+        UNIVERSAL_APK(".apk");
     }
 
     private fun ExtractorOption.toApkBuildMode() =

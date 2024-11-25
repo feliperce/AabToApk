@@ -6,7 +6,9 @@ import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
+import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
+import io.github.feliperce.aabtoapk.utils.sendErrorResponse
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -63,7 +65,6 @@ fun Application.module() {
 
     routing {
 
-
         get("/") {
             this.call.respond("aaa")
         }
@@ -72,9 +73,12 @@ fun Application.module() {
             var alias = ""
             var keystorePassword = ""
             var keyPassword = ""
+            var extractorOption = ApksExtractor.ExtractorOption.APKS
             var keystoreInfoDto: KeystoreInfoDto? = null
 
-            val multipartData = call.receiveMultipart(formFieldLimit = 400.convertMegaByteToBytesLong())
+            val multipartData = call.receiveMultipart(
+                formFieldLimit = ServerConstants.MAX_AAB_UPLOAD_MB.convertMegaByteToBytesLong()
+            )
 
             println("upload init")
 
@@ -85,6 +89,19 @@ fun Application.module() {
                             "alias" -> alias = part.value
                             "keystorePassword" -> keystorePassword = part.value
                             "keyPassword" -> keyPassword = part.value
+                            "extractorOption" -> {
+                                extractorOption = when (part.value) {
+                                    ApksExtractor.ExtractorOption.APKS.name -> {
+                                        ApksExtractor.ExtractorOption.APKS
+                                    }
+                                    ApksExtractor.ExtractorOption.UNIVERSAL_APK.name -> {
+                                        ApksExtractor.ExtractorOption.UNIVERSAL_APK
+                                    }
+                                    else -> {
+                                        ApksExtractor.ExtractorOption.APKS
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -93,9 +110,19 @@ fun Application.module() {
 
                         when (part.name) {
                             "keystore" -> {
+
                                 println("START SEND KEYSTORE")
                                 val fileName = part.originalFileName as String
-                                println("KEYSTORE NAME $fileName")
+                                val fileExtension = ".${fileName.substringAfterLast(".")}"
+
+                                if (fileExtension != ".jks" && fileExtension != ".keystore") {
+                                    call.sendErrorResponse(
+                                        httpStatusCode = HttpStatusCode.UnsupportedMediaType,
+                                        errorResponseType = ErrorResponseType.UPLOAD_INVALID_KEYSTORE_EXTENSION
+                                    )
+                                    return@forEachPart
+                                }
+
                                 val fileBytes = part.provider().readRemaining().readByteArray()
 
                                 keystoreInfoDto = KeystoreInfoDto(
@@ -109,12 +136,23 @@ fun Application.module() {
                             }
                             "aab" -> {
                                 val fileName = part.originalFileName as String
+                                val fileExtension = ".${fileName.substringAfterLast(".")}"
+
+                                if (fileExtension != ".aab") {
+                                    call.sendErrorResponse(
+                                        httpStatusCode = HttpStatusCode.UnsupportedMediaType,
+                                        errorResponseType = ErrorResponseType.UPLOAD_INVALID_AAB_EXTENSION
+                                    )
+                                    return@forEachPart
+                                }
+
                                 val fileBytes = part.provider().readRemaining().readByteArray()
 
                                 viewModel.extract(
                                     fileName = fileName,
                                     fileBytes = fileBytes,
-                                    keystoreInfoDto = keystoreInfoDto
+                                    keystoreInfoDto = keystoreInfoDto,
+                                    extractorOption = extractorOption
                                 ).collect { res ->
                                     when (res) {
                                         is Resource.Success -> {
@@ -133,8 +171,8 @@ fun Application.module() {
                                                 call.response.status(HttpStatusCode.NotAcceptable)
                                                 call.respond(error)
                                             } ?: run {
-                                                call.respond(
-                                                    ErrorResponseType.UNKNOWN.toErrorResponse()
+                                                call.sendErrorResponse(
+                                                    errorResponseType = ErrorResponseType.UNKNOWN
                                                 )
                                             }
                                         }
@@ -154,34 +192,29 @@ fun Application.module() {
         }
 
         get("/download/{hash}") {
-            val hash = call.parameters["hash"]
+            val hash = call.parameters["hash"] ?: return@get call.sendErrorResponse(
+                httpStatusCode = HttpStatusCode.BadRequest,
+                errorResponseType = ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME
+            )
 
-            if (hash != null) {
-                val extractedFileDto = viewModel.getExtractedFileByHash(hash)
+            val extractedFileDto = viewModel.getExtractedFileByHash(hash) ?: return@get call.sendErrorResponse(
+                httpStatusCode = HttpStatusCode.NotFound,
+                errorResponseType = ErrorResponseType.DOWNLOAD_NOT_FOUND
+            )
 
-                if (extractedFileDto != null) {
-                    val file = File(extractedFileDto.path)
+            val file = File(extractedFileDto.path)
+            if (!file.exists()) return@get call.sendErrorResponse(
+                httpStatusCode = HttpStatusCode.NotFound,
+                errorResponseType = ErrorResponseType.DOWNLOAD_NOT_FOUND
+            )
 
-                    if (file.exists()) {
-                        call.response.header(
-                            HttpHeaders.ContentDisposition,
-                            ContentDisposition.Attachment.withParameter(
-                                ContentDisposition.Parameters.FileName, extractedFileDto.name
-                            ).toString()
-                        )
-                        call.respondFile(file)
-                    } else {
-                        call.response.status(HttpStatusCode.NotFound)
-                        call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())
-                    }
-                } else {
-                    call.response.status(HttpStatusCode.NotFound)
-                    call.respond(ErrorResponseType.DOWNLOAD_NOT_FOUND.toErrorResponse())
-                }
-            } else {
-                call.response.status(HttpStatusCode.NotAcceptable)
-                call.respond(ErrorResponseType.DOWNLOAD_INVALID_FILE_NAME.toErrorResponse())
-            }
+            call.response.header(
+                HttpHeaders.ContentDisposition,
+                ContentDisposition.Attachment.withParameter(
+                    ContentDisposition.Parameters.FileName, extractedFileDto.name
+                ).toString()
+            )
+            call.respondFile(file)
         }
     }
 }

@@ -6,6 +6,8 @@ object ServerConstants {
     const val PORT = 8080
     const val HOST = "192.168.1.9"
     const val BASE_URL = "http://$HOST:$PORT"
+    const val MAX_AAB_UPLOAD_MB = 400
+    const val MAX_JKS_UPLOAD_MB = 1
 
     object PathConf {
         const val CACHE_PATH = "/tmp/AabToApk"
