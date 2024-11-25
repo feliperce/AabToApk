@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 class UploadedFilesEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<UploadedFilesEntity>(ExtractorDb.UploadedFiles)
 
+    var basePath by BasePathEntity referencedOn ExtractorDb.UploadedFiles.basePath
     var name by ExtractorDb.UploadedFiles.name
     var path by ExtractorDb.UploadedFiles.path
     var formattedName by ExtractorDb.UploadedFiles.formattedName

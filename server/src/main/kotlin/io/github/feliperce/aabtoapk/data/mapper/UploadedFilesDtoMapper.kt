@@ -5,9 +5,12 @@ import io.github.feliperce.aabtoapk.data.dto.UploadedFilesDto
 import io.github.feliperce.aabtoapk.data.local.entity.ExtractedFileEntity
 import io.github.feliperce.aabtoapk.data.local.entity.UploadedFilesEntity
 
-fun UploadedFilesEntity.toUploadFilesDto() =
+fun UploadedFilesEntity.toUploadFilesDto(
+    basePathId: Int
+) =
     UploadedFilesDto(
         id = id.value,
+        basePathId = basePathId,
         name = name,
         path = path,
         uploadedDate = uploadedDate,
@@ -15,10 +18,14 @@ fun UploadedFilesEntity.toUploadFilesDto() =
         hash = hash
     )
 
-fun ExtractedFileEntity.toExtractedFilesDto(uploadedFileId: Int) =
+fun ExtractedFileEntity.toExtractedFilesDto(
+    uploadedFileId: Int,
+    basePathId: Int,
+) =
     ExtractedFilesDto(
         id = id.value,
         uploadedFileId = uploadedFileId,
+        basePathId = basePathId,
         name = name,
         path = path,
         fileExtension = fileType,

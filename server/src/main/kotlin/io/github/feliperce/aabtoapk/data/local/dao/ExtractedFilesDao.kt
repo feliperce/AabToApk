@@ -26,7 +26,10 @@ class ExtractedFilesDao {
                 formattedName = extractedFilesDto.formattedName
                 hash = extractedFilesDto.hash
                 aabFile = uploadedFile
-            }.toExtractedFilesDto(extractedFilesDto.uploadedFileId)
+            }.toExtractedFilesDto(
+                uploadedFileId = extractedFilesDto.uploadedFileId,
+                basePathId = extractedFilesDto.basePathId
+            )
         }
     }
 
@@ -36,7 +39,10 @@ class ExtractedFilesDao {
         return transaction {
             val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.hash eq hash }.firstOrNull()
 
-            extractedFile?.toExtractedFilesDto(extractedFile.aabFile.id.value)
+            extractedFile?.toExtractedFilesDto(
+                uploadedFileId = extractedFile.aabFile.id.value,
+                basePathId = extractedFile.basePath.id.value
+            )
         }
     }
 }

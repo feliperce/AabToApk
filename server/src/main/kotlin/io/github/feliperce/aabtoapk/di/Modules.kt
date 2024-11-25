@@ -1,6 +1,7 @@
 package io.github.feliperce.aabtoapk.di
 
 import io.github.feliperce.aabtoapk.data.local.ExtractorDb
+import io.github.feliperce.aabtoapk.data.local.dao.BasePathDao
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
@@ -19,13 +20,14 @@ val dataModule = module {
     }
 
     single(createdAtStart = true) { ExtractorDb(get()) }
+    single { BasePathDao() }
     single { UploadFilesDao() }
     single { ExtractedFilesDao() }
 }
 
 val extractorModule = module {
     single {
-        AabExtractorRepository(get(), get())
+        AabExtractorRepository(get(), get(), get())
     }
 
     factory {

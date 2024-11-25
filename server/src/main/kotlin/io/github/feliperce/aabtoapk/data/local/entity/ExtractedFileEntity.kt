@@ -8,6 +8,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 class ExtractedFileEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ExtractedFileEntity>(ExtractorDb.ExtractedFiles)
 
+    var aabFile by UploadedFilesEntity referencedOn ExtractorDb.ExtractedFiles.aabFile
+    var basePath by BasePathEntity referencedOn ExtractorDb.ExtractedFiles.basePath
     var name by ExtractorDb.ExtractedFiles.name
     var path by ExtractorDb.ExtractedFiles.path
     var fileType by ExtractorDb.ExtractedFiles.fileExtension
@@ -16,5 +18,4 @@ class ExtractedFileEntity(id: EntityID<Int>) : IntEntity(id) {
     var extractedDate by ExtractorDb.ExtractedFiles.extractedDate
     var downloadUrl by ExtractorDb.ExtractedFiles.downloadUrl
     var hash by ExtractorDb.ExtractedFiles.hash
-    var aabFile by UploadedFilesEntity referencedOn ExtractorDb.ExtractedFiles.aabFile
 }

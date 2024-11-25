@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDateTime
 data class ExtractedFilesDto(
     val id: Int = -1,
     val uploadedFileId: Int,
+    val basePathId: Int,
     val name: String,
     val path: String,
     val fileExtension: String,

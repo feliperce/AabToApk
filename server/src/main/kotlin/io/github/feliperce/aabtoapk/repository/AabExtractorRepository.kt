@@ -1,8 +1,10 @@
 package io.github.feliperce.aabtoapk.repository
 
+import io.github.feliperce.aabtoapk.data.dto.BasePathDto
 import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.dto.UploadedFilesDto
+import io.github.feliperce.aabtoapk.data.local.dao.BasePathDao
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.data.remote.Resource
@@ -23,7 +25,8 @@ import kotlin.uuid.Uuid
 
 class AabExtractorRepository(
     private val uploadFilesDao: UploadFilesDao,
-    private val extractedFilesDao: ExtractedFilesDao
+    private val extractedFilesDao: ExtractedFilesDao,
+    private val basePathDao: BasePathDao
 ) {
 
     @OptIn(ExperimentalUuidApi::class)
@@ -70,6 +73,7 @@ class AabExtractorRepository(
     fun extract(
         uploadedFilesDto: UploadedFilesDto,
         keystoreInfoDto: KeystoreInfoDto?,
+        basePathDto: BasePathDto,
         folderHash: String,
         extractor: ApksExtractor,
         extractorOption: ApksExtractor.ExtractorOption
@@ -129,7 +133,7 @@ class AabExtractorRepository(
                         downloadUrl = encodedDownloadUrl,
                         path = path,
                         hash = folderHash,
-                        formattedName = uploadedFilesDto.formattedName
+                        formattedName = uploadedFilesDto.formattedName,
                     )
                 )
 
