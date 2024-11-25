@@ -5,6 +5,7 @@ import io.github.feliperce.aabtoapk.data.local.dao.BasePathDao
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
+import io.github.feliperce.aabtoapk.repository.RemoveCacheRepository
 import io.github.feliperce.aabtoapk.server.BuildConfig
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import org.jetbrains.exposed.sql.Database
@@ -29,6 +30,8 @@ val extractorModule = module {
     single {
         AabExtractorRepository(get(), get(), get())
     }
+
+    single { RemoveCacheRepository(get(), get(), get()) }
 
     factory {
         AabExtractorViewModel(get())

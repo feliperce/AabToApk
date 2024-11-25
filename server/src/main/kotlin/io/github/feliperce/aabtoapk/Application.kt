@@ -6,6 +6,8 @@ import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
+import io.github.feliperce.aabtoapk.job.RemoveCacheJob
+import io.github.feliperce.aabtoapk.job.initJobs
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
 import io.github.feliperce.aabtoapk.utils.sendErrorResponse
@@ -30,8 +32,12 @@ import java.io.File
 fun main() {
     ServerConstants.PathConf.mkdirs()
 
-    embeddedServer(Netty, port = ServerConstants.PORT, host = ServerConstants.HOST, module = Application::module)
-        .start(wait = true)
+    embeddedServer(
+        factory = Netty,
+        port = ServerConstants.PORT,
+        host = ServerConstants.HOST,
+        module = Application::module
+    ).start(wait = true)
 }
 
 fun Application.module() {
@@ -60,6 +66,8 @@ fun Application.module() {
         allowHeader(HttpHeaders.UserAgent)
         anyHost()
     }
+
+    initJobs()
 
     val viewModel by inject<AabExtractorViewModel>()
 

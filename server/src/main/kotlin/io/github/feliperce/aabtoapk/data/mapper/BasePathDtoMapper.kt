@@ -11,3 +11,8 @@ fun BasePathEntity.toBasePathDto() =
         createdDate = createdDate,
         dateToRemove = dateToRemove
     )
+
+fun Iterable<BasePathEntity>.toBasePathDtoList() =
+    map {
+        it.toBasePathDto()
+    }

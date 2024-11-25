@@ -7,6 +7,8 @@ import io.github.feliperce.aabtoapk.data.local.entity.BasePathEntity
 import io.github.feliperce.aabtoapk.data.local.entity.ExtractedFileEntity
 import io.github.feliperce.aabtoapk.data.local.entity.UploadedFilesEntity
 import io.github.feliperce.aabtoapk.data.mapper.toExtractedFilesDto
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ExtractedFilesDao {
@@ -44,7 +46,17 @@ class ExtractedFilesDao {
 
             val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.basePath eq basePath.id }.firstOrNull()
 
+            extractedFile?.delete()
+
             extractedFile?.toExtractedFilesDto()
+        }
+    }
+
+    fun removeByBasePathId(
+        basePathId: Int
+    ): Int {
+        return transaction {
+            ExtractorDb.ExtractedFiles.deleteWhere { basePath eq basePathId }
         }
     }
 }

@@ -42,4 +42,6 @@ dependencies {
     implementation(libs.postgresql)
 
     implementation(libs.koin.ktor)
+
+    implementation(libs.quartz)
 }

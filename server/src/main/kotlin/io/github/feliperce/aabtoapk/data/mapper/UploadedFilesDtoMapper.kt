@@ -15,6 +15,8 @@ fun UploadedFilesEntity.toUploadFilesDto() =
         formattedName = formattedName
     )
 
+fun Iterable<UploadedFilesEntity>.toUploadFilesDtoList() = map { it.toUploadFilesDto() }
+
 fun ExtractedFileEntity.toExtractedFilesDto() =
     ExtractedFilesDto(
         id = id.value,
@@ -28,3 +30,5 @@ fun ExtractedFileEntity.toExtractedFilesDto() =
         downloadUrl = downloadUrl,
         formattedName = formattedName
     )
+
+fun Iterable<ExtractedFileEntity>.toExtractedFilesDtoList() = map { it.toExtractedFilesDto() }

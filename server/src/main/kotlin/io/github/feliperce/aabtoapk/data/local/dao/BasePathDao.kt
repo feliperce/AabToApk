@@ -4,6 +4,10 @@ import io.github.feliperce.aabtoapk.data.dto.BasePathDto
 import io.github.feliperce.aabtoapk.data.local.ExtractorDb
 import io.github.feliperce.aabtoapk.data.local.entity.BasePathEntity
 import io.github.feliperce.aabtoapk.data.mapper.toBasePathDto
+import io.github.feliperce.aabtoapk.data.mapper.toBasePathDtoList
+import io.github.feliperce.aabtoapk.utils.date.getCurrentInstant
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class BasePathDao {
@@ -26,6 +30,34 @@ class BasePathDao {
         return transaction {
             val basePathEntity = BasePathEntity.find { ExtractorDb.BasePaths.name eq name }.firstOrNull()
             basePathEntity?.toBasePathDto()
+        }
+    }
+
+    fun getAllByDateToRemove(): List<BasePathDto> {
+        return transaction {
+            val currentInstant = getCurrentInstant()
+
+            val basePathEntity = BasePathEntity.find {
+                ExtractorDb.BasePaths.dateToRemove lessEq currentInstant
+            }
+
+            basePathEntity.toBasePathDtoList()
+        }
+    }
+
+    fun removeByName(
+        name: String
+    ): Int {
+        return transaction {
+            ExtractorDb.BasePaths.deleteWhere { ExtractorDb.BasePaths.name eq name }
+        }
+    }
+
+    fun removeById(
+        id: Int
+    ): Int {
+        return transaction {
+            ExtractorDb.BasePaths.deleteWhere { ExtractorDb.BasePaths.id eq id }
         }
     }
 }
