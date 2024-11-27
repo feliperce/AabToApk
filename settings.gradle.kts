@@ -37,6 +37,7 @@ include(":composeApp")
 include(":remoteApp")
 include(":server")
 include(":shared")
+include(":sharedui")
 include("shared")
 include("shared:commonMain")
 findProject(":shared:commonMain")?.name = "commonMain"

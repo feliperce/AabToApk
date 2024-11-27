@@ -125,7 +125,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        errorMsg = extractorUiState.errorMsg
+        msg = extractorUiState.errorMsg.msg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(

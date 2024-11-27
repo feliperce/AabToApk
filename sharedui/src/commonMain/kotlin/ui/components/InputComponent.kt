@@ -25,7 +25,8 @@ import io.github.vinceglb.filekit.core.PickerType
 import io.github.vinceglb.filekit.core.PlatformDirectory
 import io.github.vinceglb.filekit.core.PlatformFile
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import java.util.UUID
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,8 +185,6 @@ fun DirectoryPickerTextField(
     label: String? = null,
     enabled: Boolean = true,
     onDirectoryResult: (fileResult: PlatformDirectory) -> Unit = {},
-    fileType: PickerType = PickerType.File(),
-    selectionMode: PickerMode<PlatformFile> = PickerMode.Single,
     pickerTitle: String? = null
 ) {
     var text by remember { mutableStateOf(initialText) }
@@ -264,8 +263,9 @@ data class SpinnerItem(
     val data: Any?
 )
 
+@OptIn(ExperimentalUuidApi::class)
 data class RadioItem(
-    val id: String = UUID.randomUUID().toString(),
+    val id: String = Uuid.random().toHexString(),
     val text: String,
     val data: Any? = null,
     var isSelected: Boolean = false

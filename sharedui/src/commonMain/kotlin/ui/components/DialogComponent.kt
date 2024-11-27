@@ -7,12 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.FontWeight
 import ui.theme.Red800
-import io.github.feliperce.aabtoapk.utils.extractor.ErrorMsg
 
 @Composable
 fun ErrorDialog(
     showDialog: MutableState<Boolean>,
-    errorMsg: ErrorMsg
+    title: String = "",
+    msg: String
 ) {
     if (showDialog.value) {
         AlertDialog(
@@ -28,13 +28,13 @@ fun ErrorDialog(
             },
             title = {
                 Text(
-                    text = errorMsg.title,
+                    text = title,
                     fontWeight = FontWeight.SemiBold,
                     color = Red800
                 )
             },
             text = {
-                Text(text = errorMsg.msg)
+                Text(text = msg)
             },
         )
     }
