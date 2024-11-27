@@ -1,6 +1,5 @@
 package io.github.feliperce.aabtoapk.data.remote
 
-import java.io.File
 
 object ServerConstants {
     const val PORT = 8080
@@ -12,10 +11,6 @@ object ServerConstants {
     object PathConf {
         const val CACHE_PATH = "/tmp/AabToApk"
         const val BUILD_TOOLS_PATH = "/home/felipe/Development/Android/Sdk/build-tools/35.0.0"
-
-        fun mkdirs() {
-            File(CACHE_PATH).mkdirs()
-        }
     }
 
     object DebugKeystore {

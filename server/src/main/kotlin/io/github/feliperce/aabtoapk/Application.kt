@@ -10,6 +10,7 @@ import io.github.feliperce.aabtoapk.job.RemoveCacheJob
 import io.github.feliperce.aabtoapk.job.initJobs
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
+import io.github.feliperce.aabtoapk.utils.mkdirs
 import io.github.feliperce.aabtoapk.utils.sendErrorResponse
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*

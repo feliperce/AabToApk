@@ -2,7 +2,6 @@ package io.github.feliperce.aabtoapk.utils.date
 
 import kotlinx.datetime.*
 
-
 fun getCurrentInstant() =
     Clock.System.now()
 

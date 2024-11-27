@@ -46,8 +46,6 @@ class ExtractedFilesDao {
 
             val extractedFile = ExtractedFileEntity.find { ExtractorDb.ExtractedFiles.basePath eq basePath.id }.firstOrNull()
 
-            extractedFile?.delete()
-
             extractedFile?.toExtractedFilesDto()
         }
     }
