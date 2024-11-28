@@ -423,54 +423,6 @@ fun KeystoreSignForm(
 }
 
 @Composable
-fun FormCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    actionIcon: ImageVector? = null,
-    onActionClick: () -> Unit = {},
-    isActionButtonEnabled: Boolean = false,
-    formCardContent: @Composable () -> Unit
-) {
-    Card(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        )
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(MarginPaddingSizeMedium)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = MarginPaddingSizeSmall)
-                        .fillMaxWidth(),
-                    fontWeight = FontWeight.W500,
-                    text = title
-                )
-                actionIcon?.let {
-                    IconButton(
-                        onClick = onActionClick,
-                        enabled = isActionButtonEnabled
-                    ) {
-                        Icon(
-                            imageVector = it,
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-
-            formCardContent()
-        }
-    }
-}
-
-@Composable
 fun OutputForm(
     extractorFormData: ExtractorFormData,
     onFormDataChange: (ExtractorFormData) -> Unit,
