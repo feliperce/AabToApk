@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
@@ -28,7 +29,6 @@ fun ExtractorScreen() {
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
-    var isDebugKeystore by remember { mutableStateOf(true) }
 
     val scope = rememberCoroutineScope()
 
@@ -52,7 +52,8 @@ fun ExtractorScreen() {
         extractorUiState.errorMsg?.let { error ->
             snackbarHostState
                 .showSnackbar(
-                    message = error.msg
+                    message = error.msg,
+                    duration = SnackbarDuration.Long
                 )
         }
     }
@@ -62,11 +63,10 @@ fun ExtractorScreen() {
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             ExtractorContent(
-                isLoading = false,
+                isLoading = extractorUiState.loading,
                 extractOptions = extractorOptionsList,
                 extractorResponseDto = extractorUiState.extractorResponseDto,
                 onDebugKeystoreChecked = {
-                    isDebugKeystore = it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
                         isDebugKeystore = it
                     )
@@ -83,7 +83,7 @@ fun ExtractorScreen() {
                     }
                 },
                 selectedOption = selectedOption,
-                showKeystoreForm = !isDebugKeystore,
+                showKeystoreForm = !extractorUiState.keystore.isDebugKeystore,
                 onKeystoreFileResult = {
                     scope.launch {
                         extractorUiState.keystore = extractorUiState.keystore.copy(
@@ -204,13 +204,15 @@ fun SuccessContent(
         modifier = modifier
     ) {
         Text(
+            modifier = Modifier.fillMaxWidth(),
             text = "$fileName extracted with success!",
-            color = Green200
+            color = Green200,
+            textAlign = TextAlign.Center
         )
 
         Button(
             colors = ButtonDefaults.buttonColors(
-                contentColor = Purple600
+                containerColor = Purple600
             ),
             onClick = {
                 onButtonClick()

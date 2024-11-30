@@ -51,9 +51,12 @@ class ExtractorRepository(
     }.onCompletion {
         emit(Resource.Loading(isLoading = false))
     }.catch { cause ->
-        emit(Resource.Error(error = DefaultErrorMsg(msg = "GENERIC")))
-        when (cause) {
-
-        }
+        emit(
+            Resource.Error(
+                error = DefaultErrorMsg(
+                    msg = cause.message ?: "Something unexpected occurred, please try again later"
+                )
+            )
+        )
     }
 }
