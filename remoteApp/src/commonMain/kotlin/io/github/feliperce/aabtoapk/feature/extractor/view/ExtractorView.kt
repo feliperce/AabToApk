@@ -6,17 +6,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
+import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
+import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
+import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 
 @Composable
 fun ExtractorScreen() {
+    val extractorViewModel: ExtractorViewModel = koinViewModel()
+
+    val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
     var isDebugKeystore by remember { mutableStateOf(true) }
+
+    val scope = rememberCoroutineScope()
 
     val extractorOptionsList = listOf(
         RadioItem(
@@ -41,19 +52,54 @@ fun ExtractorScreen() {
                 extractOptions = extractorOptionsList,
                 onDebugKeystoreChecked = {
                     isDebugKeystore = it
+                    extractorUiState.keystore = extractorUiState.keystore.copy(
+                        isDebugKeystore = it
+                    )
                 },
                 onItemSelected = {
                     selectedOption = it
                 },
                 onFileResult = {
-
+                    scope.launch {
+                        extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
+                            aabByteArray = it.readBytes(),
+                            fileName = it.name
+                        )
+                    }
                 },
                 selectedOption = selectedOption,
                 showKeystoreForm = !isDebugKeystore,
-                onKeystoreFileResult = {},
-                onPasswordFieldChange = {  },
-                onAliasFieldChange = {},
-                onKeyPasswordFieldChange = {}
+                onKeystoreFileResult = {
+                    scope.launch {
+                        extractorUiState.keystore = extractorUiState.keystore.copy(
+                            keystoreFileName = it.name,
+                            keystoreByteArray = it.readBytes()
+                        )
+                    }
+                },
+                onPasswordFieldChange = {
+                    extractorUiState.keystore = extractorUiState.keystore.copy(
+                        password = it
+                    )
+                },
+                onAliasFieldChange = {
+                    extractorUiState.keystore = extractorUiState.keystore.copy(
+                        alias = it
+                    )
+                },
+                onKeyPasswordFieldChange = {
+                    extractorUiState.keystore = extractorUiState.keystore.copy(
+                        keyPassword = it
+                    )
+                },
+                onUploadButtonClick = {
+                    extractorViewModel.sendIntent(
+                        ExtractorIntent.UploadAndExtract(
+                            keystoreDto = extractorUiState.keystore,
+                            aabFileDto = extractorUiState.aabFileDto
+                        )
+                    )
+                }
             )
         }
     }
@@ -71,7 +117,8 @@ fun ExtractorContent(
     onKeystoreFileResult: (platformFile: PlatformFile) -> Unit,
     onPasswordFieldChange: (text: String) -> Unit,
     onAliasFieldChange: (text: String) -> Unit,
-    onKeyPasswordFieldChange: (text: String) -> Unit
+    onKeyPasswordFieldChange: (text: String) -> Unit,
+    onUploadButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -97,6 +144,16 @@ fun ExtractorContent(
                 onKeyPasswordFieldChange = onKeyPasswordFieldChange
             )
         }
+
+        Button(
+            modifier = Modifier
+                .padding(top = MarginPaddingSizeMedium)
+                .fillMaxWidth(),
+            onClick = onUploadButtonClick,
+            content = {
+                Text("UPLOAD AND EXTRACT")
+            }
+        )
     }
 }
 

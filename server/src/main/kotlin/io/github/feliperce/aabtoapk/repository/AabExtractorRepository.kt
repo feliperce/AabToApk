@@ -9,7 +9,7 @@ import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
-import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
+import io.github.feliperce.aabtoapk.data.remote.response.ExtractorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.utils.date.addHour
@@ -96,7 +96,7 @@ class AabExtractorRepository(
         keystoreInfoDto: KeystoreInfoDto?,
         extractor: ApksExtractor,
         extractorOption: ApksExtractor.ExtractorOption
-    ) = callbackFlow<Resource<AabConvertResponse, ErrorResponse>> {
+    ) = callbackFlow<Resource<ExtractorResponse, ErrorResponse>> {
 
         val hash = Uuid.random().toHexString()
         val isDebugKeystore = keystoreInfoDto == null
@@ -158,7 +158,7 @@ class AabExtractorRepository(
 
                 trySend(
                     Resource.Success(
-                        data = AabConvertResponse(
+                        data = ExtractorResponse(
                             fileName = realName,
                             fileType = extractorOption.extension,
                             downloadUrl = encodedDownloadUrl,
