@@ -1,13 +1,22 @@
 package io.github.feliperce.aabtoapk.feature.extractor.repository
 
+import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ExtractorResponse
 import io.github.feliperce.aabtoapk.feature.extractor.data.remote.ExtractorApi
+import io.github.feliperce.aabtoapk.feature.extractor.mapper.toErrorMsg
+import io.github.feliperce.aabtoapk.feature.extractor.mapper.toExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
+import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
 import io.github.vinceglb.filekit.core.PlatformFile
 import io.ktor.client.call.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import ui.handler.DefaultErrorMsg
 
 class ExtractorRepository(
     private val extractorApi: ExtractorApi
@@ -16,7 +25,7 @@ class ExtractorRepository(
     suspend fun uploadAndExtract(
         keystoreDto: KeystoreDto,
         aabFileDto: AabFileDto
-    ) {
+    ) = flow<Resource<ExtractorResponseDto, DefaultErrorMsg>> {
 
         println("ENTROU repository UPLOAD")
 
@@ -28,14 +37,23 @@ class ExtractorRepository(
         println("ENTROU repository UPLOAD - passou response")
 
         if (response.status == HttpStatusCode.OK) {
-            val news = response.body() as ExtractorResponse
+            val extractorResponse = response.body() as ExtractorResponse
             println("SUCCESS")
-            //emit(Resource.Success(data = news.toNews()))
+            emit(Resource.Success(data = extractorResponse.toExtractorResponseDto()))
         } else {
             println("FAILURE")
             val errorResponse = response.body() as ErrorResponse
-            //emit(Resource.Error(error = errorResponse.toErrorData()))
+            emit(Resource.Error(error = errorResponse.toErrorMsg()))
         }
 
+    }.onStart {
+        emit(Resource.Loading(isLoading = true))
+    }.onCompletion {
+        emit(Resource.Loading(isLoading = false))
+    }.catch { cause ->
+        emit(Resource.Error(error = DefaultErrorMsg(msg = "GENERIC")))
+        when (cause) {
+
+        }
     }
 }

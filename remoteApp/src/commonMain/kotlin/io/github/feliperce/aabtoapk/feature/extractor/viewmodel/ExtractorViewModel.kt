@@ -2,6 +2,7 @@ package io.github.feliperce.aabtoapk.feature.extractor.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
 import io.github.feliperce.aabtoapk.feature.extractor.repository.ExtractorRepository
@@ -10,6 +11,7 @@ import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorUiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import ui.handler.DefaultErrorMsg
 
 class ExtractorViewModel(
     private val extractorRepository: ExtractorRepository
@@ -49,12 +51,29 @@ class ExtractorViewModel(
         keystoreDto: KeystoreDto,
         aabFileDto: AabFileDto
     ) {
-        println("ENTROU VIEW MODEL UPLOAD")
         viewModelScope.launch {
             extractorRepository.uploadAndExtract(
                 keystoreDto = keystoreDto,
                 aabFileDto = aabFileDto
-            )
+            ).collect { res ->
+                when (res) {
+                    is Resource.Success -> {
+                        _extractorState.update {
+                            it.copy(extractorResponseDto = res.data)
+                        }
+                    }
+                    is Resource.Error -> {
+                        _extractorState.update {
+                            it.copy(errorMsg = res.error ?: DefaultErrorMsg(msg = "GENERIC"))
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _extractorState.update {
+                            it.copy(loading = res.isLoading)
+                        }
+                    }
+                }
+            }
         }
     }
 

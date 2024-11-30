@@ -7,7 +7,8 @@ import kotlin.uuid.Uuid
 data class DefaultErrorMsg(
     val title: String = "",
     val msg: String = "",
-    val id: String = Uuid.random().toHexString()
+    val id: String = Uuid.random().toHexString(),
+    val code: Int = -1
 )
 
 @OptIn(ExperimentalUuidApi::class)

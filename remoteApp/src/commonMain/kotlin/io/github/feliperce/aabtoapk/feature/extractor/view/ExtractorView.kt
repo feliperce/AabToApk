@@ -6,18 +6,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
-import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
+import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
+import ui.theme.Green200
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
+import ui.theme.Purple600
 
 @Composable
 fun ExtractorScreen() {
@@ -25,6 +27,7 @@ fun ExtractorScreen() {
 
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
     var isDebugKeystore by remember { mutableStateOf(true) }
 
     val scope = rememberCoroutineScope()
@@ -45,11 +48,23 @@ fun ExtractorScreen() {
 
     var selectedOption by remember { mutableStateOf(extractorOptionsList[0]) }
 
-    Scaffold { paddingValues ->
+    LaunchedEffect(extractorUiState.errorMsg?.id) {
+        extractorUiState.errorMsg?.let { error ->
+            snackbarHostState
+                .showSnackbar(
+                    message = error.msg
+                )
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             ExtractorContent(
                 isLoading = false,
                 extractOptions = extractorOptionsList,
+                extractorResponseDto = extractorUiState.extractorResponseDto,
                 onDebugKeystoreChecked = {
                     isDebugKeystore = it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
@@ -99,8 +114,20 @@ fun ExtractorScreen() {
                             aabFileDto = extractorUiState.aabFileDto
                         )
                     )
+                },
+                onDownloadButtonClick = {
+
                 }
             )
+        }
+
+        if (extractorUiState.loading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -111,6 +138,7 @@ fun ExtractorContent(
     showKeystoreForm: Boolean,
     extractOptions: List<RadioItem>,
     selectedOption: RadioItem,
+    extractorResponseDto: ExtractorResponseDto?,
     onDebugKeystoreChecked: (isChecked: Boolean) -> Unit,
     onItemSelected: (item: RadioItem) -> Unit,
     onFileResult: (platformFile: PlatformFile) -> Unit,
@@ -118,7 +146,8 @@ fun ExtractorContent(
     onPasswordFieldChange: (text: String) -> Unit,
     onAliasFieldChange: (text: String) -> Unit,
     onKeyPasswordFieldChange: (text: String) -> Unit,
-    onUploadButtonClick: () -> Unit
+    onUploadButtonClick: () -> Unit,
+    onDownloadButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -152,6 +181,42 @@ fun ExtractorContent(
             onClick = onUploadButtonClick,
             content = {
                 Text("UPLOAD AND EXTRACT")
+            }
+        )
+
+        extractorResponseDto?.let { extractorResponse ->
+            SuccessContent(
+                modifier = Modifier.padding(top = MarginPaddingSizeMedium),
+                fileName = extractorResponse.fileName,
+                onButtonClick = onDownloadButtonClick
+            )
+        }
+    }
+}
+
+@Composable
+fun SuccessContent(
+    modifier: Modifier = Modifier,
+    fileName: String,
+    onButtonClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = "$fileName extracted with success!",
+            color = Green200
+        )
+
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Purple600
+            ),
+            onClick = {
+                onButtonClick()
+            },
+            content = {
+                Text("DOWNLOAD")
             }
         )
     }
@@ -284,7 +349,16 @@ fun KeystoreForm(
 
 @Composable
 @Preview
-fun UploadFormPreview() {
+private fun SuccessContentPreview() {
+    SuccessContent(
+        fileName = "aaa.apks",
+        onButtonClick = {}
+    )
+}
+
+@Composable
+@Preview
+private fun UploadFormPreview() {
     UploadForm(
         isLoading = false,
         extractOptions = fakeExtractOptions,
