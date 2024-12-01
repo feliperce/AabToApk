@@ -31,6 +31,9 @@ fun ExtractorScreen() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showKeystoreForm by remember { mutableStateOf(false) }
+    var passwordText by remember { mutableStateOf("") }
+    var aliasText by remember { mutableStateOf("") }
+    var keyPasswordText by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
 
@@ -96,16 +99,19 @@ fun ExtractorScreen() {
                     }
                 },
                 onPasswordFieldChange = {
+                    passwordText = it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
                         password = it
                     )
                 },
                 onAliasFieldChange = {
+                    aliasText = it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
                         alias = it
                     )
                 },
                 onKeyPasswordFieldChange = {
+                    keyPasswordText = it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
                         keyPassword = it
                     )
@@ -121,7 +127,10 @@ fun ExtractorScreen() {
                 },
                 onDownloadButtonClick = {
 
-                }
+                },
+                passwordText = passwordText,
+                aliasText = aliasText,
+                keyPasswordText = keyPasswordText
             )
         }
 
@@ -151,8 +160,12 @@ fun ExtractorContent(
     onAliasFieldChange: (text: String) -> Unit,
     onKeyPasswordFieldChange: (text: String) -> Unit,
     onUploadButtonClick: () -> Unit,
-    onDownloadButtonClick: () -> Unit
+    onDownloadButtonClick: () -> Unit,
+    passwordText: String,
+    aliasText: String,
+    keyPasswordText: String
 ) {
+    // TODO ARRUMAR O KEYSTORE PATH QUE SOME COM O IS DEBUG
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -174,7 +187,10 @@ fun ExtractorContent(
                 onKeystoreFileResult = onKeystoreFileResult,
                 onPasswordFieldChange = onPasswordFieldChange,
                 onAliasFieldChange = onAliasFieldChange,
-                onKeyPasswordFieldChange = onKeyPasswordFieldChange
+                onKeyPasswordFieldChange = onKeyPasswordFieldChange,
+                passwordText = passwordText,
+                aliasText = aliasText,
+                keyPasswordText = keyPasswordText
             )
         }
 
@@ -294,12 +310,11 @@ fun KeystoreForm(
     onKeystoreFileResult: (platformFile: PlatformFile) -> Unit,
     onPasswordFieldChange: (text: String) -> Unit,
     onAliasFieldChange: (text: String) -> Unit,
-    onKeyPasswordFieldChange: (text: String) -> Unit
+    onKeyPasswordFieldChange: (text: String) -> Unit,
+    passwordText: String,
+    aliasText: String,
+    keyPasswordText: String
 ) {
-    var passwordText by remember { mutableStateOf("") }
-    var aliasText by remember { mutableStateOf("") }
-    var keyPasswordText by remember { mutableStateOf("") }
-
     FormCard(
         modifier = modifier.fillMaxWidth(),
         title = "Keystore",
@@ -323,7 +338,6 @@ fun KeystoreForm(
             value = passwordText,
             enabled = !isLoading,
             onValueChange = { text ->
-                passwordText = text
                 onPasswordFieldChange(text)
             },
             label = { Text("Keystore Password") }
@@ -334,7 +348,6 @@ fun KeystoreForm(
             value = aliasText,
             enabled = !isLoading,
             onValueChange = { text ->
-                aliasText = text
                 onAliasFieldChange(text)
             },
             label = { Text("Alias") }
@@ -345,7 +358,6 @@ fun KeystoreForm(
             value = keyPasswordText,
             enabled = !isLoading,
             onValueChange = { text ->
-                keyPasswordText = text
                 onKeyPasswordFieldChange(text)
             },
             label = { Text("Key Password") }
