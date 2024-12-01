@@ -58,5 +58,6 @@ class ExtractorRepository(
                 )
             )
         )
+        emit(Resource.Loading(isLoading = false))
     }
 }

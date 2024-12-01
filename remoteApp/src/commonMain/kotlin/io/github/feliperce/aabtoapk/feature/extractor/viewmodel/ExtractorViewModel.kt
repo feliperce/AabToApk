@@ -52,27 +52,81 @@ class ExtractorViewModel(
         aabFileDto: AabFileDto
     ) {
         viewModelScope.launch {
-            extractorRepository.uploadAndExtract(
-                keystoreDto = keystoreDto,
-                aabFileDto = aabFileDto
-            ).collect { res ->
-                when (res) {
-                    is Resource.Success -> {
-                        _extractorState.update {
-                            it.copy(extractorResponseDto = res.data)
-                        }
-                    }
-                    is Resource.Error -> {
-                        _extractorState.update {
-                            it.copy(errorMsg = res.error ?: DefaultErrorMsg(msg = "GENERIC"))
-                        }
-                    }
-                    is Resource.Loading -> {
-                        _extractorState.update {
-                            it.copy(loading = res.isLoading)
+            if (validateAabForm(aabFileDto)) {
+                if (validateKeystoreForm(keystoreDto)) {
+                    extractorRepository.uploadAndExtract(
+                        keystoreDto = keystoreDto,
+                        aabFileDto = aabFileDto
+                    ).collect { res ->
+                        when (res) {
+                            is Resource.Success -> {
+                                _extractorState.update {
+                                    it.copy(extractorResponseDto = res.data)
+                                }
+                            }
+                            is Resource.Error -> {
+                                _extractorState.update {
+                                    it.copy(errorMsg = res.error ?: DefaultErrorMsg(msg = "GENERIC"))
+                                }
+                            }
+                            is Resource.Loading -> {
+                                _extractorState.update {
+                                    it.copy(loading = res.isLoading)
+                                }
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun validateKeystoreForm(keystoreDto: KeystoreDto): Boolean {
+        return with(keystoreDto) {
+            if (isDebugKeystore) {
+                true
+            } else {
+                when {
+                    password.isEmpty() -> {
+                        _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                            msg = "Enter the keystore password"
+                        )) }
+                        false
+                    }
+                    alias.isEmpty() -> {
+                        _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                            msg = "Enter the keystore key alias"
+                        )) }
+                        false
+                    }
+                    keyPassword.isEmpty() -> {
+                        _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                            msg = "Enter the keystore key password"
+                        )) }
+                        false
+                    }
+                    keystoreByteArray.isEmpty() -> {
+                        _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                            msg ="Enter the keystore file"
+                        )) }
+                        false
+                    }
+                    else -> true
+                }
+            }
+        }
+    }
+
+    private fun validateAabForm(aabFileDto: AabFileDto): Boolean {
+        return with(aabFileDto) {
+            when {
+                aabByteArray.isEmpty() || this.fileName.isEmpty() -> {
+                    _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                        msg = "Enter the aab file"
+                    )) }
+                    false
+                }
+                else -> true
             }
         }
     }

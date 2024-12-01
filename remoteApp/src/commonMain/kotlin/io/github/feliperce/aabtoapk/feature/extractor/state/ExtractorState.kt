@@ -8,11 +8,10 @@ import ui.handler.DefaultSuccessMsg
 
 data class ExtractorUiState (
     val loading: Boolean = false,
-    val extractorResponseDto: ExtractorResponseDto? = null,
+    var extractorResponseDto: ExtractorResponseDto? = null,
     var aabFileDto: AabFileDto = AabFileDto(),
     var keystore: KeystoreDto = KeystoreDto(),
-    val errorMsg: DefaultErrorMsg? = null,
-    val successMsg: DefaultSuccessMsg = DefaultSuccessMsg()
+    val errorMsg: DefaultErrorMsg? = null
 )
 
 sealed class ExtractorIntent {

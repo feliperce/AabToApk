@@ -30,6 +30,8 @@ fun ExtractorScreen() {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var showKeystoreForm by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
 
     val extractorOptionsList = listOf(
@@ -67,6 +69,7 @@ fun ExtractorScreen() {
                 extractOptions = extractorOptionsList,
                 extractorResponseDto = extractorUiState.extractorResponseDto,
                 onDebugKeystoreChecked = {
+                    showKeystoreForm = !it
                     extractorUiState.keystore = extractorUiState.keystore.copy(
                         isDebugKeystore = it
                     )
@@ -83,7 +86,7 @@ fun ExtractorScreen() {
                     }
                 },
                 selectedOption = selectedOption,
-                showKeystoreForm = !extractorUiState.keystore.isDebugKeystore,
+                showKeystoreForm = showKeystoreForm,
                 onKeystoreFileResult = {
                     scope.launch {
                         extractorUiState.keystore = extractorUiState.keystore.copy(
@@ -108,6 +111,7 @@ fun ExtractorScreen() {
                     )
                 },
                 onUploadButtonClick = {
+                    extractorUiState.extractorResponseDto = null
                     extractorViewModel.sendIntent(
                         ExtractorIntent.UploadAndExtract(
                             keystoreDto = extractorUiState.keystore,
@@ -201,7 +205,7 @@ fun SuccessContent(
     onButtonClick: () -> Unit
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
