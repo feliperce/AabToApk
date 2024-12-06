@@ -28,6 +28,7 @@ class ExtractorRepository(
     ) = flow<Resource<ExtractorResponseDto, DefaultErrorMsg>> {
 
         println("ENTROU repository UPLOAD")
+        println(aabFileDto.fileName)
 
         val response = extractorApi.uploadAndExtract(
             keystoreDto = keystoreDto,
@@ -51,6 +52,8 @@ class ExtractorRepository(
     }.onCompletion {
         emit(Resource.Loading(isLoading = false))
     }.catch { cause ->
+        println("CAIU CATCH")
+        println(cause.toString())
         emit(
             Resource.Error(
                 error = DefaultErrorMsg(

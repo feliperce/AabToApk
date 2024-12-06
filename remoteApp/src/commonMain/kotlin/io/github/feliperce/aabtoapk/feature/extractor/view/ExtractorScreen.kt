@@ -1,17 +1,21 @@
 package io.github.feliperce.aabtoapk.feature.extractor.view
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -62,7 +66,10 @@ fun ExtractorScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+        ) {
             ExtractorContent(
                 isLoading = extractorUiState.loading,
                 extractOptions = extractorOptionsList,
@@ -196,34 +203,37 @@ fun ExtractorContent(
             )
         }
 
-        Button(
-            modifier = Modifier
-                .padding(top = MarginPaddingSizeMedium)
-                .fillMaxWidth(),
-            onClick = onUploadButtonClick,
-            content = {
-                Text("UPLOAD AND EXTRACT")
-            }
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                modifier = Modifier
+                    .padding(top = MarginPaddingSizeMedium)
+                    .weight(1f)
+                    .fillMaxWidth(),
+                onClick = onUploadButtonClick,
+                content = {
+                    Text("UPLOAD AND EXTRACT")
+                }
+            )
 
-        extractorResponseDto?.let { extractorResponse ->
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+            AnimatedVisibility(
+                modifier = Modifier.weight(1f),
+                visible = extractorResponseDto != null
             ) {
-                Button(
+                TweenButton(
+                    modifier = Modifier
+                        .padding(top = MarginPaddingSizeMedium)
+                        .fillMaxWidth(),
+                    text = "DOWNLOAD",
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Purple600
                     ),
-                    onClick = {
-
-                    },
-                    content = {
-                        Text("DOWNLOAD")
-                    }
+                    onClick = onDownloadButtonClick
                 )
             }
         }
+
     }
 }
 

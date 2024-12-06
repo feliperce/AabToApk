@@ -17,7 +17,6 @@ fun main() {
     }
 
     ComposeViewport(document.body!!) {
-        //App()
         ExtractorScreen()
     }
 }
