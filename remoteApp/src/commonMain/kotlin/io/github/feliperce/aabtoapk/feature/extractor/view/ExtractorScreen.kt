@@ -167,18 +167,10 @@ fun ExtractorContent(
             .padding(MarginPaddingSizeMedium)
     ) {
 
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                MessageCard(
-                    msg = "During upload there may be a \"stuck\", don't worry, wait for the upload process",
-                    title = "Upload lag",
-                    cardType = CardType.INFO
-                )
-            }
-        }
+        MessageBox(
+            isLoading = isLoading,
+            extractorResponseDto = extractorResponseDto,
+        )
 
         UploadForm(
             modifier = Modifier.padding(top = MarginPaddingSizeMedium),
@@ -215,46 +207,50 @@ fun ExtractorContent(
         )
 
         extractorResponseDto?.let { extractorResponse ->
-            SuccessContent(
-                modifier = Modifier.padding(top = MarginPaddingSizeMedium),
-                fileName = extractorResponse.fileName,
-                onButtonClick = onDownloadButtonClick
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Purple600
+                    ),
+                    onClick = {
+
+                    },
+                    content = {
+                        Text("DOWNLOAD")
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
-fun SuccessContent(
-    modifier: Modifier = Modifier,
-    fileName: String,
-    onButtonClick: () -> Unit
+fun MessageBox(
+    isLoading: Boolean,
+    extractorResponseDto: ExtractorResponseDto?
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
+        extractorResponseDto?.let { extractorResponse ->
             MessageCard(
-                msg = "$fileName extracted with success!",
+                msg = "${extractorResponse.fileName} extracted with success!",
                 title = "SUCCESS!",
                 cardType = CardType.SUCCESS
             )
-        }
-
-        Button(
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Purple600
-            ),
-            onClick = {
-                onButtonClick()
-            },
-            content = {
-                Text("DOWNLOAD")
+        } ?: run {
+            if (isLoading) {
+                MessageCard(
+                    msg = "During upload there may be a \"stuck\", don't worry, wait for the upload process",
+                    title = "Upload lag",
+                    cardType = CardType.INFO
+                )
             }
-        )
+        }
     }
 }
 
@@ -377,15 +373,6 @@ fun KeystoreForm(
             label = { Text("Key Password") }
         )
     }
-}
-
-@Composable
-@Preview
-private fun SuccessContentPreview() {
-    SuccessContent(
-        fileName = "aaa.apks",
-        onButtonClick = {}
-    )
 }
 
 @Composable
