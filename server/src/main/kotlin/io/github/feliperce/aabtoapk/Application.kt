@@ -100,10 +100,10 @@ fun Application.module() {
                             "keyPassword" -> keyPassword = part.value
                             "extractorOption" -> {
                                 extractorOption = when (part.value) {
-                                    ApksExtractor.ExtractorOption.APKS.name -> {
+                                    ApksExtractor.ExtractorOption.APKS.id -> {
                                         ApksExtractor.ExtractorOption.APKS
                                     }
-                                    ApksExtractor.ExtractorOption.UNIVERSAL_APK.name -> {
+                                    ApksExtractor.ExtractorOption.UNIVERSAL_APK.id -> {
                                         ApksExtractor.ExtractorOption.UNIVERSAL_APK
                                     }
                                     else -> {

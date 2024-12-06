@@ -10,9 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.*
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
@@ -220,8 +217,10 @@ fun ExtractorContent(
 
         extractorFormData.settingsData?.let {
             if (it.adbPath.isEmpty() || it.outputPath.isEmpty() || it.buildToolsPath.isEmpty()) {
-                WarningCard(
-                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
+                MessageCard(
+                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set",
+                    title = "PAY ATTENTION",
+                    cardType = CardType.ERROR
                 )
             }
         }

@@ -12,15 +12,11 @@ import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
-import ui.theme.Green200
-import ui.theme.MarginPaddingSizeMedium
-import ui.theme.MarginPaddingSizeSmall
-import ui.theme.Purple600
+import ui.theme.*
 
 @Composable
 fun ExtractorScreen() {
@@ -39,13 +35,13 @@ fun ExtractorScreen() {
 
     val extractorOptionsList = listOf(
         RadioItem(
-            id = ExtractorOption.APKS.name,
+            id = ExtractorOption.APKS.id,
             text = "APKS",
             data = ExtractorOption.APKS,
             isSelected = true
         ),
         RadioItem(
-            id = ExtractorOption.APK.name,
+            id = ExtractorOption.APK.id,
             data = ExtractorOption.APK,
             text = "Universal APK"
         )
@@ -165,13 +161,27 @@ fun ExtractorContent(
     aliasText: String,
     keyPasswordText: String
 ) {
-    // TODO ARRUMAR O KEYSTORE PATH QUE SOME COM O IS DEBUG
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(MarginPaddingSizeMedium)
     ) {
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                MessageCard(
+                    msg = "During upload there may be a \"stuck\", don't worry, wait for the upload process",
+                    title = "Upload lag",
+                    cardType = CardType.INFO
+                )
+            }
+        }
+
         UploadForm(
+            modifier = Modifier.padding(top = MarginPaddingSizeMedium),
             isLoading = isLoading,
             extractOptions = extractOptions,
             selectedOption = selectedOption,
@@ -223,12 +233,16 @@ fun SuccessContent(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        Text(
+        Box(
             modifier = Modifier.fillMaxWidth(),
-            text = "$fileName extracted with success!",
-            color = Green200,
-            textAlign = TextAlign.Center
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            MessageCard(
+                msg = "$fileName extracted with success!",
+                title = "SUCCESS!",
+                cardType = CardType.SUCCESS
+            )
+        }
 
         Button(
             colors = ButtonDefaults.buttonColors(
