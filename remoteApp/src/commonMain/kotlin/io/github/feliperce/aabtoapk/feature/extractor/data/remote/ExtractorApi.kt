@@ -3,9 +3,7 @@ package io.github.feliperce.aabtoapk.feature.extractor.data.remote
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
-import io.github.vinceglb.filekit.core.PlatformFile
 import io.ktor.client.*
-import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*

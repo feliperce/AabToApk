@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
@@ -30,6 +31,8 @@ fun ExtractorScreen() {
     var passwordText by remember { mutableStateOf("") }
     var aliasText by remember { mutableStateOf("") }
     var keyPasswordText by remember { mutableStateOf("") }
+
+    val uriHandler = LocalUriHandler.current
 
     val scope = rememberCoroutineScope()
 
@@ -128,7 +131,9 @@ fun ExtractorScreen() {
                     )
                 },
                 onDownloadButtonClick = {
-
+                    extractorUiState.extractorResponseDto?.let {
+                        uriHandler.openUri(it.downloadUrl)
+                    }
                 },
                 passwordText = passwordText,
                 aliasText = aliasText,
