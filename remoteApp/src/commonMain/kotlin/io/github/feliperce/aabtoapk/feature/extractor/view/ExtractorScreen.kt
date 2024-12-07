@@ -7,15 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -82,6 +78,9 @@ fun ExtractorScreen() {
                 },
                 onItemSelected = {
                     selectedOption = it
+                    extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
+                        extractorOption = it.data as ExtractorOption
+                    )
                 },
                 onFileResult = {
                     scope.launch {

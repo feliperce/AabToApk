@@ -28,6 +28,7 @@ class ExtractorApi (
                         append(HttpHeaders.ContentDisposition, "filename=\"${keystoreDto.keystoreFileName}\"")
                     })
                 }
+                append("extractorOption", aabFileDto.extractorOption.id)
                 append("aab", aabFileDto.aabByteArray, Headers.build {
                     append(HttpHeaders.ContentDisposition, "filename=\"${aabFileDto.fileName}\"")
                 })
