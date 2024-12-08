@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
+import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
@@ -90,7 +91,8 @@ fun ExtractorScreen() {
                     scope.launch {
                         extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
                             aabByteArray = it.readBytes(),
-                            fileName = it.name
+                            fileName = it.name,
+                            fileSize = it.getSize() ?: 0
                         )
                     }
                 },
@@ -297,7 +299,8 @@ fun UploadForm(
                 },
                 label = "AAB Path",
                 fileType = aabInputType,
-                pickerTitle = "AAB"
+                pickerTitle = "AAB",
+                supportingText = "Max size: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
             )
 
             Row {

@@ -3,11 +3,13 @@ package io.github.feliperce.aabtoapk.feature.extractor.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.feliperce.aabtoapk.data.remote.Resource
+import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.feature.extractor.model.AabFileDto
 import io.github.feliperce.aabtoapk.feature.extractor.model.KeystoreDto
 import io.github.feliperce.aabtoapk.feature.extractor.repository.ExtractorRepository
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorUiState
+import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -119,14 +121,19 @@ class ExtractorViewModel(
 
     private fun validateAabForm(aabFileDto: AabFileDto): Boolean {
         return with(aabFileDto) {
-            when {
-                aabByteArray.isEmpty() || this.fileName.isEmpty() -> {
+            if (aabByteArray.isEmpty() || this.fileName.isEmpty()) {
+                _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
+                    msg = "Enter the aab file"
+                )) }
+                false
+            } else {
+                if (this.fileSize > ServerConstants.MAX_AAB_UPLOAD_MB.convertMegaByteToBytesLong()) {
                     _extractorState.update { it.copy(errorMsg = DefaultErrorMsg(
-                        msg = "Enter the aab file"
+                        msg = "Max file aab file size is: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
                     )) }
-                    false
+                    return false
                 }
-                else -> true
+                true
             }
         }
     }

@@ -145,6 +145,7 @@ fun FilePickerTextField(
     initialText: String = "",
     label: String? = null,
     enabled: Boolean = true,
+    supportingText: String? = null,
     onFileResult: (fileResult: PlatformFile) -> Unit = {},
     fileType: PickerType = PickerType.File(),
     selectionMode: PickerMode<PlatformFile> = PickerMode.Single,
@@ -175,7 +176,14 @@ fun FilePickerTextField(
         }
     }
 
-    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+    PickerOutlineTextField(
+        modifier = modifier,
+        text = text,
+        label = label,
+        supportingText = supportingText,
+        enabled = enabled,
+        clickAction = clickAction
+    )
 }
 
 @Composable
@@ -183,6 +191,7 @@ fun DirectoryPickerTextField(
     modifier: Modifier = Modifier,
     initialText: String = "",
     label: String? = null,
+    supportingText: String? = null,
     enabled: Boolean = true,
     onDirectoryResult: (fileResult: PlatformDirectory) -> Unit = {},
     pickerTitle: String? = null
@@ -210,7 +219,14 @@ fun DirectoryPickerTextField(
         }
     }
 
-    PickerOutlineTextField(modifier, text, label, enabled, clickAction)
+    PickerOutlineTextField(
+        modifier = modifier,
+        text = text,
+        label = label,
+        supportingText = supportingText,
+        enabled = enabled,
+        clickAction = clickAction
+    )
 }
 
 @Composable
@@ -218,6 +234,7 @@ private fun PickerOutlineTextField(
     modifier: Modifier,
     text: String,
     label: String?,
+    supportingText: String? = null,
     enabled: Boolean,
     clickAction: () -> Unit
 ) {
@@ -238,6 +255,11 @@ private fun PickerOutlineTextField(
         singleLine = true,
         enabled = enabled,
         readOnly = true,
+        supportingText = {
+            supportingText?.let {
+                Text(it)
+            }
+        },
         trailingIcon = {
             Icon(
                 modifier = Modifier.clickable { clickAction() },
