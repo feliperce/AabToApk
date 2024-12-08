@@ -40,7 +40,7 @@ fun TweenButton(
         while (true) {
             delay(1000)
             coroutineScope.launch {
-                animate(initialValue = 0f, targetValue = (-4..4).random().toFloat(), animationSpec = tween(durationMillis = 100)) { value, _ ->
+                animate(initialValue = 0f, targetValue = 4f, animationSpec = tween(durationMillis = 100)) { value, _ ->
                     rotation = value
                 }
                 animate(initialValue = rotation, targetValue = 0f, animationSpec = tween(durationMillis = 100)) { value, _ ->

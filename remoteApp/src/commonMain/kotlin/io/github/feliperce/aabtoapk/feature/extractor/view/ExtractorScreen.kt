@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorResponseDto
 import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
@@ -172,6 +173,8 @@ fun ExtractorContent(
     aliasText: String,
     keyPasswordText: String
 ) {
+    val buttonsWidth = 200.dp
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -208,13 +211,13 @@ fun ExtractorContent(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 modifier = Modifier
                     .padding(top = MarginPaddingSizeMedium)
-                    .weight(1f)
-                    .fillMaxWidth(),
+                    .width(buttonsWidth),
                 onClick = onUploadButtonClick,
                 content = {
                     Text("UPLOAD AND EXTRACT")
@@ -222,13 +225,15 @@ fun ExtractorContent(
             )
 
             AnimatedVisibility(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.width(buttonsWidth),
                 visible = extractorResponseDto != null
             ) {
                 TweenButton(
                     modifier = Modifier
-                        .padding(top = MarginPaddingSizeMedium)
-                        .fillMaxWidth(),
+                        .padding(
+                            top = MarginPaddingSizeMedium,
+                            start = MarginPaddingSizeMedium
+                        ),
                     text = "DOWNLOAD",
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Purple600
