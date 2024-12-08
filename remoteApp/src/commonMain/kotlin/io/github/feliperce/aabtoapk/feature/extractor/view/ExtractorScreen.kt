@@ -180,7 +180,6 @@ fun ExtractorContent(
             .fillMaxSize()
             .padding(MarginPaddingSizeMedium)
     ) {
-
         MessageBox(
             isLoading = isLoading,
             extractorResponseDto = extractorResponseDto,
