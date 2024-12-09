@@ -9,6 +9,7 @@ data class ErrorResponse(
 )
 
 enum class ErrorResponseType(val code: Int, val msg: String) {
+    WRONG_API_KEY(500, "Wrong API Key"),
     KEYSTORE(1000, "Invalid keystore"),
     EXTRACT(2000, "Error with extractor"),
     DOWNLOAD_NOT_FOUND(3000, "File not found"),

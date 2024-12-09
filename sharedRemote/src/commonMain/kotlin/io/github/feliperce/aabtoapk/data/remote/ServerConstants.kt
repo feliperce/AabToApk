@@ -5,7 +5,7 @@ object ServerConstants {
     const val PORT = 8080
     const val HOST = "localhost"
     const val BASE_URL = "http://$HOST:$PORT"
-    const val MAX_AAB_UPLOAD_MB = 400
+    const val MAX_AAB_UPLOAD_MB = 100
     const val REMOVE_UPLOAD_HOUR_TIME = 1
 
     object PathConf {

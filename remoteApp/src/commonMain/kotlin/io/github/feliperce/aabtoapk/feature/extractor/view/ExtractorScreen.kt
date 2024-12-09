@@ -67,91 +67,99 @@ fun ExtractorScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
-                .padding(paddingValues)
+                .fillMaxWidth()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            ExtractorContent(
-                isLoading = extractorUiState.loading,
-                extractOptions = extractorOptionsList,
-                extractorResponseDto = extractorUiState.extractorResponseDto,
-                onDebugKeystoreChecked = {
-                    showKeystoreForm = !it
-                    extractorUiState.keystore = extractorUiState.keystore.copy(
-                        isDebugKeystore = it
-                    )
-                },
-                onItemSelected = {
-                    selectedOption = it
-                    extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
-                        extractorOption = it.data as ExtractorOption
-                    )
-                },
-                onFileResult = {
-                    scope.launch {
-                        extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
-                            aabByteArray = it.readBytes(),
-                            fileName = it.name,
-                            fileSize = it.getSize() ?: 0
-                        )
-                    }
-                },
-                selectedOption = selectedOption,
-                showKeystoreForm = showKeystoreForm,
-                onKeystoreFileResult = {
-                    scope.launch {
-                        extractorUiState.keystore = extractorUiState.keystore.copy(
-                            keystoreFileName = it.name,
-                            keystoreByteArray = it.readBytes()
-                        )
-                    }
-                },
-                onPasswordFieldChange = {
-                    passwordText = it
-                    extractorUiState.keystore = extractorUiState.keystore.copy(
-                        password = it
-                    )
-                },
-                onAliasFieldChange = {
-                    aliasText = it
-                    extractorUiState.keystore = extractorUiState.keystore.copy(
-                        alias = it
-                    )
-                },
-                onKeyPasswordFieldChange = {
-                    keyPasswordText = it
-                    extractorUiState.keystore = extractorUiState.keystore.copy(
-                        keyPassword = it
-                    )
-                },
-                onUploadButtonClick = {
-                    extractorUiState.extractorResponseDto = null
-                    extractorViewModel.sendIntent(
-                        ExtractorIntent.UploadAndExtract(
-                            keystoreDto = extractorUiState.keystore,
-                            aabFileDto = extractorUiState.aabFileDto
-                        )
-                    )
-                },
-                onDownloadButtonClick = {
-                    extractorUiState.extractorResponseDto?.let {
-                        uriHandler.openUri(it.downloadUrl)
-                    }
-                },
-                passwordText = passwordText,
-                aliasText = aliasText,
-                keyPasswordText = keyPasswordText
-            )
-        }
-
-        if (extractorUiState.loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier
+                    .width(1000.dp)
             ) {
-                CircularProgressIndicator()
+                ExtractorContent(
+                    isLoading = extractorUiState.loading,
+                    extractOptions = extractorOptionsList,
+                    extractorResponseDto = extractorUiState.extractorResponseDto,
+                    onDebugKeystoreChecked = {
+                        showKeystoreForm = !it
+                        extractorUiState.keystore = extractorUiState.keystore.copy(
+                            isDebugKeystore = it
+                        )
+                    },
+                    onItemSelected = {
+                        selectedOption = it
+                        extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
+                            extractorOption = it.data as ExtractorOption
+                        )
+                    },
+                    onFileResult = {
+                        scope.launch {
+                            extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
+                                aabByteArray = it.readBytes(),
+                                fileName = it.name,
+                                fileSize = it.getSize() ?: 0
+                            )
+                        }
+                    },
+                    selectedOption = selectedOption,
+                    showKeystoreForm = showKeystoreForm,
+                    onKeystoreFileResult = {
+                        scope.launch {
+                            extractorUiState.keystore = extractorUiState.keystore.copy(
+                                keystoreFileName = it.name,
+                                keystoreByteArray = it.readBytes()
+                            )
+                        }
+                    },
+                    onPasswordFieldChange = {
+                        passwordText = it
+                        extractorUiState.keystore = extractorUiState.keystore.copy(
+                            password = it
+                        )
+                    },
+                    onAliasFieldChange = {
+                        aliasText = it
+                        extractorUiState.keystore = extractorUiState.keystore.copy(
+                            alias = it
+                        )
+                    },
+                    onKeyPasswordFieldChange = {
+                        keyPasswordText = it
+                        extractorUiState.keystore = extractorUiState.keystore.copy(
+                            keyPassword = it
+                        )
+                    },
+                    onUploadButtonClick = {
+                        extractorUiState.extractorResponseDto = null
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UploadAndExtract(
+                                keystoreDto = extractorUiState.keystore,
+                                aabFileDto = extractorUiState.aabFileDto
+                            )
+                        )
+                    },
+                    onDownloadButtonClick = {
+                        extractorUiState.extractorResponseDto?.let {
+                            uriHandler.openUri(it.downloadUrl)
+                        }
+                    },
+                    passwordText = passwordText,
+                    aliasText = aliasText,
+                    keyPasswordText = keyPasswordText
+                )
+            }
+
+            if (extractorUiState.loading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
+
     }
 }
 
