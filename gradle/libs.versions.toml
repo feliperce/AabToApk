@@ -5,7 +5,7 @@ exposedCore = "0.56.0"
 filekit = "0.8.7"
 kotlinMultiplatformAppdirs = "1.1.1"
 kotlinxDatetime = "0.6.1"
-ksp = "2.0.0-1.0.22"
+ksp = "2.0.21-1.0.26"
 android-compileSdk = "34"
 android-minSdk = "26"
 android-targetSdk = "34"
@@ -18,11 +18,11 @@ androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 compose-plugin = "1.7.0"
 junit = "4.13.2"
-koin = "4.0.0"
-koinCompose = "4.0.0"
-kotlin = "2.0.0"
+koin = "4.1.0-Beta1"
+koinCompose = "4.1.0-Beta1"
+kotlin = "2.0.20"
 kotlinxCoroutinesSwing = "1.9.0"
-lifecycleViewmodelCompose = "2.8.2"
+androidxLifeCycle = "2.8.2"
 material3Desktop = "1.3.1"
 androidxRoom = "2.7.0-alpha04"
 navigationCompose = "2.7.0-alpha07"
@@ -30,8 +30,8 @@ postgresql = "42.3.1"
 sqlite = "2.5.0-SNAPSHOT"
 datastore = "1.1.1"
 material3Android = "1.3.1"
-ktor = "3.0.0-beta-2-eap-913"
-ktor-server = "3.0.0-rc-1"
+ktor = "3.0.1"
+ktor-server = "3.0.1"
 logback = "1.5.7"
 quartz = "2.3.2"
 
@@ -65,7 +65,8 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-material3-desktop = { group = "androidx.compose.material3", name = "material3-desktop", version.ref = "material3Desktop" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesSwing" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifeCycle" }
+lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifeCycle" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "androidxRoom" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
@@ -77,6 +78,7 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor-server" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor-server" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-server" }
+ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-server" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-jetty = { module = "io.ktor:ktor-client-jetty", version.ref = "ktor" }
@@ -85,6 +87,8 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }

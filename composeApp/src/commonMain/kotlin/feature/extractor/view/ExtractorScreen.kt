@@ -10,9 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.*
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
@@ -125,7 +122,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        errorMsg = extractorUiState.errorMsg
+        msg = extractorUiState.errorMsg.msg
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -220,8 +217,10 @@ fun ExtractorContent(
 
         extractorFormData.settingsData?.let {
             if (it.adbPath.isEmpty() || it.outputPath.isEmpty() || it.buildToolsPath.isEmpty()) {
-                WarningCard(
-                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set"
+                MessageCard(
+                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set",
+                    title = "PAY ATTENTION",
+                    cardType = CardType.ERROR
                 )
             }
         }
@@ -419,54 +418,6 @@ fun KeystoreSignForm(
                 Text("Key Password")
             }
         )
-    }
-}
-
-@Composable
-fun FormCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    actionIcon: ImageVector? = null,
-    onActionClick: () -> Unit = {},
-    isActionButtonEnabled: Boolean = false,
-    formCardContent: @Composable () -> Unit
-) {
-    Card(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        )
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(MarginPaddingSizeMedium)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = MarginPaddingSizeSmall)
-                        .fillMaxWidth(),
-                    fontWeight = FontWeight.W500,
-                    text = title
-                )
-                actionIcon?.let {
-                    IconButton(
-                        onClick = onActionClick,
-                        enabled = isActionButtonEnabled
-                    ) {
-                        Icon(
-                            imageVector = it,
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-
-            formCardContent()
-        }
     }
 }
 

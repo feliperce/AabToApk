@@ -34,8 +34,10 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":remoteApp")
 include(":server")
-include(":shared")
-include("shared")
-include("shared:commonMain")
-findProject(":shared:commonMain")?.name = "commonMain"
+include(":extractor")
+include(":sharedui")
+include(":sharedRemote")
+include("extractor:commonMain")
+findProject(":extractor:commonMain")?.name = "commonMain"

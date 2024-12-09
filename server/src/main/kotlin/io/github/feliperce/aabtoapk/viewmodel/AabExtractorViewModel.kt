@@ -5,7 +5,7 @@ import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
-import io.github.feliperce.aabtoapk.data.remote.response.AabConvertResponse
+import io.github.feliperce.aabtoapk.data.remote.response.ExtractorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
@@ -20,7 +20,7 @@ class AabExtractorViewModel(
         fileBytes: ByteArray,
         keystoreInfoDto: KeystoreInfoDto?,
         extractorOption: ApksExtractor.ExtractorOption
-    ): Flow<Resource<AabConvertResponse, ErrorResponse>> {
+    ): Flow<Resource<ExtractorResponse, ErrorResponse>> {
 
         val basePathDto = aabExtractorRepository.insertBasePath()
 

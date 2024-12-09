@@ -32,7 +32,8 @@ kotlin {
             implementation(libs.koin.android)
         }
         commonMain.dependencies {
-            implementation(projects.shared)
+            implementation(projects.sharedui)
+            implementation(projects.extractor)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
