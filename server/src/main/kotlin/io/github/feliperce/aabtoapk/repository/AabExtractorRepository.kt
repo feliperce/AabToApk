@@ -130,7 +130,6 @@ class AabExtractorRepository(
             }
         )
 
-        println("SET KEYSTORE")
         extractor.aabToApks(
             apksFileName = hash,
             extractorOption = extractorOption,

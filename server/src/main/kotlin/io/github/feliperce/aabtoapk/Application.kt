@@ -3,7 +3,6 @@ package io.github.feliperce.aabtoapk
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
-import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponse
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
@@ -105,8 +104,6 @@ fun Application.module() {
                     formFieldLimit = ServerConstants.MAX_AAB_UPLOAD_MB.convertMegaByteToBytesLong()
                 )
 
-                println("upload init")
-
                 multipartData.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
@@ -133,12 +130,9 @@ fun Application.module() {
                         }
 
                         is PartData.FileItem -> {
-                            println("upload start ${part.name}")
-
                             when (part.name) {
                                 "keystore" -> {
 
-                                    println("START SEND KEYSTORE")
                                     val fileName = part.originalFileName as String
                                     val fileExtension = ".${fileName.substringAfterLast(".")}"
 
@@ -213,9 +207,7 @@ fun Application.module() {
                             }
                         }
 
-                        else -> {
-                            println("ELSE -0-")
-                        }
+                        else -> { }
                     }
                     part.dispose()
                 }
