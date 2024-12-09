@@ -29,7 +29,6 @@ import io.ktor.utils.io.*
 import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
-import sun.security.util.KeyUtil.validate
 import java.io.File
 
 fun main() {
