@@ -32,6 +32,8 @@ kotlin {
             implementation(libs.koin.android)
         }
         commonMain.dependencies {
+            implementation(projects.sharedui)
+            implementation(projects.extractor)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -43,7 +45,6 @@ kotlin {
             implementation(libs.koin.test)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.mpfilepicker)
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.kotlinx.coroutines.swing)
 
@@ -59,6 +60,7 @@ kotlin {
             implementation(libs.bundletool)
             implementation(libs.kotlin.multiplatform.appdirs)
 
+            implementation(libs.filekit.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -79,7 +81,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 3
-        versionName = "0.6.0"
+        versionName = "0.7.0"
     }
     packaging {
         resources {
@@ -113,7 +115,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "1.1.1"
+            packageVersion = "2.0.0"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }
@@ -126,6 +128,7 @@ compose.desktop {
                 menuGroup = "tools"
                 appCategory = "tools"
                 iconFile.set(project.file("icons/ic_aabtoapk.png"))
+                modules("jdk.security.auth")
             }
         }
     }

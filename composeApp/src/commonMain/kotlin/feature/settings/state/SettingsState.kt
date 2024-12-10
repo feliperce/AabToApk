@@ -2,8 +2,7 @@ package feature.settings.state
 
 import feature.settings.model.SettingsFormData
 import shared.settings.SettingsData
-import utils.ErrorMsg
-import utils.SuccessMsg
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsg
 
 data class SettingsUiState (
     val settingsData: SettingsData? = null,

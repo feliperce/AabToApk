@@ -3,8 +3,8 @@ package feature.extractor.state
 import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import shared.settings.SettingsData
-import utils.ErrorMsg
-import utils.SuccessMsg
+import io.github.feliperce.aabtoapk.utils.extractor.ErrorMsg
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsg
 
 data class ExtractorUiState (
     val loading: Boolean = false,

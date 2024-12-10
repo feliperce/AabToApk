@@ -8,10 +8,10 @@ import feature.extractor.repository.ExtractorRepository
 import feature.extractor.state.ExtractorIntent
 import feature.extractor.state.ExtractorUiState
 import feature.settings.repository.SettingsRepository
+import io.github.feliperce.aabtoapk.utils.extractor.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import utils.*
 import java.io.File
 
 class ExtractorViewModel(
@@ -132,7 +132,7 @@ class ExtractorViewModel(
                 apksExtractor?.aabToApks(
                     apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
                     extractorOption = extractorFormData.selectedExtractOption.data as ApksExtractor.ExtractorOption,
-                    onSuccess = { output ->
+                    onSuccess = { output, _ ->
                         _extractorState.update {
                             it.copy(
                                 loading = false,
