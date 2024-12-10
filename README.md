@@ -12,7 +12,7 @@
 
 This is a Kotlin Multiplatform project targeting Android, Desktop, Web and Server.
 
-## Local - Android and Desktop
+### Local - Android and Desktop
 Running local extractor, 100% code share.
 
 Built with:
@@ -24,7 +24,7 @@ Built with:
 * Koin
 * MVI
 
-## Remote - WASM
+### Remote - WASM
 Using api from ktor server to extract .apk
 
 Built with:
@@ -34,7 +34,7 @@ Built with:
 * Ktor client
 * MVI
 
-## Server
+### Server
 Ktor server that WASM consumes
 
 Built with:
