@@ -246,7 +246,7 @@ fun ExtractorContent(
             Button(
                 modifier = Modifier.weight(1f),
                 content = {
-                    Text("AAB TO APKS")
+                    Text("EXTRACT")
                 },
                 onClick = onExtractApksButtonClick,
                 enabled = !isLoading

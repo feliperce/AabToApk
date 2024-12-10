@@ -81,7 +81,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 3
-        versionName = "0.6.0"
+        versionName = "0.7.0"
     }
     packaging {
         resources {
@@ -115,7 +115,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "1.1.1"
+            packageVersion = "2.0.0"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }
