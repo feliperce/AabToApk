@@ -1,7 +1,11 @@
 package io.github.feliperce.aabtoapk.feature.extractor.view
 
+import aabtoapk.remoteapp.generated.resources.Res
+import aabtoapk.remoteapp.generated.resources.ic_aabtoapk
+import aabtoapk.remoteapp.generated.resources.ic_kotlin
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +20,7 @@ import io.github.feliperce.aabtoapk.feature.extractor.state.ExtractorIntent
 import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewModel
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
@@ -65,7 +70,10 @@ fun ExtractorScreen() {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = {
+            Footer()
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -252,6 +260,34 @@ fun ExtractorContent(
             }
         }
 
+    }
+}
+
+@Composable
+fun Footer() {
+    val uriHandler = LocalUriHandler.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                end = MarginPaddingSizeMedium,
+                bottom = MarginPaddingSizeMedium
+            ),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("Built with")
+        Spacer(modifier = Modifier.padding(start = MarginPaddingSizeSmall))
+        Icon(
+            modifier = Modifier
+                .height(20.dp)
+                .clickable {
+                    uriHandler.openUri("https://kotlinlang.org/docs/wasm-overview.html")
+                },
+            painter = painterResource(Res.drawable.ic_kotlin),
+            contentDescription = null
+        )
     }
 }
 
