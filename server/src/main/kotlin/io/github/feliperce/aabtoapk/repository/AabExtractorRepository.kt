@@ -137,7 +137,7 @@ class AabExtractorRepository(
                 println("AAB TO APKS success!!! -> ${path} || $name")
 
                 val encodedDownloadUrl =
-                    "${ServerConstants.BASE_URL}/download/${uploadedFilesDto.basePathDto.name}"
+                    "${ServerConstants.PROXY_BASE_URL}/download/${uploadedFilesDto.basePathDto.name}"
 
                 val realName = uploadedFilesDto.name.replaceExtension(extractorOption.extension)
 

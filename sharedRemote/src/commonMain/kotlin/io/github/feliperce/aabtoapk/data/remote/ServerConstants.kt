@@ -1,10 +1,14 @@
 package io.github.feliperce.aabtoapk.data.remote
 
+import AabToApk.sharedRemote.BuildConfig
+
 
 object ServerConstants {
-    const val PORT = 8080
-    const val HOST = "localhost"
+    const val PORT = BuildConfig.PORT
+    const val HOST = BuildConfig.HOST
+    const val PROXY_HOST = BuildConfig.PROXY_HOST
     const val BASE_URL = "http://$HOST:$PORT"
+    const val PROXY_BASE_URL = "https://$PROXY_HOST"
     const val MAX_AAB_UPLOAD_MB = 100
     const val REMOVE_UPLOAD_HOUR_TIME = 1
 
