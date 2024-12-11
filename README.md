@@ -12,6 +12,10 @@
 
 This is a Kotlin Multiplatform project targeting Android, Desktop, Web and Server.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/25b4e1a1-daeb-42f8-8f4d-8f8fec949845" width=50% height=50%>
+</p>
+
 ### Local - Android and Desktop
 Running local extractor, 100% code share.
 
