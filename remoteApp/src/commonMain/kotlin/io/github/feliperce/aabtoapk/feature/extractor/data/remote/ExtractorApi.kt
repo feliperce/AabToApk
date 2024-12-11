@@ -16,7 +16,7 @@ class ExtractorApi (
         aabFileDto: AabFileDto
     ): HttpResponse {
         return client.submitFormWithBinaryData(
-            url = "${ServerConstants.BASE_URL}/uploadAab",
+            url = "${ServerConstants.PROXY_BASE_URL}/uploadAab",
             formData = formData {
                 if (!keystoreDto.isDebugKeystore) {
                     append("alias", keystoreDto.alias)

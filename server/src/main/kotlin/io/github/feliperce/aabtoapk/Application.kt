@@ -36,7 +36,7 @@ fun main() {
 
     embeddedServer(
         factory = Netty,
-        port = ServerConstants.PORT,
+        port = ServerConstants.PORT.toInt(),
         host = ServerConstants.HOST,
         module = Application::module
     ).start(wait = true)

@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
@@ -7,6 +8,17 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     kotlin("plugin.serialization") version "2.0.20"
+    id("com.github.gmazzo.buildconfig") version "5.5.0"
+}
+
+val host: String = gradleLocalProperties(rootDir).getProperty("sv.host")
+val port: String = gradleLocalProperties(rootDir).getProperty("sv.port")
+val proxyHost: String = gradleLocalProperties(rootDir).getProperty("proxy.host")
+
+buildConfig {
+    buildConfigField("HOST", host)
+    buildConfigField("PORT", port)
+    buildConfigField("PROXY_HOST", proxyHost)
 }
 
 kotlin {
