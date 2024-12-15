@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build for ${{ matrix.os }}
-        run: ./gradlew clean build
+        run: ./gradlew clean
 
       - name: Package for ${{ matrix.os }}
         run: ./gradlew composeApp:packageDistributionForCurrentOS
