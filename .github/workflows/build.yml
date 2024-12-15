@@ -11,9 +11,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
+      - name: Update local.properties
+        run: | 
+          echo "sv.dbUser=${{ secrets.SV_DB_USER }}" > ./local.properties
+          echo "sv.dbPassword=${{ secrets.SV_DB_PASSWORD }}" > ./local.properties
+          echo "sv.port=${{ secrets.SV_PORT }}" > ./local.properties
+          echo "sv.host=${{ secrets.SV_HOST }}" > ./local.properties
+          echo "proxy.host=${{ secrets.PROXY_HOST }}" > ./local.properties
+          echo "auth.token=${{ secrets.AUTH_TOKEN }}" > ./local.properties
       - name: Checkout code
         uses: actions/checkout@v3
-
+      
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
