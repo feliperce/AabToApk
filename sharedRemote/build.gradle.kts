@@ -11,9 +11,9 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "5.5.0"
 }
 
-val host: String = gradleLocalProperties(rootDir).getProperty("sv.host")
-val port: String = gradleLocalProperties(rootDir).getProperty("sv.port")
-val proxyHost: String = gradleLocalProperties(rootDir).getProperty("proxy.host")
+val host: String = gradleLocalProperties(rootDir).getProperty("sv.host") ?: ""
+val port: String = gradleLocalProperties(rootDir).getProperty("sv.port") ?: ""
+val proxyHost: String = gradleLocalProperties(rootDir).getProperty("proxy.host") ?: ""
 
 buildConfig {
     buildConfigField("HOST", host)
