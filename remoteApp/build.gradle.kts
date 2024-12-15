@@ -10,7 +10,7 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "5.5.0"
 }
 
-val authToken: String = gradleLocalProperties(rootDir).getProperty("auth.token")
+val authToken: String = gradleLocalProperties(rootDir).getProperty("auth.token") ?: ""
 
 buildConfig {
     buildConfigField("AUTH_TOKEN", authToken)

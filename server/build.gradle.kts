@@ -8,9 +8,9 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "5.5.0"
 }
 
-val dbUser: String = gradleLocalProperties(rootDir).getProperty("sv.dbUser")
-val dbPassword: String = gradleLocalProperties(rootDir).getProperty("sv.dbPassword")
-val authToken: String = gradleLocalProperties(rootDir).getProperty("auth.token")
+val dbUser: String = gradleLocalProperties(rootDir).getProperty("sv.dbUser") ?: ""
+val dbPassword: String = gradleLocalProperties(rootDir).getProperty("sv.dbPassword") ?: ""
+val authToken: String = gradleLocalProperties(rootDir).getProperty("auth.token") ?: ""
 
 buildConfig {
     buildConfigField("DB_USER", dbUser)
