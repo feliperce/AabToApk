@@ -25,7 +25,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build for ${{ matrix.os }}
-        run: ./gradlew clean build
+        run: ./gradlew clean
 
       - name: Package for ${{ matrix.os }}
         run: ./gradlew composeApp:packageDistributionForCurrentOS
@@ -39,28 +39,28 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifact
-          path: /home/runner/work/GithubActionsKmp/GithubActionsKmp/composeApp/build/compose/binaries/main/deb/*.deb
+          path: /home/runner/work/AabToApk/AabToApk/composeApp/build/compose/binaries/main/deb/*.deb
 
       - name: Upload Android artifact
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: android-artifact
-          path: /home/runner/work/GithubActionsKmp/GithubActionsKmp/composeApp/build/outputs/apk/release/*.apk 
+          path: /home/runner/work/AabToApk/AabToApk/composeApp/build/outputs/apk/release/*.apk 
 
       - name: Upload macOS artifact
         if: matrix.os == 'macOS-latest'
         uses: actions/upload-artifact@v4
         with:
           name: macos-artifact
-          path: /Users/runner/work/GithubActionsKmp/GithubActionsKmp/composeApp/build/compose/binaries/main/dmg/*.dmg
+          path: /Users/runner/work/AabToApk/AabToApk/composeApp/build/compose/binaries/main/dmg/*.dmg
 
       - name: Upload Windows artifact
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifact
-          path: D:\a\GithubActionsKmp\GithubActionsKmp\composeApp\build\compose\binaries\main\msi\*.msi
+          path: D:\a\AabToApk\AabToApk\composeApp\build\compose\binaries\main\msi\*.msi
 
   release:
     runs-on: ubuntu-latest
