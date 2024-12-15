@@ -112,7 +112,7 @@ compose.desktop {
         nativeDistributions {
             modules("jdk.unsupported")
 
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.AppImage, TargetFormat.Exe)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
             packageVersion = "2.0.0"
