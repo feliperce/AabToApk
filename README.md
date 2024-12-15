@@ -27,6 +27,7 @@ Built with:
 * DataStore
 * Koin
 * MVI
+* Github Actions
 
 ### Remote - WASM
 Using api from ktor server to extract .apk
