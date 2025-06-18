@@ -9,7 +9,11 @@ import androidx.compose.ui.Modifier
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import feature.extractor.mapper.KeystoreDto
 import feature.extractor.model.ExtractorFormData
 import feature.extractor.model.ExtractorFormDataCallback
@@ -29,30 +33,34 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val extractorUiState by extractorViewModel.extractorState.collectAsState()
 
-    val extractorOptionsList = listOf(
-        RadioItem(
-            id = ApksExtractor.ExtractorOption.APKS.name,
-            text = "APKS",
-            data = ApksExtractor.ExtractorOption.APKS,
-            isSelected = true
-        ),
-        RadioItem(
-            id = ApksExtractor.ExtractorOption.UNIVERSAL_APK.name,
-            data = ApksExtractor.ExtractorOption.UNIVERSAL_APK,
-            text = "Universal APK"
-        )
-    )
-
-    var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
-
-    val showErrorDialog = remember { mutableStateOf(false) }
-    var extractorFormData by remember {
+    var extractorFormData by remember { 
         mutableStateOf(
             ExtractorFormData(
-                extractOptions = extractorOptionsList,
-                selectedExtractOption = extractorOptionsList[0]
+                selectedExtractOption = extractorUiState.selectedExtractOption ?: RadioItem(text = "")
+            )
+        ) 
+    }
+
+    val showErrorDialog = remember { mutableStateOf(false) }
+    var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val extractorOptionsList = listOf(
+            RadioItem(
+                id = ApksExtractor.ExtractorOption.APKS.name,
+                text = "APKS",
+                data = ApksExtractor.ExtractorOption.APKS,
+                isSelected = true
+            ),
+            RadioItem(
+                id = ApksExtractor.ExtractorOption.UNIVERSAL_APK.name,
+                data = ApksExtractor.ExtractorOption.UNIVERSAL_APK,
+                text = "Universal APK"
             )
         )
+
+        extractorViewModel.sendIntent(ExtractorIntent.UpdateExtractOptions(extractorOptionsList))
+        extractorViewModel.sendIntent(ExtractorIntent.UpdateSelectedExtractOption(extractorOptionsList[0]))
     }
 
     val onFormDataChange: (ExtractorFormData) -> Unit = { newFormData ->
@@ -73,6 +81,10 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
         showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
+    }
+
+    LaunchedEffect(extractorUiState.showKeystoreRemoveDialog) {
+        showKeystoreRemoveDialog = extractorUiState.showKeystoreRemoveDialog
     }
 
     LaunchedEffect(extractorUiState.successMsg.id) {
@@ -120,6 +132,29 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
         )
     }
 
+    LaunchedEffect(extractorUiState.selectedExtractOption) {
+        extractorUiState.selectedExtractOption?.let { option ->
+            extractorFormData = extractorFormData.copy(
+                selectedExtractOption = option,
+                extractOptions = extractorUiState.extractOptions
+            )
+        }
+    }
+
+    LaunchedEffect(extractorUiState.keystoreDto) {
+        extractorFormData = extractorFormData.copy(
+            keystoreDto = extractorUiState.keystoreDto
+        )
+    }
+
+    LaunchedEffect(extractorUiState.aabPath) {
+        if (extractorUiState.aabPath.isNotEmpty()) {
+            extractorFormData = extractorFormData.copy(
+                aabPath = extractorUiState.aabPath
+            )
+        }
+    }
+
     ErrorDialog(
         showDialog = showErrorDialog,
         msg = extractorUiState.errorMsg.msg
@@ -127,32 +162,30 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
         onKeystoreSpinnerItemChanged = { keystoreDto ->
-            extractorFormData = extractorFormData.copy(
-                keystoreDto = keystoreDto
-            )
+            extractorViewModel.sendIntent(ExtractorIntent.UpdateKeystoreDto(keystoreDto))
         },
         onKeystoreRemoveClick = {
-            showKeystoreRemoveDialog = true
+            extractorViewModel.sendIntent(ExtractorIntent.SetShowKeystoreRemoveDialog(true))
         },
         onItemSelected = { item ->
-            extractorFormData = extractorFormData.copy(
-                selectedExtractOption = item
-            )
+            extractorViewModel.sendIntent(ExtractorIntent.UpdateSelectedExtractOption(item))
         }
     )
 
     if (showKeystoreRemoveDialog) {
         KeystoreRemovalDialog(
             keystoreName = extractorFormData.keystoreDto.name,
-            onDismiss = { showKeystoreRemoveDialog = false },
+            onDismiss = { 
+                extractorViewModel.sendIntent(ExtractorIntent.SetShowKeystoreRemoveDialog(false))
+            },
             onPositiveButtonClick = {
                 extractorViewModel.sendIntent(
                     ExtractorIntent.RemoveKeystore(extractorFormData.keystoreDto)
                 )
-
-                extractorFormData = extractorFormData.copy(
-                    keystoreDto = KeystoreDto()
+                extractorViewModel.sendIntent(
+                    ExtractorIntent.UpdateKeystoreDto(KeystoreDto())
                 )
+                extractorViewModel.sendIntent(ExtractorIntent.SetShowKeystoreRemoveDialog(false))
             }
         )
     }
@@ -178,9 +211,17 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
                 extractorFormData.keystoreDto.let { keystoreDto ->
                     if (keystoreDto.name.isNotEmpty()) {
+                        val existingKeystore = extractorUiState.keystoreDtoList.find { it.name == keystoreDto.name }
+
+                        val keystoreToSave = if (existingKeystore != null && keystoreDto.id == null) {
+                            keystoreDto.copy(id = existingKeystore.id)
+                        } else {
+                            keystoreDto
+                        }
+
                         extractorViewModel.sendIntent(
                             ExtractorIntent.SaveKeystore(
-                                keystoreDto = keystoreDto
+                                keystoreDto = keystoreToSave
                             )
                         )
                     }
@@ -302,6 +343,8 @@ fun KeystoreSignForm(
     isLoading: Boolean
 ) {
     val inputModifier = Modifier.fillMaxWidth()
+    var passwordVisible by remember { mutableStateOf(false) }
+    var keyPasswordVisible by remember { mutableStateOf(false) }
 
     val spinnerItems = keystoreDtoList.map {
         SpinnerItem(
@@ -332,13 +375,21 @@ fun KeystoreSignForm(
 
                 keystoreDto = keystoreDto?.copy(
                     name = spinnerItem.name
-                )?: KeystoreDto(
-                    name = spinnerItem.name,
-                    path = extractorFormData.keystoreDto.path,
-                    password = extractorFormData.keystoreDto.password,
-                    keyAlias = extractorFormData.keystoreDto.keyAlias,
-                    keyPassword = extractorFormData.keystoreDto.keyPassword
-                )
+                ) ?: run {
+                    val existingKeystore = keystoreDtoList.find { it.name == spinnerItem.name }
+
+                    if (existingKeystore != null) {
+                        existingKeystore.copy()
+                    } else {
+                        KeystoreDto(
+                            name = spinnerItem.name,
+                            path = extractorFormData.keystoreDto.path,
+                            password = extractorFormData.keystoreDto.password,
+                            keyAlias = extractorFormData.keystoreDto.keyAlias,
+                            keyPassword = extractorFormData.keystoreDto.keyPassword
+                        )
+                    }
+                }
 
                 onItemChanged(keystoreDto)
             }
@@ -378,6 +429,15 @@ fun KeystoreSignForm(
             },
             label = {
                 Text("Keystore Password")
+            },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                    )
+                }
             }
         )
 
@@ -416,6 +476,15 @@ fun KeystoreSignForm(
             },
             label = {
                 Text("Key Password")
+            },
+            visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { keyPasswordVisible = !keyPasswordVisible }) {
+                    Icon(
+                        imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
+                    )
+                }
             }
         )
     }

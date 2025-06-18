@@ -2,25 +2,24 @@ package io.github.feliperce.aabtoapk.data.remote
 
 import AabToApk.sharedRemote.BuildConfig
 
-
 object ServerConstants {
     const val PORT = BuildConfig.PORT
     const val HOST = BuildConfig.HOST
     const val PROXY_HOST = BuildConfig.PROXY_HOST
     const val BASE_URL = "http://$HOST:$PORT"
     const val PROXY_BASE_URL = "https://$PROXY_HOST"
-    const val MAX_AAB_UPLOAD_MB = 100
-    const val REMOVE_UPLOAD_HOUR_TIME = 1
+    val MAX_AAB_UPLOAD_MB = BuildConfig.MAX_AAB_UPLOAD_MB.toInt()
+    val REMOVE_UPLOAD_HOUR_TIME = BuildConfig.REMOVE_UPLOAD_HOUR_TIME.toInt()
 
     object PathConf {
-        const val CACHE_PATH = "/tmp/AabToApk"
-        const val BUILD_TOOLS_PATH = "/home/felipe/Development/Android/Sdk/build-tools/35.0.0"
+        val CACHE_PATH = BuildConfig.CACHE_PATH
+        val BUILD_TOOLS_PATH = BuildConfig.BUILD_TOOLS_PATH
     }
 
     object DebugKeystore {
-        const val PATH = "/home/felipe/.android/debug.keystore"
-        const val ALIAS = "androiddebugkey"
-        const val STORE_PASSWORD = "android"
-        const val KEY_PASSWORD = "android"
+        val PATH = BuildConfig.DEBUG_KEYSTORE_PATH
+        val ALIAS = BuildConfig.DEBUG_KEYSTORE_ALIAS
+        val STORE_PASSWORD = BuildConfig.DEBUG_KEYSTORE_STORE_PASSWORD
+        val KEY_PASSWORD = BuildConfig.DEBUG_KEYSTORE_KEY_PASSWORD
     }
 }

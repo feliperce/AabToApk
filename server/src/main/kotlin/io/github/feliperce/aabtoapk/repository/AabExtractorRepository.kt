@@ -112,7 +112,7 @@ class AabExtractorRepository(
                 fileBytes = ByteArray(0)
             )
         } else {
-            keystoreInfoDto!!
+            keystoreInfoDto
         }
 
         extractor.setSignConfig(

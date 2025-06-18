@@ -11,19 +11,23 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import feature.extractor.view.ExtractorScreen
+import feature.nav.state.NavIntent
+import feature.nav.viewmodel.NavViewModel
 import feature.settings.view.SettingsScreen
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavScreen() {
     val navController = rememberNavController()
-    var currentScreen: Screen? by remember { mutableStateOf(null) }
+    val navViewModel: NavViewModel = koinViewModel()
+    val navUiState by navViewModel.navState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            currentScreen?.let {
+            navUiState.currentScreen?.let {
                 TopAppBar(
                     title = {
                         Text(text = it.title)
@@ -43,13 +47,13 @@ fun NavScreen() {
                     SettingsScreen(
                         snackbarHostState = snackbarHostState
                     )
-                    currentScreen = Screen.SettingsScreen
+                    navViewModel.sendIntent(NavIntent.SetCurrentScreen(Screen.SettingsScreen))
                 }
                 composable(route = Screen.ExtractorScreen.route) {
                     ExtractorScreen(
                         snackbarHostState = snackbarHostState
                     )
-                    currentScreen = Screen.ExtractorScreen
+                    navViewModel.sendIntent(NavIntent.SetCurrentScreen(Screen.ExtractorScreen))
                 }
             }
         }
