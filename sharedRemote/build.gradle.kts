@@ -14,11 +14,27 @@ plugins {
 val host: String = gradleLocalProperties(rootDir).getProperty("sv.host") ?: ""
 val port: String = gradleLocalProperties(rootDir).getProperty("sv.port") ?: ""
 val proxyHost: String = gradleLocalProperties(rootDir).getProperty("proxy.host") ?: ""
+val maxAabUploadMb: String = System.getenv("AAB_MAX_UPLOAD_MB") ?: "100"
+val removeUploadHourTime: String = System.getenv("AAB_REMOVE_UPLOAD_HOUR_TIME") ?: "1"
+val cachePath: String = System.getenv("AAB_CACHE_PATH") ?: "/tmp/AabToApk"
+val buildToolsPath: String = System.getenv("AAB_BUILD_TOOLS_PATH") ?: ""
+val keystorePath: String = System.getenv("DEBUG_KEYSTORE_PATH") ?: ""
+val keystoreAlias: String = System.getenv("DEBUG_KEYSTORE_ALIAS") ?: "androiddebugkey"
+val keystoreStorePassword: String = System.getenv("DEBUG_KEYSTORE_STORE_PASSWORD") ?: "android"
+val keystoreKeyPassword: String = System.getenv("DEBUG_KEYSTORE_KEY_PASSWORD") ?: "android"
 
 buildConfig {
     buildConfigField("HOST", host)
     buildConfigField("PORT", port)
     buildConfigField("PROXY_HOST", proxyHost)
+    buildConfigField("MAX_AAB_UPLOAD_MB", maxAabUploadMb)
+    buildConfigField("REMOVE_UPLOAD_HOUR_TIME", removeUploadHourTime)
+    buildConfigField("CACHE_PATH", cachePath)
+    buildConfigField("BUILD_TOOLS_PATH", buildToolsPath)
+    buildConfigField("DEBUG_KEYSTORE_PATH", keystorePath)
+    buildConfigField("DEBUG_KEYSTORE_ALIAS", keystoreAlias)
+    buildConfigField("DEBUG_KEYSTORE_STORE_PASSWORD", keystoreStorePassword)
+    buildConfigField("DEBUG_KEYSTORE_KEY_PASSWORD", keystoreKeyPassword)
 }
 
 kotlin {
