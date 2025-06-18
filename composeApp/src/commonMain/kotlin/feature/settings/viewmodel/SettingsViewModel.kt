@@ -55,12 +55,20 @@ class SettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
+    private fun reduce(currentState: SettingsUiState, newState: SettingsUiState): SettingsUiState {
+        return newState
+    }
+
+    private fun updateState(stateReducer: (SettingsUiState) -> SettingsUiState) {
+        _settingsState.update { currentState ->
+            reduce(currentState, stateReducer(currentState))
+        }
+    }
+
     private fun getIsFirstAccess() {
         viewModelScope.launch {
             settingsRepository.getIsFirstAccess().collect { isFirstAccess ->
-                _settingsState.update {
-                    it.copy(isFirstAccess = isFirstAccess)
-                }
+                updateState { it.copy(isFirstAccess = isFirstAccess) }
             }
         }
     }
@@ -68,9 +76,7 @@ class SettingsViewModel(
     private fun getSettings() {
         viewModelScope.launch {
             settingsRepository.getSettings().collect { settingsData ->
-                _settingsState.update {
-                    it.copy(settingsData = settingsData)
-                }
+                updateState { it.copy(settingsData = settingsData) }
             }
         }
     }
@@ -84,11 +90,10 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             settingsRepository.saveSettings(settingsData)
-            _settingsState.update {
+            updateState { 
                 it.copy(successMsg = SuccessMsg(
                     msg = "Settings changed with success!"
-                )
-                )
+                ))
             }
         }
     }
@@ -100,7 +105,7 @@ class SettingsViewModel(
     }
 
     private fun validateForm(settingsFormData: SettingsFormData) {
-        _settingsState.update {
+        updateState {
             it.copy(
                 isFormValid = settingsFormData.adbPath.isNotEmpty() &&
                         settingsFormData.buildToolsPath.isNotEmpty() &&
