@@ -80,8 +80,8 @@ android {
         applicationId = "io.github.feliperce.aabtoapk"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "0.7.0"
+        versionCode = 4
+        versionName = "0.8.0"
     }
     packaging {
         resources {
@@ -115,7 +115,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "2.0.0"
+            packageVersion = "2.1.0"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }
