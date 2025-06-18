@@ -12,11 +12,16 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.feature.extractor.model.ExtractorOption
@@ -98,55 +103,48 @@ fun ExtractorScreen() {
                     extractorResponseDto = extractorUiState.extractorResponseDto,
                     onDebugKeystoreChecked = {
                         showKeystoreForm = !it
-                        extractorUiState.keystore = extractorUiState.keystore.copy(
-                            isDebugKeystore = it
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateKeystoreDebug(isDebugKeystore = it)
                         )
                     },
                     onItemSelected = {
                         selectedOption = it
-                        extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
-                            extractorOption = it.data as ExtractorOption
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateExtractorOption(extractorOption = it.data as ExtractorOption)
                         )
                     },
                     onFileResult = {
-                        scope.launch {
-                            extractorUiState.aabFileDto = extractorUiState.aabFileDto.copy(
-                                aabByteArray = it.readBytes(),
-                                fileName = it.name,
-                                fileSize = it.getSize() ?: 0
-                            )
-                        }
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateAabFile(file = it)
+                        )
                     },
                     selectedOption = selectedOption,
                     showKeystoreForm = showKeystoreForm,
                     onKeystoreFileResult = {
-                        scope.launch {
-                            extractorUiState.keystore = extractorUiState.keystore.copy(
-                                keystoreFileName = it.name,
-                                keystoreByteArray = it.readBytes()
-                            )
-                        }
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateKeystoreFile(file = it)
+                        )
                     },
                     onPasswordFieldChange = {
                         passwordText = it
-                        extractorUiState.keystore = extractorUiState.keystore.copy(
-                            password = it
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateKeystorePassword(password = it)
                         )
                     },
                     onAliasFieldChange = {
                         aliasText = it
-                        extractorUiState.keystore = extractorUiState.keystore.copy(
-                            alias = it
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateKeystoreAlias(alias = it)
                         )
                     },
                     onKeyPasswordFieldChange = {
                         keyPasswordText = it
-                        extractorUiState.keystore = extractorUiState.keystore.copy(
-                            keyPassword = it
+                        extractorViewModel.sendIntent(
+                            ExtractorIntent.UpdateKeystoreKeyPassword(keyPassword = it)
                         )
                     },
                     onUploadButtonClick = {
-                        extractorUiState.extractorResponseDto = null
+                        extractorViewModel.sendIntent(ExtractorIntent.ResetExtractorResponse)
                         extractorViewModel.sendIntent(
                             ExtractorIntent.UploadAndExtract(
                                 keystoreDto = extractorUiState.keystore,
@@ -398,6 +396,9 @@ fun KeystoreForm(
     aliasText: String,
     keyPasswordText: String
 ) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    var keyPasswordVisible by remember { mutableStateOf(false) }
+
     FormCard(
         modifier = modifier.fillMaxWidth(),
         title = "Keystore",
@@ -423,7 +424,16 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onPasswordFieldChange(text)
             },
-            label = { Text("Keystore Password") }
+            label = { Text("Keystore Password") },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                    )
+                }
+            }
         )
 
         OutlinedTextField(
@@ -443,7 +453,16 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onKeyPasswordFieldChange(text)
             },
-            label = { Text("Key Password") }
+            label = { Text("Key Password") },
+            visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { keyPasswordVisible = !keyPasswordVisible }) {
+                    Icon(
+                        imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
+                    )
+                }
+            }
         )
     }
 }

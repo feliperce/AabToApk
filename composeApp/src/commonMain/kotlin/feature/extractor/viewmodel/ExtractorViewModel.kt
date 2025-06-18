@@ -9,6 +9,7 @@ import feature.extractor.state.ExtractorIntent
 import feature.extractor.state.ExtractorUiState
 import feature.settings.repository.SettingsRepository
 import io.github.feliperce.aabtoapk.utils.extractor.*
+import ui.components.RadioItem
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -61,8 +62,36 @@ class ExtractorViewModel(
                     is ExtractorIntent.RemoveKeystore -> {
                         removeKeystore(intent.keystoreDto)
                     }
+                    is ExtractorIntent.SetShowKeystoreRemoveDialog -> {
+                        setShowKeystoreRemoveDialog(intent.show)
+                    }
+                    is ExtractorIntent.SetShowErrorDialog -> {
+                        setShowErrorDialog(intent.show)
+                    }
+                    is ExtractorIntent.UpdateAabPath -> {
+                        updateAabPath(intent.path)
+                    }
+                    is ExtractorIntent.UpdateKeystoreDto -> {
+                        updateKeystoreDto(intent.keystoreDto)
+                    }
+                    is ExtractorIntent.UpdateExtractOptions -> {
+                        updateExtractOptions(intent.options)
+                    }
+                    is ExtractorIntent.UpdateSelectedExtractOption -> {
+                        updateSelectedExtractOption(intent.option)
+                    }
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private fun reduce(currentState: ExtractorUiState, newState: ExtractorUiState): ExtractorUiState {
+        return newState
+    }
+
+    private fun updateState(stateReducer: (ExtractorUiState) -> ExtractorUiState) {
+        _extractorState.update { currentState ->
+            reduce(currentState, stateReducer(currentState))
+        }
     }
 
     private fun removeKeystore(keystoreDto: KeystoreDto) {
@@ -80,9 +109,7 @@ class ExtractorViewModel(
     private fun getKeystoreData() {
         viewModelScope.launch {
             extractorRepository.getKeystoreAll().collect { keystoreList ->
-                _extractorState.update {
-                    it.copy(keystoreDtoList = keystoreList)
-                }
+                updateState { it.copy(keystoreDtoList = keystoreList) }
             }
         }
     }
@@ -90,19 +117,13 @@ class ExtractorViewModel(
     private fun getSettingsData() {
         viewModelScope.launch {
             settingsRepository.getSettings().collect { settings ->
-                _extractorState.update {
-                    it.copy(settingsData = settings)
-                }
+                updateState { it.copy(settingsData = settings) }
             }
         }
     }
 
     private fun extractAab(extractorFormData: ExtractorFormData) {
-        _extractorState.update {
-            it.copy(
-                loading = true
-            )
-        }
+        updateState { it.copy(loading = true) }
 
         extractorFormData.settingsData?.let { settingsData ->
             viewModelScope.launch {
@@ -119,12 +140,7 @@ class ExtractorViewModel(
                         keystorePassword = keystoreDto.password,
                         keyPassword = keystoreDto.keyPassword,
                         onFailure = { errorMsg ->
-                            _extractorState.update {
-                                it.copy(
-                                    loading = false,
-                                    errorMsg = errorMsg
-                                )
-                            }
+                            updateState { it.copy(loading = false, errorMsg = errorMsg) }
                         }
                     )
                 }
@@ -133,7 +149,7 @@ class ExtractorViewModel(
                     apksFileName = File(extractorFormData.aabPath).nameWithoutExtension,
                     extractorOption = extractorFormData.selectedExtractOption.data as ApksExtractor.ExtractorOption,
                     onSuccess = { output, _ ->
-                        _extractorState.update {
+                        updateState { 
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
@@ -145,17 +161,12 @@ class ExtractorViewModel(
                         }
                     },
                     onFailure = { errorMsg ->
-                        _extractorState.update {
-                            it.copy(
-                                loading = false,
-                                errorMsg = errorMsg
-                            )
-                        }
+                        updateState { it.copy(loading = false, errorMsg = errorMsg) }
                     }
                 )
             }
         } ?: run {
-            _extractorState.update {
+            updateState { 
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
@@ -168,11 +179,7 @@ class ExtractorViewModel(
     }
 
     private fun installApks(extractorFormData: ExtractorFormData) {
-        _extractorState.update {
-            it.copy(
-                loading = true
-            )
-        }
+        updateState { it.copy(loading = true) }
 
         extractorFormData.settingsData?.let { settingsData ->
             val apksInstall = ApksInstall(settingsData.adbPath)
@@ -181,7 +188,7 @@ class ExtractorViewModel(
                 apksInstall.installApks(
                     apksPath = _extractorState.value.extractedApksPath,
                     onSuccess = {
-                        _extractorState.update {
+                        updateState { 
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
@@ -192,17 +199,12 @@ class ExtractorViewModel(
                         }
                     },
                     onFailure = { errorMsg ->
-                        _extractorState.update {
-                            it.copy(
-                                loading = false,
-                                errorMsg = errorMsg
-                            )
-                        }
+                        updateState { it.copy(loading = false, errorMsg = errorMsg) }
                     }
                 )
             }
         } ?: run {
-            _extractorState.update {
+            updateState { 
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
@@ -215,11 +217,7 @@ class ExtractorViewModel(
     }
 
     private fun installApk(extractorFormData: ExtractorFormData) {
-        _extractorState.update {
-            it.copy(
-                loading = true
-            )
-        }
+        updateState { it.copy(loading = true) }
 
         extractorFormData.settingsData?.let { settingsData ->
             val apkInstall = ApkInstall(settingsData.adbPath)
@@ -228,7 +226,7 @@ class ExtractorViewModel(
                 apkInstall.installApk(
                     apkPath = _extractorState.value.extractedApksPath,
                     onSuccess = {
-                        _extractorState.update {
+                        updateState { 
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
@@ -239,17 +237,12 @@ class ExtractorViewModel(
                         }
                     },
                     onFailure = { errorMsg ->
-                        _extractorState.update {
-                            it.copy(
-                                loading = false,
-                                errorMsg = errorMsg
-                            )
-                        }
+                        updateState { it.copy(loading = false, errorMsg = errorMsg) }
                     }
                 )
             }
         } ?: run {
-            _extractorState.update {
+            updateState { 
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
@@ -259,5 +252,28 @@ class ExtractorViewModel(
                 )
             }
         }
+    }
+    private fun setShowKeystoreRemoveDialog(show: Boolean) {
+        updateState { it.copy(showKeystoreRemoveDialog = show) }
+    }
+
+    private fun setShowErrorDialog(show: Boolean) {
+        updateState { it.copy(showErrorDialog = show) }
+    }
+
+    private fun updateAabPath(path: String) {
+        updateState { it.copy(aabPath = path) }
+    }
+
+    private fun updateKeystoreDto(keystoreDto: KeystoreDto) {
+        updateState { it.copy(keystoreDto = keystoreDto) }
+    }
+
+    private fun updateExtractOptions(options: List<RadioItem>) {
+        updateState { it.copy(extractOptions = options) }
+    }
+
+    private fun updateSelectedExtractOption(option: RadioItem) {
+        updateState { it.copy(selectedExtractOption = option) }
     }
 }
