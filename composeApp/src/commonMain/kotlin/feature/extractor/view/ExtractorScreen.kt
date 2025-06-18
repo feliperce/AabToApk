@@ -211,9 +211,17 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
                 extractorFormData.keystoreDto.let { keystoreDto ->
                     if (keystoreDto.name.isNotEmpty()) {
+                        val existingKeystore = extractorUiState.keystoreDtoList.find { it.name == keystoreDto.name }
+
+                        val keystoreToSave = if (existingKeystore != null && keystoreDto.id == null) {
+                            keystoreDto.copy(id = existingKeystore.id)
+                        } else {
+                            keystoreDto
+                        }
+
                         extractorViewModel.sendIntent(
                             ExtractorIntent.SaveKeystore(
-                                keystoreDto = keystoreDto
+                                keystoreDto = keystoreToSave
                             )
                         )
                     }
@@ -367,13 +375,21 @@ fun KeystoreSignForm(
 
                 keystoreDto = keystoreDto?.copy(
                     name = spinnerItem.name
-                )?: KeystoreDto(
-                    name = spinnerItem.name,
-                    path = extractorFormData.keystoreDto.path,
-                    password = extractorFormData.keystoreDto.password,
-                    keyAlias = extractorFormData.keystoreDto.keyAlias,
-                    keyPassword = extractorFormData.keystoreDto.keyPassword
-                )
+                ) ?: run {
+                    val existingKeystore = keystoreDtoList.find { it.name == spinnerItem.name }
+
+                    if (existingKeystore != null) {
+                        existingKeystore.copy()
+                    } else {
+                        KeystoreDto(
+                            name = spinnerItem.name,
+                            path = extractorFormData.keystoreDto.path,
+                            password = extractorFormData.keystoreDto.password,
+                            keyAlias = extractorFormData.keystoreDto.keyAlias,
+                            keyPassword = extractorFormData.keystoreDto.keyPassword
+                        )
+                    }
+                }
 
                 onItemChanged(keystoreDto)
             }
