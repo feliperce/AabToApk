@@ -3,6 +3,7 @@ package shared.di
 import data.local.db.ExtractorDatabase
 import data.local.db.getRoomDatabase
 import feature.extractor.viewmodel.ExtractorViewModel
+import feature.nav.viewmodel.NavViewModel
 import feature.settings.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
@@ -22,5 +23,6 @@ actual class PlatformModule {
         }
         viewModelOf(::ExtractorViewModel)
         viewModelOf(::SettingsViewModel)
+        viewModelOf(::NavViewModel)
     }
 }
