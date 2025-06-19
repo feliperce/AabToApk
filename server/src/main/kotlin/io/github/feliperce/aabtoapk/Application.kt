@@ -8,7 +8,6 @@ import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
 import io.github.feliperce.aabtoapk.job.initJobs
-import io.github.feliperce.aabtoapk.server.BuildConfig
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
 import io.github.feliperce.aabtoapk.utils.sendErrorResponse

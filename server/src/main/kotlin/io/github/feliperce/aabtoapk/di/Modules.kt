@@ -7,7 +7,6 @@ import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
 import io.github.feliperce.aabtoapk.repository.AabExtractorRepository
 import io.github.feliperce.aabtoapk.repository.RemoveCacheRepository
-import io.github.feliperce.aabtoapk.server.BuildConfig
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import org.jetbrains.exposed.sql.Database
 import org.koin.dsl.module

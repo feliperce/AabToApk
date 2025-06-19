@@ -1,7 +1,5 @@
 package io.github.feliperce.aabtoapk.config
 
-import io.github.feliperce.aabtoapk.server.BuildConfig
-
 object ServerConfig {
     object PathConf {
         val CACHE_PATH: String = System.getenv("AAB_CACHE_PATH") ?: "/tmp/AabToApk"
