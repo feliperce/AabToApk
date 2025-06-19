@@ -1,6 +1,5 @@
 package io.github.feliperce.aabtoapk.utils
 
-import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.ktor.http.*
 import io.ktor.server.response.*
@@ -16,6 +15,3 @@ suspend fun RoutingCall.sendErrorResponse(
     this.respond(errorResponseType.toErrorResponse(customErrorMsg))
 }
 
-fun ServerConstants.PathConf.mkdirs() {
-    File(CACHE_PATH).mkdirs()
-}

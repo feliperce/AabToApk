@@ -1,5 +1,6 @@
 package io.github.feliperce.aabtoapk.job
 
+import io.github.feliperce.aabtoapk.config.ServerConfig
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.ktor.server.application.*
 import org.quartz.JobBuilder
@@ -19,7 +20,7 @@ fun Application.initJobs() {
         .withIdentity("cacheRemoval", "cache")
         .withSchedule(
             SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInHours(ServerConstants.REMOVE_UPLOAD_HOUR_TIME)
+                .withIntervalInHours(ServerConfig.REMOVE_UPLOAD_HOUR_TIME)
                 .repeatForever())
         .build()
 

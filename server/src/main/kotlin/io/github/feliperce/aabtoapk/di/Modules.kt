@@ -1,5 +1,6 @@
 package io.github.feliperce.aabtoapk.di
 
+import io.github.feliperce.aabtoapk.config.ServerConfig
 import io.github.feliperce.aabtoapk.data.local.ExtractorDb
 import io.github.feliperce.aabtoapk.data.local.dao.BasePathDao
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
@@ -14,9 +15,9 @@ import org.koin.dsl.module
 val dataModule = module {
     single {
         Database.connect(
-            "jdbc:postgresql://localhost:5432/AabToApk",
-            user = BuildConfig.DB_USER,
-            password = BuildConfig.DB_PASSWORD
+            ServerConfig.Database.URL,
+            user = ServerConfig.Database.USER,
+            password = ServerConfig.Database.PASSWORD
         )
     }
 
