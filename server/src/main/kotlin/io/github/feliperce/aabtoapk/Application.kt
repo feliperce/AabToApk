@@ -66,7 +66,8 @@ fun Application.module() {
         allowHeader(HttpHeaders.Host)
         allowHeader(HttpHeaders.Upgrade)
         allowHeader(HttpHeaders.UserAgent)
-        anyHost()
+        allowHost("aabtoapk.io", schemes = listOf("https"))
+        allowHost("www.aabtoapk.io", schemes = listOf("https"))
     }
 
     install(Authentication) {

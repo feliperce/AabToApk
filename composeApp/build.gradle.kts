@@ -120,7 +120,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "2.1.0"
+            packageVersion = "2.1.1"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }
