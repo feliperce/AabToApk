@@ -40,7 +40,7 @@ class ApksExtractor(
             }.onFailure { failure ->
                 onFailure(
                     ErrorMsg(
-                        title = "SIGN FAILURE",
+                        type = ErrorType.SIGN_FAILURE,
                         msg = failure.message ?: "Keystore sign error"
                     )
                 )
@@ -95,7 +95,7 @@ class ApksExtractor(
                 }.onFailure { failure ->
                     onFailure(
                         ErrorMsg(
-                            title = "AAB EXTRACT FAILURE",
+                            type = ErrorType.AAB_EXTRACT_FAILURE,
                             msg = failure.message ?: "Error on Extract aab"
                         )
                     )

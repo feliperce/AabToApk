@@ -25,7 +25,17 @@ import aabtoapk.composeapp.generated.resources.build_tools_directory
 import aabtoapk.composeapp.generated.resources.output_dir_path
 import aabtoapk.composeapp.generated.resources.output_directory
 import aabtoapk.composeapp.generated.resources.save_settings
+import aabtoapk.composeapp.generated.resources.settings_changed_success
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun getSuccessMessage(successType: SuccessMsgType): String {
+    return when (successType) {
+        SuccessMsgType.SETTINGS_CHANGED -> stringResource(Res.string.settings_changed_success)
+        else -> ""
+    }
+}
 
 @Composable
 fun SettingsScreen(

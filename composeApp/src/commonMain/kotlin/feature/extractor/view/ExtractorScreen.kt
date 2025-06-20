@@ -48,8 +48,22 @@ import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import io.github.feliperce.aabtoapk.utils.extractor.ErrorMsg
+import io.github.feliperce.aabtoapk.utils.extractor.ErrorType
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsg
 import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
 import org.jetbrains.compose.resources.stringResource
+import aabtoapk.composeapp.generated.resources.extracted_with_success
+import aabtoapk.composeapp.generated.resources.apks_installed_success
+import aabtoapk.composeapp.generated.resources.apk_installed_success
+import aabtoapk.composeapp.generated.resources.invalid_settings
+import aabtoapk.composeapp.generated.resources.go_to_settings
+import aabtoapk.composeapp.generated.resources.sign_failure
+import aabtoapk.composeapp.generated.resources.keystore_sign_error
+import aabtoapk.composeapp.generated.resources.aab_extract_failure
+import aabtoapk.composeapp.generated.resources.error_extract_aab
+import aabtoapk.composeapp.generated.resources.install_apk_error
+import aabtoapk.composeapp.generated.resources.error_install_apks
 
 @Composable
 fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
@@ -106,7 +120,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
     }
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
-        showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
+        showErrorDialog.value = extractorUiState.errorMsg.type != ErrorType.NONE
     }
 
     LaunchedEffect(extractorUiState.showKeystoreRemoveDialog) {
@@ -115,14 +129,18 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     val installText = stringResource(Res.string.install)
 
-    LaunchedEffect(extractorUiState.successMsg.id) {
-        val successMsg = extractorUiState.successMsg
+    val successMsg = getSuccessMessage(
+        successType = extractorUiState.successMsg.type,
+        extractedPath = extractorUiState.extractedApksPath,
+        isApks = extractorUiState.selectedExtractOption?.data == ApksExtractor.ExtractorOption.APKS
+    )
 
-        if (successMsg.msg.isNotEmpty()) {
-            if (successMsg.type == SuccessMsgType.EXTRACT_AAB) {
+    LaunchedEffect(extractorUiState.successMsg.id) {
+        if (successMsg.isNotEmpty()) {
+            if (extractorUiState.successMsg.type == SuccessMsgType.EXTRACT_AAB) {
                 val result = snackbarHostState
                     .showSnackbar(
-                        message = successMsg.msg,
+                        message = successMsg,
                         actionLabel = installText,
                         duration = SnackbarDuration.Indefinite
                     )
@@ -147,7 +165,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             } else {
                 snackbarHostState
                     .showSnackbar(
-                        message = successMsg.msg,
+                        message = successMsg,
                         duration = SnackbarDuration.Long
                     )
             }
@@ -185,7 +203,8 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        msg = extractorUiState.errorMsg.msg
+        title = getErrorTitle(extractorUiState.errorMsg.type),
+        msg = getErrorMessage(extractorUiState.errorMsg.type)
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -579,6 +598,37 @@ fun KeystoreRemovalDialog(
             )
         }
     )
+}
+
+@Composable
+fun getErrorMessage(errorType: ErrorType): String {
+    return when (errorType) {
+        ErrorType.SIGN_FAILURE -> stringResource(Res.string.keystore_sign_error)
+        ErrorType.AAB_EXTRACT_FAILURE -> stringResource(Res.string.error_extract_aab)
+        ErrorType.INSTALL_APK_ERROR -> stringResource(Res.string.error_install_apks)
+        ErrorType.INVALID_SETTINGS -> stringResource(Res.string.go_to_settings)
+        else -> ""
+    }
+}
+
+@Composable
+fun getErrorTitle(errorType: ErrorType): String {
+    return when (errorType) {
+        ErrorType.SIGN_FAILURE -> stringResource(Res.string.sign_failure)
+        ErrorType.AAB_EXTRACT_FAILURE -> stringResource(Res.string.aab_extract_failure)
+        ErrorType.INSTALL_APK_ERROR -> stringResource(Res.string.install_apk_error)
+        ErrorType.INVALID_SETTINGS -> stringResource(Res.string.invalid_settings)
+        else -> ""
+    }
+}
+
+@Composable
+fun getSuccessMessage(successType: SuccessMsgType, extractedPath: String, isApks: Boolean): String {
+    return when (successType) {
+        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success, extractedPath)
+        SuccessMsgType.INSTALL_APKS -> if (isApks) stringResource(Res.string.apks_installed_success) else stringResource(Res.string.apk_installed_success)
+        else -> ""
+    }
 }
 
 @Composable

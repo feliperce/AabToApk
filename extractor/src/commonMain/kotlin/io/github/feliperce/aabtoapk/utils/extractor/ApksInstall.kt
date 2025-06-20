@@ -34,7 +34,7 @@ class ApksInstall(
             }.onFailure { error ->
                 onFailure(
                     ErrorMsg(
-                        title = "INSTALL APK ERROR",
+                        type = ErrorType.INSTALL_APK_ERROR,
                         msg = error.message ?: "Error on install APKS"
                     )
                 )

@@ -21,4 +21,11 @@
     <string name="show_password">Show password</string>
     <string name="alias">Alias</string>
     <string name="key_password">Key Password</string>
+    <string name="generic_error">GENERIC</string>
+    <string name="enter_keystore_password">Enter the keystore password</string>
+    <string name="enter_keystore_key_alias">Enter the keystore key alias</string>
+    <string name="enter_keystore_key_password">Enter the keystore key password</string>
+    <string name="enter_keystore_file">Enter the keystore file</string>
+    <string name="enter_aab_file">Enter the aab file</string>
+    <string name="max_file_size">Max file aab file size is: %s mb</string>
 </resources>

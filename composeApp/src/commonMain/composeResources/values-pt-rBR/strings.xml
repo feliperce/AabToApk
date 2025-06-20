@@ -22,4 +22,27 @@
     <string name="remove_keystore_data">REMOVER DADOS DO KEYSTORE</string>
     <string name="remove_keystore">Remover %s?</string>
     <string name="remove">REMOVER</string>
+    <string name="adb_dir_path">Caminho do ADB</string>
+    <string name="adb_directory">Diretório do ADB</string>
+    <string name="build_tools_dir_path">Caminho das Build Tools</string>
+    <string name="build_tools_directory">Diretório das Build Tools</string>
+    <string name="output_dir_path">Caminho de Saída</string>
+    <string name="output_directory">Diretório de Saída</string>
+    <string name="save_settings">SALVAR CONFIGURAÇÕES</string>
+    <string name="settings_title">Configurações</string>
+    <string name="extractor_title">AabToApk</string>
+    <string name="extractor_label">Extrator</string>
+    <string name="settings_label">Configurações</string>
+    <string name="extracted_with_success">Extraído com sucesso: %s</string>
+    <string name="invalid_settings">CONFIGURAÇÕES INVÁLIDAS</string>
+    <string name="go_to_settings">Vá para o menu de configurações e verifique</string>
+    <string name="apks_installed_success">Apks instalados com sucesso!</string>
+    <string name="apk_installed_success">APK instalado com sucesso!</string>
+    <string name="settings_changed_success">Configurações alteradas com sucesso!</string>
+    <string name="sign_failure">FALHA NA ASSINATURA</string>
+    <string name="keystore_sign_error">Erro na assinatura do keystore</string>
+    <string name="aab_extract_failure">FALHA NA EXTRAÇÃO DO AAB</string>
+    <string name="error_extract_aab">Erro ao extrair aab</string>
+    <string name="install_apk_error">ERRO AO INSTALAR APK</string>
+    <string name="error_install_apks">Erro ao instalar APKS</string>
 </resources>
