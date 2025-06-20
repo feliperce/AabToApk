@@ -153,8 +153,7 @@ class ExtractorViewModel(
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
-                                    type = SuccessMsgType.EXTRACT_AAB,
-                                    msg = "Extracted with success: $output"
+                                    type = SuccessMsgType.EXTRACT_AAB
                                 ),
                                 extractedApksPath = output
                             )
@@ -170,8 +169,7 @@ class ExtractorViewModel(
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
-                        type = ErrorType.INVALID_SETTINGS,
-                        msg = "Go to the settings menu and check"
+                        type = ErrorType.INVALID_SETTINGS
                     )
                 )
             }
@@ -192,8 +190,7 @@ class ExtractorViewModel(
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
-                                    type = SuccessMsgType.INSTALL_APKS,
-                                    msg = "Apks installed with success!"
+                                    type = SuccessMsgType.INSTALL_APKS
                                 )
                             )
                         }
@@ -208,8 +205,7 @@ class ExtractorViewModel(
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
-                        type = ErrorType.INVALID_SETTINGS,
-                        msg = "Go to the settings menu and check"
+                        type = ErrorType.INVALID_SETTINGS
                     )
                 )
             }
@@ -230,8 +226,7 @@ class ExtractorViewModel(
                             it.copy(
                                 loading = false,
                                 successMsg = SuccessMsg(
-                                    type = SuccessMsgType.INSTALL_APKS,
-                                    msg = "APK installed with success!"
+                                    type = SuccessMsgType.INSTALL_APKS
                                 )
                             )
                         }
@@ -246,8 +241,7 @@ class ExtractorViewModel(
                 it.copy(
                     loading = false,
                     errorMsg = ErrorMsg(
-                        type = ErrorType.INVALID_SETTINGS,
-                        msg = "Go to the settings menu and check"
+                        type = ErrorType.INVALID_SETTINGS
                     )
                 )
             }

@@ -93,8 +93,7 @@ class SettingsViewModel(
             settingsRepository.saveSettings(settingsData)
             updateState { 
                 it.copy(successMsg = SuccessMsg(
-                    type = SuccessMsgType.SETTINGS_CHANGED,
-                    msg = "Settings changed with success!"
+                    type = SuccessMsgType.SETTINGS_CHANGED
                 ))
             }
         }

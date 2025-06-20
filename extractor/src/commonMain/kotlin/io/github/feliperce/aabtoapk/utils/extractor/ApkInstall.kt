@@ -29,8 +29,7 @@ class ApkInstall(
             }.onFailure { error ->
                 onFailure(
                     ErrorMsg(
-                        type = ErrorType.INSTALL_APK_ERROR,
-                        msg = error.message ?: "Error on install APKS"
+                        type = ErrorType.INSTALL_APK_ERROR
                     )
                 )
             }

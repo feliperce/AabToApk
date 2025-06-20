@@ -12,7 +12,6 @@ enum class ErrorType {
 
 data class ErrorMsg(
     val type: ErrorType = ErrorType.NONE,
-    val msg: String = "",
     val id: String = UUID.randomUUID().toString()
 )
 
@@ -25,6 +24,5 @@ enum class SuccessMsgType {
 
 data class SuccessMsg(
     val type: SuccessMsgType = SuccessMsgType.NONE,
-    val msg: String = "",
     val id: String = UUID.randomUUID().toString()
 )

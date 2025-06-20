@@ -30,14 +30,6 @@ import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun getSuccessMessage(successType: SuccessMsgType): String {
-    return when (successType) {
-        SuccessMsgType.SETTINGS_CHANGED -> stringResource(Res.string.settings_changed_success)
-        else -> ""
-    }
-}
-
-@Composable
 fun SettingsScreen(
     snackbarHostState: SnackbarHostState
 ) {
@@ -73,12 +65,15 @@ fun SettingsScreen(
         }
     }
 
-    LaunchedEffect(settingsUiState.successMsg.id) {
-        val successMsg = settingsUiState.successMsg
+    val successMsg = getSuccessMessage(
+        successType = settingsUiState.successMsg.type
+    )
 
-        if (successMsg.msg.isNotEmpty()) {
+    LaunchedEffect(settingsUiState.successMsg.id) {
+
+        if (successMsg.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                message = successMsg.msg,
+                message = successMsg,
                 duration = SnackbarDuration.Short
             )
         }
@@ -158,6 +153,14 @@ fun SettingsContent(
             onClick = settingsFormDataCallback.onSaveButtonClick,
             enabled = isFormValid
         )
+    }
+}
+
+@Composable
+fun getSuccessMessage(successType: SuccessMsgType): String {
+    return when (successType) {
+        SuccessMsgType.SETTINGS_CHANGED -> stringResource(Res.string.settings_changed_success)
+        else -> ""
     }
 }
 
