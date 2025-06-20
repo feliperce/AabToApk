@@ -48,9 +48,7 @@ import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
-import io.github.feliperce.aabtoapk.utils.extractor.ErrorMsg
 import io.github.feliperce.aabtoapk.utils.extractor.ErrorType
-import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsg
 import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
 import org.jetbrains.compose.resources.stringResource
 import aabtoapk.composeapp.generated.resources.extracted_with_success
@@ -625,7 +623,7 @@ fun getErrorTitle(errorType: ErrorType): String {
 @Composable
 fun getSuccessMessage(successType: SuccessMsgType, extractedPath: String, isApks: Boolean): String {
     return when (successType) {
-        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success, extractedPath)
+        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success).format(extractedPath)
         SuccessMsgType.INSTALL_APKS -> if (isApks) stringResource(Res.string.apks_installed_success) else stringResource(Res.string.apk_installed_success)
         else -> ""
     }
