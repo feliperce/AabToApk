@@ -582,7 +582,7 @@ fun KeystoreRemovalDialog(
             Text(stringResource(Res.string.remove_keystore_data))
         },
         text = {
-            Text(stringResource(Res.string.remove_keystore).format(keystoreName))
+            Text(stringResource(Res.string.remove_keystore, keystoreName))
         },
         confirmButton = {
             Button(
@@ -623,7 +623,7 @@ fun getErrorTitle(errorType: ErrorType): String {
 @Composable
 fun getSuccessMessage(successType: SuccessMsgType, extractedPath: String, isApks: Boolean): String {
     return when (successType) {
-        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success).format(extractedPath)
+        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success, extractedPath)
         SuccessMsgType.INSTALL_APKS -> if (isApks) stringResource(Res.string.apks_installed_success) else stringResource(Res.string.apk_installed_success)
         else -> ""
     }

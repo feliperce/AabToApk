@@ -3,7 +3,7 @@
     <string name="apks">APKS</string>
     <string name="universal_apk">Universal APK</string>
     <string name="install">INSTALL</string>
-    <string name="settings_need_configuration">Some settings need to be configured to use this function, go to \"Settings\" and set</string>
+    <string name="settings_need_configuration">Some settings need to be configured to use this function, go to "Settings" and set</string>
     <string name="pay_attention">PAY ATTENTION</string>
     <string name="extract">EXTRACT</string>
     <string name="keystore_sign">Keystore Sign</string>
@@ -20,7 +20,7 @@
     <string name="aab_path">AAB Path</string>
     <string name="aab">AAB</string>
     <string name="remove_keystore_data">REMOVE KEYSTORE DATA</string>
-    <string name="remove_keystore">Remove %s?</string>
+    <string name="remove_keystore">Remove %1$s?</string>
     <string name="remove">REMOVE</string>
     <string name="adb_dir_path">ADB Dir Path</string>
     <string name="adb_directory">ADB Directory</string>
@@ -33,7 +33,7 @@
     <string name="extractor_title">AabToApk</string>
     <string name="extractor_label">Extractor</string>
     <string name="settings_label">Settings</string>
-    <string name="extracted_with_success">Extracted with success: %s</string>
+    <string name="extracted_with_success">Extracted with success: %1$s</string>
     <string name="invalid_settings">INVALID SETTINGS</string>
     <string name="go_to_settings">Go to the settings menu and check</string>
     <string name="apks_installed_success">Apks installed with success!</string>

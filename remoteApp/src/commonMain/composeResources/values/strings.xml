@@ -5,14 +5,14 @@
     <string name="upload_and_extract">UPLOAD AND EXTRACT</string>
     <string name="download">DOWNLOAD</string>
     <string name="built_with">Built with</string>
-    <string name="file_extracted_success">%s extracted with success!</string>
+    <string name="file_extracted_success">%1$s extracted with success!</string>
     <string name="success">SUCCESS!</string>
-    <string name="upload_lag_message">During upload there may be a \"stuck\", don\'t worry, wait for the upload process</string>
+    <string name="upload_lag_message">During upload there may be a "stuck", don't worry, wait for the upload process</string>
     <string name="upload_lag">Upload lag</string>
     <string name="extractor">Extractor</string>
     <string name="aab_path">AAB Path</string>
     <string name="aab">AAB</string>
-    <string name="max_size">Max size: %s mb</string>
+    <string name="max_size">Max size: %1$d mb</string>
     <string name="use_debug_keystore">Use debug keystore</string>
     <string name="keystore">Keystore</string>
     <string name="keystore_path">Keystore Path</string>
@@ -27,5 +27,5 @@
     <string name="enter_keystore_key_password">Enter the keystore key password</string>
     <string name="enter_keystore_file">Enter the keystore file</string>
     <string name="enter_aab_file">Enter the aab file</string>
-    <string name="max_file_size">Max file aab file size is: %s mb</string>
+    <string name="max_file_size">Max file aab file size is: %1$d mb</string>
 </resources>
