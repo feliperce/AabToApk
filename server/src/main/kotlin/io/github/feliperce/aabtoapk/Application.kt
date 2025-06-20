@@ -54,19 +54,22 @@ fun Application.module() {
     }
 
     install(CORS) {
+        // Permitir apenas os cabeçalhos necessários
         allowHeader(HttpHeaders.ContentType)
-        allowMethod(HttpMethod.Get)
-        allowMethod(HttpMethod.Post)
         allowHeader(HttpHeaders.Authorization)
+        // Headers adicionais para funcionalidade completa
         allowHeader(HttpHeaders.AcceptEncoding)
         allowHeader(HttpHeaders.AcceptLanguage)
-        allowHeader(HttpHeaders.CacheControl)
-        allowHeader(HttpHeaders.AccessControlMaxAge)
-        allowHeader(HttpHeaders.Connection)
-        allowHeader(HttpHeaders.Host)
-        allowHeader(HttpHeaders.Upgrade)
-        allowHeader(HttpHeaders.UserAgent)
-        anyHost()
+
+        // Métodos permitidos
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+
+        // Permitir apenas localhost e aabtoapk.io
+        allowHost("localhost:3000") // Para desenvolvimento local
+        allowHost("localhost:8000") // Para outra porta de desenvolvimento local, se necessário
+        allowHost("aabtoapk.io", schemes = listOf("https", "http")) // Domínio principal
+        allowHost("www.aabtoapk.io", schemes = listOf("https", "http")) // Subdomínio www
     }
 
     install(Authentication) {

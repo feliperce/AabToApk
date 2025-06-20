@@ -3,6 +3,27 @@ package io.github.feliperce.aabtoapk.feature.extractor.view
 import aabtoapk.remoteapp.generated.resources.Res
 import aabtoapk.remoteapp.generated.resources.ic_aabtoapk
 import aabtoapk.remoteapp.generated.resources.ic_kotlin
+import aabtoapk.remoteapp.generated.resources.apks
+import aabtoapk.remoteapp.generated.resources.universal_apk
+import aabtoapk.remoteapp.generated.resources.upload_and_extract
+import aabtoapk.remoteapp.generated.resources.download
+import aabtoapk.remoteapp.generated.resources.built_with
+import aabtoapk.remoteapp.generated.resources.file_extracted_success
+import aabtoapk.remoteapp.generated.resources.success
+import aabtoapk.remoteapp.generated.resources.upload_lag_message
+import aabtoapk.remoteapp.generated.resources.upload_lag
+import aabtoapk.remoteapp.generated.resources.extractor
+import aabtoapk.remoteapp.generated.resources.aab_path
+import aabtoapk.remoteapp.generated.resources.aab
+import aabtoapk.remoteapp.generated.resources.max_size
+import aabtoapk.remoteapp.generated.resources.use_debug_keystore
+import aabtoapk.remoteapp.generated.resources.keystore
+import aabtoapk.remoteapp.generated.resources.keystore_path
+import aabtoapk.remoteapp.generated.resources.keystore_password
+import aabtoapk.remoteapp.generated.resources.hide_password
+import aabtoapk.remoteapp.generated.resources.show_password
+import aabtoapk.remoteapp.generated.resources.alias
+import aabtoapk.remoteapp.generated.resources.key_password
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
@@ -31,6 +52,8 @@ import io.github.feliperce.aabtoapk.feature.extractor.viewmodel.ExtractorViewMod
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
@@ -56,14 +79,14 @@ fun ExtractorScreen() {
     val extractorOptionsList = listOf(
         RadioItem(
             id = ExtractorOption.APKS.id,
-            text = "APKS",
+            text = stringResource(Res.string.apks),
             data = ExtractorOption.APKS,
             isSelected = true
         ),
         RadioItem(
             id = ExtractorOption.APK.id,
             data = ExtractorOption.APK,
-            text = "Universal APK"
+            text = stringResource(Res.string.universal_apk)
         )
     )
 
@@ -163,14 +186,6 @@ fun ExtractorScreen() {
                 )
             }
 
-            if (extractorUiState.loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
         }
     }
 }
@@ -240,8 +255,16 @@ fun ExtractorContent(
                     .padding(top = MarginPaddingSizeMedium)
                     .width(buttonsWidth),
                 onClick = onUploadButtonClick,
+                enabled = !isLoading,
                 content = {
-                    Text("UPLOAD AND EXTRACT")
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(stringResource(Res.string.upload_and_extract))
+                    }
                 }
             )
 
@@ -255,7 +278,7 @@ fun ExtractorContent(
                             top = MarginPaddingSizeMedium,
                             start = MarginPaddingSizeMedium
                         ),
-                    text = "DOWNLOAD",
+                    text = stringResource(Res.string.download),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Purple600
                     ),
@@ -282,7 +305,7 @@ fun Footer() {
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Built with")
+        Text(stringResource(Res.string.built_with))
         Spacer(modifier = Modifier.padding(start = MarginPaddingSizeSmall))
         Icon(
             modifier = Modifier
@@ -307,15 +330,15 @@ fun MessageBox(
     ) {
         extractorResponseDto?.let { extractorResponse ->
             MessageCard(
-                msg = "${extractorResponse.fileName} extracted with success!",
-                title = "SUCCESS!",
+                msg = stringResource(Res.string.file_extracted_success, extractorResponse.fileName),
+                title = stringResource(Res.string.success),
                 cardType = CardType.SUCCESS
             )
         } ?: run {
             if (isLoading) {
                 MessageCard(
-                    msg = "During upload there may be a \"stuck\", don't worry, wait for the upload process",
-                    title = "Upload lag",
+                    msg = stringResource(Res.string.upload_lag_message),
+                    title = stringResource(Res.string.upload_lag),
                     cardType = CardType.INFO
                 )
             }
@@ -338,7 +361,7 @@ fun UploadForm(
 
     FormCard(
         modifier =  modifier,
-        title = "Extractor",
+        title = stringResource(Res.string.extractor),
         formCardContent = {
             FilePickerTextField(
                 modifier = inputModifier,
@@ -346,10 +369,10 @@ fun UploadForm(
                 onFileResult = { platformFile ->
                     onFileResult(platformFile)
                 },
-                label = "AAB Path",
+                label = stringResource(Res.string.aab_path),
                 fileType = aabInputType,
-                pickerTitle = "AAB",
-                supportingText = "Max size: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
+                pickerTitle = stringResource(Res.string.aab),
+                supportingText = stringResource(Res.string.max_size, ServerConstants.MAX_AAB_UPLOAD_MB)
             )
 
             Column(
@@ -371,6 +394,7 @@ fun UploadForm(
                 ) {
                     Checkbox(
                         checked = isChecked,
+                        enabled = !isLoading,
                         onCheckedChange = {
                             isChecked = it
                             onDebugKeystoreChecked(it)
@@ -379,7 +403,7 @@ fun UploadForm(
 
                     Text(
                         modifier = Modifier.padding(start = MarginPaddingSizeSmall),
-                        text = "Use debug keystore",
+                        text = stringResource(Res.string.use_debug_keystore),
                         softWrap = true
                     )
                 }
@@ -405,7 +429,7 @@ fun KeystoreForm(
 
     FormCard(
         modifier = modifier.fillMaxWidth(),
-        title = "Keystore",
+        title = stringResource(Res.string.keystore),
         isActionButtonEnabled = !isLoading
     ) {
         val inputModifier = Modifier
@@ -416,9 +440,9 @@ fun KeystoreForm(
             modifier = inputModifier.padding(top = MarginPaddingSizeMedium),
             enabled = !isLoading,
             onFileResult = onKeystoreFileResult,
-            label = "Keystore Path",
+            label = stringResource(Res.string.keystore_path),
             fileType = keystoreInputType,
-            pickerTitle = "Keystore"
+            pickerTitle = stringResource(Res.string.keystore)
         )
 
         OutlinedTextField(
@@ -428,13 +452,16 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onPasswordFieldChange(text)
             },
-            label = { Text("Keystore Password") },
+            label = { Text(stringResource(Res.string.keystore_password)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                IconButton(
+                    onClick = { passwordVisible = !passwordVisible },
+                    enabled = !isLoading
+                ) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        contentDescription = if (passwordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -447,7 +474,7 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onAliasFieldChange(text)
             },
-            label = { Text("Alias") }
+            label = { Text(stringResource(Res.string.alias)) }
         )
 
         OutlinedTextField(
@@ -457,13 +484,16 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onKeyPasswordFieldChange(text)
             },
-            label = { Text("Key Password") },
+            label = { Text(stringResource(Res.string.key_password)) },
             visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = { keyPasswordVisible = !keyPasswordVisible }) {
+                IconButton(
+                    onClick = { keyPasswordVisible = !keyPasswordVisible },
+                    enabled = !isLoading
+                ) {
                     Icon(
                         imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
+                        contentDescription = if (keyPasswordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -486,7 +516,7 @@ private fun UploadFormPreview() {
 
 private val fakeExtractOptions = listOf(
     RadioItem(
-        text = "APK",
+        text = "Universal APK",
         isSelected = true
     ),
     RadioItem(

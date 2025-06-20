@@ -17,6 +17,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.DirectoryPickerTextField
 import ui.theme.MarginPaddingSizeMedium
+import aabtoapk.composeapp.generated.resources.Res
+import aabtoapk.composeapp.generated.resources.adb_dir_path
+import aabtoapk.composeapp.generated.resources.adb_directory
+import aabtoapk.composeapp.generated.resources.build_tools_dir_path
+import aabtoapk.composeapp.generated.resources.build_tools_directory
+import aabtoapk.composeapp.generated.resources.output_dir_path
+import aabtoapk.composeapp.generated.resources.output_directory
+import aabtoapk.composeapp.generated.resources.save_settings
+import aabtoapk.composeapp.generated.resources.settings_changed_success
+import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SettingsScreen(
@@ -54,12 +65,15 @@ fun SettingsScreen(
         }
     }
 
-    LaunchedEffect(settingsUiState.successMsg.id) {
-        val successMsg = settingsUiState.successMsg
+    val successMsg = getSuccessMessage(
+        successType = settingsUiState.successMsg.type
+    )
 
-        if (successMsg.msg.isNotEmpty()) {
+    LaunchedEffect(settingsUiState.successMsg.id) {
+
+        if (successMsg.isNotEmpty()) {
             snackbarHostState.showSnackbar(
-                message = successMsg.msg,
+                message = successMsg,
                 duration = SnackbarDuration.Short
             )
         }
@@ -107,8 +121,8 @@ fun SettingsContent(
             onDirectoryResult = {
                 onSettingsFormChange(settingsFormData.copy(adbPath = it.path ?: ""))
             },
-            label = "ADB Dir Path",
-            pickerTitle = "ADB Directory"
+            label = stringResource(Res.string.adb_dir_path),
+            pickerTitle = stringResource(Res.string.adb_directory)
         )
 
         DirectoryPickerTextField(
@@ -117,8 +131,8 @@ fun SettingsContent(
             onDirectoryResult = {
                 onSettingsFormChange(settingsFormData.copy(buildToolsPath = it.path ?: ""))
             },
-            label = "Build Tools Dir Path",
-            pickerTitle = "Build Tools Directory"
+            label = stringResource(Res.string.build_tools_dir_path),
+            pickerTitle = stringResource(Res.string.build_tools_directory)
         )
 
         DirectoryPickerTextField(
@@ -127,18 +141,26 @@ fun SettingsContent(
             onDirectoryResult = {
                 onSettingsFormChange(settingsFormData.copy(outputApksPath = it.path ?: ""))
             },
-            label = "Output Dir Path",
-            pickerTitle = "Output Directory"
+            label = stringResource(Res.string.output_dir_path),
+            pickerTitle = stringResource(Res.string.output_directory)
         )
 
         Button(
             modifier = defaultModifier,
             content = {
-                Text("SAVE SETTINGS")
+                Text(stringResource(Res.string.save_settings))
             },
             onClick = settingsFormDataCallback.onSaveButtonClick,
             enabled = isFormValid
         )
+    }
+}
+
+@Composable
+fun getSuccessMessage(successType: SuccessMsgType): String {
+    return when (successType) {
+        SuccessMsgType.SETTINGS_CHANGED -> stringResource(Res.string.settings_changed_success)
+        else -> ""
     }
 }
 
