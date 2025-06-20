@@ -163,14 +163,6 @@ fun ExtractorScreen() {
                 )
             }
 
-            if (extractorUiState.loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
         }
     }
 }
@@ -240,8 +232,16 @@ fun ExtractorContent(
                     .padding(top = MarginPaddingSizeMedium)
                     .width(buttonsWidth),
                 onClick = onUploadButtonClick,
+                enabled = !isLoading,
                 content = {
-                    Text("UPLOAD AND EXTRACT")
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("UPLOAD AND EXTRACT")
+                    }
                 }
             )
 
@@ -371,6 +371,7 @@ fun UploadForm(
                 ) {
                     Checkbox(
                         checked = isChecked,
+                        enabled = !isLoading,
                         onCheckedChange = {
                             isChecked = it
                             onDebugKeystoreChecked(it)
@@ -431,7 +432,10 @@ fun KeystoreForm(
             label = { Text("Keystore Password") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                IconButton(
+                    onClick = { passwordVisible = !passwordVisible },
+                    enabled = !isLoading
+                ) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                         contentDescription = if (passwordVisible) "Hide password" else "Show password"
@@ -460,7 +464,10 @@ fun KeystoreForm(
             label = { Text("Key Password") },
             visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = { keyPasswordVisible = !keyPasswordVisible }) {
+                IconButton(
+                    onClick = { keyPasswordVisible = !keyPasswordVisible },
+                    enabled = !isLoading
+                ) {
                     Icon(
                         imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                         contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
