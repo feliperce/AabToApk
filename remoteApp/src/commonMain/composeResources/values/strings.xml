@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">AabToApk</string>
+    <string name="apks">APKS</string>
+    <string name="universal_apk">Universal APK</string>
+    <string name="upload_and_extract">UPLOAD AND EXTRACT</string>
+    <string name="download">DOWNLOAD</string>
+    <string name="built_with">Built with</string>
+    <string name="file_extracted_success">%s extracted with success!</string>
+    <string name="success">SUCCESS!</string>
+    <string name="upload_lag_message">During upload there may be a \"stuck\", don\'t worry, wait for the upload process</string>
+    <string name="upload_lag">Upload lag</string>
+    <string name="extractor">Extractor</string>
+    <string name="aab_path">AAB Path</string>
+    <string name="aab">AAB</string>
+    <string name="max_size">Max size: %s mb</string>
+    <string name="use_debug_keystore">Use debug keystore</string>
+    <string name="keystore">Keystore</string>
+    <string name="keystore_path">Keystore Path</string>
+    <string name="keystore_password">Keystore Password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="alias">Alias</string>
+    <string name="key_password">Key Password</string>
+</resources>

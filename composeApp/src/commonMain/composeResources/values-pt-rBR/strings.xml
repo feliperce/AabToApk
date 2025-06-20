@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">AabToApk</string>
+    <string name="apks">APKS</string>
+    <string name="universal_apk">APK Universal</string>
+    <string name="install">INSTALAR</string>
+    <string name="settings_need_configuration">Algumas configurações precisam ser definidas para usar esta função, vá para \"Configurações\" e configure</string>
+    <string name="pay_attention">PRESTE ATENÇÃO</string>
+    <string name="extract">EXTRAIR</string>
+    <string name="keystore_sign">Assinatura Keystore</string>
+    <string name="name">Nome</string>
+    <string name="select_name_to_save_keystore">Selecione um nome para salvar as informações do keystore, deixe em branco para não salvar</string>
+    <string name="keystore_path">Caminho do Keystore</string>
+    <string name="keystore">Keystore</string>
+    <string name="keystore_password">Senha do Keystore</string>
+    <string name="hide_password">Ocultar senha</string>
+    <string name="show_password">Mostrar senha</string>
+    <string name="alias">Alias</string>
+    <string name="key_password">Senha da Chave</string>
+    <string name="aab_extract_install">Extrair / Instalar AAB</string>
+    <string name="aab_path">Caminho do AAB</string>
+    <string name="aab">AAB</string>
+    <string name="remove_keystore_data">REMOVER DADOS DO KEYSTORE</string>
+    <string name="remove_keystore">Remover %s?</string>
+    <string name="remove">REMOVER</string>
+</resources>
