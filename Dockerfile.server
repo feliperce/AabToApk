@@ -1,0 +1,16 @@
+FROM gradle:jdk21 as builder
+WORKDIR /app
+COPY . /app/
+RUN gradle server:buildFatJar --no-daemon
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=builder /app/server/build/libs/*-all.jar /app/server.jar
+RUN mkdir -p /app/storage
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/server.jar"]

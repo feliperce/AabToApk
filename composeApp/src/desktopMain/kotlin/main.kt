@@ -6,9 +6,11 @@ import androidx.compose.ui.window.*
 import di.initKoin
 import feature.nav.view.NavScreen
 import org.jetbrains.compose.resources.painterResource
+import shared.di.DesktopDispatcher
 import shared.di.PlatformModule
 
 fun main() = application {
+    DesktopDispatcher.initialize()
     initKoin(
         actualModules = listOf(PlatformModule().module)
     )

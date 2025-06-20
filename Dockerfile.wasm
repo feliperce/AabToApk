@@ -1,0 +1,24 @@
+FROM gradle:jdk17 AS build
+
+WORKDIR /app
+COPY . .
+
+RUN gradle :remoteApp:wasmJsBrowserDistribution
+
+# Use a simple HTTP server instead of nginx
+FROM node:alpine
+
+WORKDIR /app
+
+# Install a simple HTTP server
+RUN npm install -g http-server
+
+# Copy the compiled files to the app directory
+COPY --from=build /app/remoteApp/build/dist/wasmJs/productionExecutable /app
+COPY --from=build /app/remoteApp/icons /app/icons
+
+# Expose port 80
+EXPOSE 80
+
+# Start the HTTP server
+CMD ["http-server", "-p", "80", "--cors", "-c-1"]

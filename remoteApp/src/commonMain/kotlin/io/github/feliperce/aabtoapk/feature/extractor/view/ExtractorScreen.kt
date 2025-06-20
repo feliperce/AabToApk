@@ -172,7 +172,6 @@ fun ExtractorScreen() {
                 }
             }
         }
-
     }
 }
 
@@ -353,7 +352,9 @@ fun UploadForm(
                 supportingText = "Max size: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
             )
 
-            Row {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 RadioGroup(
                     radioOptions = extractOptions,
                     isEnabled = !isLoading,
@@ -362,9 +363,11 @@ fun UploadForm(
                 )
 
                 Row(
-                    modifier = inputModifier,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = MarginPaddingSizeSmall),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     Checkbox(
                         checked = isChecked,
@@ -376,7 +379,8 @@ fun UploadForm(
 
                     Text(
                         modifier = Modifier.padding(start = MarginPaddingSizeSmall),
-                        text = "Use debug keystore"
+                        text = "Use debug keystore",
+                        softWrap = true
                     )
                 }
             }

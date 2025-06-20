@@ -2,15 +2,14 @@ package io.github.feliperce.aabtoapk
 
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
 import io.github.feliperce.aabtoapk.data.remote.Resource
+import io.github.feliperce.aabtoapk.config.ServerConfig
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ErrorResponseType
 import io.github.feliperce.aabtoapk.di.dataModule
 import io.github.feliperce.aabtoapk.di.extractorModule
 import io.github.feliperce.aabtoapk.job.initJobs
-import io.github.feliperce.aabtoapk.server.BuildConfig
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
 import io.github.feliperce.aabtoapk.utils.format.convertMegaByteToBytesLong
-import io.github.feliperce.aabtoapk.utils.mkdirs
 import io.github.feliperce.aabtoapk.utils.sendErrorResponse
 import io.github.feliperce.aabtoapk.viewmodel.AabExtractorViewModel
 import io.ktor.http.*
@@ -32,12 +31,12 @@ import org.koin.ktor.plugin.Koin
 import java.io.File
 
 fun main() {
-    ServerConstants.PathConf.mkdirs()
+    ServerConfig.PathConf.mkdirs()
 
     embeddedServer(
         factory = Netty,
-        port = ServerConstants.PORT.toInt(),
-        host = ServerConstants.HOST,
+        port = 8080,
+        host = "0.0.0.0",
         module = Application::module
     ).start(wait = true)
 }
@@ -74,7 +73,7 @@ fun Application.module() {
         bearer {
             realm = "Wasm access"
             authenticate { tokenCredential ->
-                if (tokenCredential.token == BuildConfig.AUTH_TOKEN) {
+                if (tokenCredential.token == ServerConfig.AUTH_TOKEN) {
                     UserIdPrincipal("kwasm")
                 } else {
                     this.respond(
@@ -90,6 +89,13 @@ fun Application.module() {
     val viewModel by inject<AabExtractorViewModel>()
 
     routing {
+
+        println("=== CONFIGURING ROUTES ===")
+
+        get("/health") {
+            println("Health endpoint called!")
+            call.respond(HttpStatusCode.OK, "OK")
+        }
 
         authenticate {
             post("/uploadAab") {
