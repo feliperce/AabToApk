@@ -124,10 +124,9 @@ class AabExtractorRepository(
             onFailure = {
                 trySend(
                     Resource.Error(
-                        error = ErrorResponseType.KEYSTORE.toErrorResponse(it.msg)
+                        error = ErrorResponseType.KEYSTORE.toErrorResponse("Error setting keystore config")
                     )
                 )
-                println("SET KEYSTORE FAIL -> ${it.msg}")
             }
         )
 
@@ -170,10 +169,9 @@ class AabExtractorRepository(
             onFailure = {
                 trySend(
                     Resource.Error(
-                        error = ErrorResponseType.EXTRACT.toErrorResponse(it.msg)
+                        error = ErrorResponseType.EXTRACT.toErrorResponse("Error extracting AAB to APKS")
                     )
                 )
-                println("AAB TO APKS FAIL -> ${it.msg}")
             }
         )
 
@@ -191,5 +189,4 @@ class AabExtractorRepository(
             extractedFilesDao.getByBasePath(basePathDto)
         }
     }
-
 }

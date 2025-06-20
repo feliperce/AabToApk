@@ -3,6 +3,12 @@ package feature.nav.view
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import aabtoapk.composeapp.generated.resources.Res
+import aabtoapk.composeapp.generated.resources.extractor_title
+import aabtoapk.composeapp.generated.resources.settings_title
+import aabtoapk.composeapp.generated.resources.extractor_label
+import aabtoapk.composeapp.generated.resources.settings_label
+import org.jetbrains.compose.resources.stringResource
 
 sealed class Screen(val title: String, val route: String) {
     data object ExtractorScreen : Screen("AabToApk", "extractor")
