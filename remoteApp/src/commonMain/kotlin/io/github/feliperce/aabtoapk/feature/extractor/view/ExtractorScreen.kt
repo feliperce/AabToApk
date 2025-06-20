@@ -79,14 +79,14 @@ fun ExtractorScreen() {
     val extractorOptionsList = listOf(
         RadioItem(
             id = ExtractorOption.APKS.id,
-            text = "APKS",
+            text = stringResource(Res.string.apks),
             data = ExtractorOption.APKS,
             isSelected = true
         ),
         RadioItem(
             id = ExtractorOption.APK.id,
             data = ExtractorOption.APK,
-            text = "Universal APK"
+            text = stringResource(Res.string.universal_apk)
         )
     )
 
@@ -263,7 +263,7 @@ fun ExtractorContent(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("UPLOAD AND EXTRACT")
+                        Text(stringResource(Res.string.upload_and_extract))
                     }
                 }
             )
@@ -278,7 +278,7 @@ fun ExtractorContent(
                             top = MarginPaddingSizeMedium,
                             start = MarginPaddingSizeMedium
                         ),
-                    text = "DOWNLOAD",
+                    text = stringResource(Res.string.download),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Purple600
                     ),
@@ -305,7 +305,7 @@ fun Footer() {
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("Built with")
+        Text(stringResource(Res.string.built_with))
         Spacer(modifier = Modifier.padding(start = MarginPaddingSizeSmall))
         Icon(
             modifier = Modifier
@@ -330,15 +330,15 @@ fun MessageBox(
     ) {
         extractorResponseDto?.let { extractorResponse ->
             MessageCard(
-                msg = "${extractorResponse.fileName} extracted with success!",
-                title = "SUCCESS!",
+                msg = stringResource(Res.string.file_extracted_success, extractorResponse.fileName),
+                title = stringResource(Res.string.success),
                 cardType = CardType.SUCCESS
             )
         } ?: run {
             if (isLoading) {
                 MessageCard(
-                    msg = "During upload there may be a \"stuck\", don't worry, wait for the upload process",
-                    title = "Upload lag",
+                    msg = stringResource(Res.string.upload_lag_message),
+                    title = stringResource(Res.string.upload_lag),
                     cardType = CardType.INFO
                 )
             }
@@ -361,7 +361,7 @@ fun UploadForm(
 
     FormCard(
         modifier =  modifier,
-        title = "Extractor",
+        title = stringResource(Res.string.extractor),
         formCardContent = {
             FilePickerTextField(
                 modifier = inputModifier,
@@ -369,10 +369,10 @@ fun UploadForm(
                 onFileResult = { platformFile ->
                     onFileResult(platformFile)
                 },
-                label = "AAB Path",
+                label = stringResource(Res.string.aab_path),
                 fileType = aabInputType,
-                pickerTitle = "AAB",
-                supportingText = "Max size: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
+                pickerTitle = stringResource(Res.string.aab),
+                supportingText = stringResource(Res.string.max_size, ServerConstants.MAX_AAB_UPLOAD_MB)
             )
 
             Column(
@@ -403,7 +403,7 @@ fun UploadForm(
 
                     Text(
                         modifier = Modifier.padding(start = MarginPaddingSizeSmall),
-                        text = "Use debug keystore",
+                        text = stringResource(Res.string.use_debug_keystore),
                         softWrap = true
                     )
                 }
@@ -429,7 +429,7 @@ fun KeystoreForm(
 
     FormCard(
         modifier = modifier.fillMaxWidth(),
-        title = "Keystore",
+        title = stringResource(Res.string.keystore),
         isActionButtonEnabled = !isLoading
     ) {
         val inputModifier = Modifier
@@ -440,9 +440,9 @@ fun KeystoreForm(
             modifier = inputModifier.padding(top = MarginPaddingSizeMedium),
             enabled = !isLoading,
             onFileResult = onKeystoreFileResult,
-            label = "Keystore Path",
+            label = stringResource(Res.string.keystore_path),
             fileType = keystoreInputType,
-            pickerTitle = "Keystore"
+            pickerTitle = stringResource(Res.string.keystore)
         )
 
         OutlinedTextField(
@@ -452,7 +452,7 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onPasswordFieldChange(text)
             },
-            label = { Text("Keystore Password") },
+            label = { Text(stringResource(Res.string.keystore_password)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(
@@ -461,7 +461,7 @@ fun KeystoreForm(
                 ) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        contentDescription = if (passwordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -474,7 +474,7 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onAliasFieldChange(text)
             },
-            label = { Text("Alias") }
+            label = { Text(stringResource(Res.string.alias)) }
         )
 
         OutlinedTextField(
@@ -484,7 +484,7 @@ fun KeystoreForm(
             onValueChange = { text ->
                 onKeyPasswordFieldChange(text)
             },
-            label = { Text("Key Password") },
+            label = { Text(stringResource(Res.string.key_password)) },
             visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(
@@ -493,7 +493,7 @@ fun KeystoreForm(
                 ) {
                     Icon(
                         imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
+                        contentDescription = if (keyPasswordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -516,7 +516,7 @@ private fun UploadFormPreview() {
 
 private val fakeExtractOptions = listOf(
     RadioItem(
-        text = "APK",
+        text = "Universal APK",
         isSelected = true
     ),
     RadioItem(

@@ -22,4 +22,15 @@
     <string name="remove_keystore_data">REMOVE KEYSTORE DATA</string>
     <string name="remove_keystore">Remove %s?</string>
     <string name="remove">REMOVE</string>
+    <string name="adb_dir_path">ADB Dir Path</string>
+    <string name="adb_directory">ADB Directory</string>
+    <string name="build_tools_dir_path">Build Tools Dir Path</string>
+    <string name="build_tools_directory">Build Tools Directory</string>
+    <string name="output_dir_path">Output Dir Path</string>
+    <string name="output_directory">Output Directory</string>
+    <string name="save_settings">SAVE SETTINGS</string>
+    <string name="settings_title">Settings</string>
+    <string name="extractor_title">AabToApk</string>
+    <string name="extractor_label">Extractor</string>
+    <string name="settings_label">Settings</string>
 </resources>
