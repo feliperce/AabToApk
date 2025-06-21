@@ -23,7 +23,14 @@ import aabtoapk.remoteapp.generated.resources.keystore_password
 import aabtoapk.remoteapp.generated.resources.hide_password
 import aabtoapk.remoteapp.generated.resources.show_password
 import aabtoapk.remoteapp.generated.resources.alias
+import aabtoapk.remoteapp.generated.resources.enter_aab_file
+import aabtoapk.remoteapp.generated.resources.enter_keystore_file
+import aabtoapk.remoteapp.generated.resources.enter_keystore_key_alias
+import aabtoapk.remoteapp.generated.resources.enter_keystore_key_password
+import aabtoapk.remoteapp.generated.resources.enter_keystore_password
+import aabtoapk.remoteapp.generated.resources.generic_error
 import aabtoapk.remoteapp.generated.resources.key_password
+import aabtoapk.remoteapp.generated.resources.max_file_size
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
@@ -57,6 +64,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 import ui.components.*
+import ui.handler.DefaultErrorType
 import ui.theme.*
 
 @Composable
@@ -92,11 +100,29 @@ fun ExtractorScreen() {
 
     var selectedOption by remember { mutableStateOf(extractorOptionsList[0]) }
 
+    val genericErrorMsg = stringResource(Res.string.generic_error)
+    val keystorePasswordErrorMsg = stringResource(Res.string.enter_keystore_password)
+    val keystoreKeyAliasErrorMsg = stringResource(Res.string.enter_keystore_key_alias)
+    val keystoreKeyPasswordErrorMsg = stringResource(Res.string.enter_keystore_key_password)
+    val keystoreFileErrorMsg = stringResource(Res.string.enter_keystore_file)
+    val aabFileErrorMsg = stringResource(Res.string.enter_aab_file)
+    val maxFileSizeErrorMsg = stringResource(Res.string.max_file_size, ServerConstants.MAX_AAB_UPLOAD_MB)
+
     LaunchedEffect(extractorUiState.errorMsg?.id) {
         extractorUiState.errorMsg?.let { error ->
+            val errorMessage = when (error.type) {
+                DefaultErrorType.GENERIC -> genericErrorMsg
+                DefaultErrorType.KEYSTORE_PASSWORD -> keystorePasswordErrorMsg
+                DefaultErrorType.KEYSTORE_KEY_ALIAS -> keystoreKeyAliasErrorMsg
+                DefaultErrorType.KEYSTORE_KEY_PASSWORD -> keystoreKeyPasswordErrorMsg
+                DefaultErrorType.KEYSTORE_FILE -> keystoreFileErrorMsg
+                DefaultErrorType.AAB_FILE -> aabFileErrorMsg
+                DefaultErrorType.MAX_FILE_SIZE -> maxFileSizeErrorMsg
+                DefaultErrorType.NONE -> ""
+            }
             snackbarHostState
                 .showSnackbar(
-                    message = error.msg,
+                    message = errorMessage,
                     duration = SnackbarDuration.Long
                 )
         }

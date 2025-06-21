@@ -21,11 +21,11 @@
     <string name="show_password">Mostrar senha</string>
     <string name="alias">Alias</string>
     <string name="key_password">Senha da Chave</string>
-    <string name="generic_error">GENÉRICO</string>
-    <string name="enter_keystore_password">Digite a senha do keystore</string>
-    <string name="enter_keystore_key_alias">Digite o alias da chave do keystore</string>
-    <string name="enter_keystore_key_password">Digite a senha da chave do keystore</string>
+    <string name="generic_error">Algo inesperado aconteceu, tente novamente mais tarde</string>
+    <string name="enter_keystore_password">Informe a senha do keystore</string>
+    <string name="enter_keystore_key_alias">Informe o alias da chave do keystore</string>
+    <string name="enter_keystore_key_password">Informe a senha da chave do keystore</string>
     <string name="enter_keystore_file">Digite o arquivo do keystore</string>
-    <string name="enter_aab_file">Digite o arquivo aab</string>
+    <string name="enter_aab_file">Informe o arquivo aab</string>
     <string name="max_file_size">O tamanho máximo do arquivo aab é: %1$d mb</string>
 </resources>

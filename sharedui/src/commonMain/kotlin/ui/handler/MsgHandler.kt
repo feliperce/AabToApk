@@ -17,7 +17,6 @@ enum class DefaultErrorType {
 @OptIn(ExperimentalUuidApi::class)
 data class DefaultErrorMsg(
     val type: DefaultErrorType = DefaultErrorType.NONE,
-    val msg: String = "",
     val id: String = Uuid.random().toHexString(),
     val code: Int = -1
 )

@@ -5,6 +5,5 @@ import ui.handler.DefaultErrorMsg
 
 fun ErrorResponse.toErrorMsg() =
     DefaultErrorMsg(
-        msg = message,
         code = code
     )
