@@ -17,16 +17,16 @@ kotlin {
             }
         }
     }
-    
+
     jvm("desktop")
-    
+
     sourceSets {
         sourceSets.commonMain {
             kotlin.srcDir("build/generated/ksp/metadata")
         }
 
         val desktopMain by getting
-        
+
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
@@ -49,6 +49,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.swing)
 
             implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.room.ktx)
+            implementation(libs.sqlite.core)
             implementation(libs.sqlite.bundled)
 
             implementation(libs.datastore.preferences)
@@ -64,6 +66,9 @@ kotlin {
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
         }
     }
 }
@@ -115,7 +120,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "AabToApk"
             description = "Extract .apk from .aab"
-            packageVersion = "2.1.0"
+            packageVersion = "2.1.1"
             macOS {
                 iconFile.set(project.file("icons/ic_aabtoapk.icns"))
             }

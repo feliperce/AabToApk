@@ -14,6 +14,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ui.handler.DefaultErrorMsg
+import ui.handler.DefaultErrorType
 
 class ExtractorViewModel(
     private val extractorRepository: ExtractorRepository
@@ -155,7 +156,7 @@ class ExtractorViewModel(
                                 updateState { it.copy(extractorResponseDto = res.data) }
                             }
                             is Resource.Error -> {
-                                updateState { it.copy(errorMsg = res.error ?: DefaultErrorMsg(msg = "GENERIC")) }
+                                updateState { it.copy(errorMsg = res.error ?: DefaultErrorMsg(type = DefaultErrorType.GENERIC)) }
                             }
                             is Resource.Loading -> {
                                 updateState { it.copy(loading = res.isLoading) }
@@ -175,25 +176,25 @@ class ExtractorViewModel(
                 when {
                     password.isEmpty() -> {
                         updateState { it.copy(errorMsg = DefaultErrorMsg(
-                            msg = "Enter the keystore password"
+                            type = DefaultErrorType.KEYSTORE_PASSWORD
                         )) }
                         false
                     }
                     alias.isEmpty() -> {
                         updateState { it.copy(errorMsg = DefaultErrorMsg(
-                            msg = "Enter the keystore key alias"
+                            type = DefaultErrorType.KEYSTORE_KEY_ALIAS
                         )) }
                         false
                     }
                     keyPassword.isEmpty() -> {
                         updateState { it.copy(errorMsg = DefaultErrorMsg(
-                            msg = "Enter the keystore key password"
+                            type = DefaultErrorType.KEYSTORE_KEY_PASSWORD
                         )) }
                         false
                     }
                     keystoreByteArray.isEmpty() -> {
                         updateState { it.copy(errorMsg = DefaultErrorMsg(
-                            msg ="Enter the keystore file"
+                            type = DefaultErrorType.KEYSTORE_FILE
                         )) }
                         false
                     }
@@ -207,13 +208,13 @@ class ExtractorViewModel(
         return with(aabFileDto) {
             if (aabByteArray.isEmpty() || this.fileName.isEmpty()) {
                 updateState { it.copy(errorMsg = DefaultErrorMsg(
-                    msg = "Enter the aab file"
+                    type = DefaultErrorType.AAB_FILE
                 )) }
                 false
             } else {
                 if (this.fileSize > ServerConstants.MAX_AAB_UPLOAD_MB.convertMegaByteToBytesLong()) {
                     updateState { it.copy(errorMsg = DefaultErrorMsg(
-                        msg = "Max file aab file size is: ${ServerConstants.MAX_AAB_UPLOAD_MB} mb"
+                        type = DefaultErrorType.MAX_FILE_SIZE
                     )) }
                     return false
                 }

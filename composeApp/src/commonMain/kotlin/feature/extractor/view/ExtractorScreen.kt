@@ -6,6 +6,29 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import aabtoapk.composeapp.generated.resources.Res
+import aabtoapk.composeapp.generated.resources.apks
+import aabtoapk.composeapp.generated.resources.universal_apk
+import aabtoapk.composeapp.generated.resources.install
+import aabtoapk.composeapp.generated.resources.settings_need_configuration
+import aabtoapk.composeapp.generated.resources.pay_attention
+import aabtoapk.composeapp.generated.resources.extract
+import aabtoapk.composeapp.generated.resources.keystore_sign
+import aabtoapk.composeapp.generated.resources.name
+import aabtoapk.composeapp.generated.resources.select_name_to_save_keystore
+import aabtoapk.composeapp.generated.resources.keystore_path
+import aabtoapk.composeapp.generated.resources.keystore
+import aabtoapk.composeapp.generated.resources.keystore_password
+import aabtoapk.composeapp.generated.resources.hide_password
+import aabtoapk.composeapp.generated.resources.show_password
+import aabtoapk.composeapp.generated.resources.alias
+import aabtoapk.composeapp.generated.resources.key_password
+import aabtoapk.composeapp.generated.resources.aab_extract_install
+import aabtoapk.composeapp.generated.resources.aab_path
+import aabtoapk.composeapp.generated.resources.aab
+import aabtoapk.composeapp.generated.resources.remove_keystore_data
+import aabtoapk.composeapp.generated.resources.remove_keystore
+import aabtoapk.composeapp.generated.resources.remove
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
@@ -25,7 +48,20 @@ import ui.components.*
 import ui.theme.MarginPaddingSizeMedium
 import ui.theme.MarginPaddingSizeSmall
 import io.github.feliperce.aabtoapk.utils.extractor.ApksExtractor
+import io.github.feliperce.aabtoapk.utils.extractor.ErrorType
 import io.github.feliperce.aabtoapk.utils.extractor.SuccessMsgType
+import org.jetbrains.compose.resources.stringResource
+import aabtoapk.composeapp.generated.resources.extracted_with_success
+import aabtoapk.composeapp.generated.resources.apks_installed_success
+import aabtoapk.composeapp.generated.resources.apk_installed_success
+import aabtoapk.composeapp.generated.resources.invalid_settings
+import aabtoapk.composeapp.generated.resources.go_to_settings
+import aabtoapk.composeapp.generated.resources.sign_failure
+import aabtoapk.composeapp.generated.resources.keystore_sign_error
+import aabtoapk.composeapp.generated.resources.aab_extract_failure
+import aabtoapk.composeapp.generated.resources.error_extract_aab
+import aabtoapk.composeapp.generated.resources.install_apk_error
+import aabtoapk.composeapp.generated.resources.error_install_apks
 
 @Composable
 fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
@@ -44,21 +80,23 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
     val showErrorDialog = remember { mutableStateOf(false) }
     var showKeystoreRemoveDialog by remember { mutableStateOf(false) }
 
+    val apksText = stringResource(Res.string.apks)
+    val universalApkText = stringResource(Res.string.universal_apk)
+
     LaunchedEffect(Unit) {
         val extractorOptionsList = listOf(
             RadioItem(
                 id = ApksExtractor.ExtractorOption.APKS.name,
-                text = "APKS",
+                text = apksText,
                 data = ApksExtractor.ExtractorOption.APKS,
                 isSelected = true
             ),
             RadioItem(
                 id = ApksExtractor.ExtractorOption.UNIVERSAL_APK.name,
                 data = ApksExtractor.ExtractorOption.UNIVERSAL_APK,
-                text = "Universal APK"
+                text = universalApkText
             )
         )
-
         extractorViewModel.sendIntent(ExtractorIntent.UpdateExtractOptions(extractorOptionsList))
         extractorViewModel.sendIntent(ExtractorIntent.UpdateSelectedExtractOption(extractorOptionsList[0]))
     }
@@ -80,22 +118,28 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
     }
 
     LaunchedEffect(extractorUiState.errorMsg.id) {
-        showErrorDialog.value = extractorUiState.errorMsg.title.isNotEmpty() && extractorUiState.errorMsg.msg.isNotEmpty()
+        showErrorDialog.value = extractorUiState.errorMsg.type != ErrorType.NONE
     }
 
     LaunchedEffect(extractorUiState.showKeystoreRemoveDialog) {
         showKeystoreRemoveDialog = extractorUiState.showKeystoreRemoveDialog
     }
 
-    LaunchedEffect(extractorUiState.successMsg.id) {
-        val successMsg = extractorUiState.successMsg
+    val installText = stringResource(Res.string.install)
 
-        if (successMsg.msg.isNotEmpty()) {
-            if (successMsg.type == SuccessMsgType.EXTRACT_AAB) {
+    val successMsg = getSuccessMessage(
+        successType = extractorUiState.successMsg.type,
+        extractedPath = extractorUiState.extractedApksPath,
+        isApks = extractorUiState.selectedExtractOption?.data == ApksExtractor.ExtractorOption.APKS
+    )
+
+    LaunchedEffect(extractorUiState.successMsg.id) {
+        if (successMsg.isNotEmpty()) {
+            if (extractorUiState.successMsg.type == SuccessMsgType.EXTRACT_AAB) {
                 val result = snackbarHostState
                     .showSnackbar(
-                        message = successMsg.msg,
-                        actionLabel = "INSTALL",
+                        message = successMsg,
+                        actionLabel = installText,
                         duration = SnackbarDuration.Indefinite
                     )
                 when (result) {
@@ -119,7 +163,7 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
             } else {
                 snackbarHostState
                     .showSnackbar(
-                        message = successMsg.msg,
+                        message = successMsg,
                         duration = SnackbarDuration.Long
                     )
             }
@@ -157,7 +201,8 @@ fun ExtractorScreen(snackbarHostState: SnackbarHostState) {
 
     ErrorDialog(
         showDialog = showErrorDialog,
-        msg = extractorUiState.errorMsg.msg
+        title = getErrorTitle(extractorUiState.errorMsg.type),
+        msg = getErrorMessage(extractorUiState.errorMsg.type)
     )
 
     val extractorFormDataCallback = ExtractorFormDataCallback(
@@ -259,8 +304,8 @@ fun ExtractorContent(
         extractorFormData.settingsData?.let {
             if (it.adbPath.isEmpty() || it.outputPath.isEmpty() || it.buildToolsPath.isEmpty()) {
                 MessageCard(
-                    msg = "Some settings need to be configured to use this function, go to \"Settings\" and set",
-                    title = "PAY ATTENTION",
+                    msg = stringResource(Res.string.settings_need_configuration),
+                    title = stringResource(Res.string.pay_attention),
                     cardType = CardType.ERROR
                 )
             }
@@ -287,7 +332,7 @@ fun ExtractorContent(
             Button(
                 modifier = Modifier.weight(1f),
                 content = {
-                    Text("EXTRACT")
+                    Text(stringResource(Res.string.extract))
                 },
                 onClick = onExtractApksButtonClick,
                 enabled = !isLoading
@@ -355,7 +400,7 @@ fun KeystoreSignForm(
 
     FormCard(
         modifier = Modifier.fillMaxWidth(),
-        title = "Kesytore Sign",
+        title = stringResource(Res.string.keystore_sign),
         actionIcon = if (extractorFormData.keystoreDto.id == null) {
             null
         } else {
@@ -366,10 +411,10 @@ fun KeystoreSignForm(
     ) {
         SpinnerTextInput(
             modifier = inputModifier,
-            title = "Name",
+            title = stringResource(Res.string.name),
             items = spinnerItems,
             isEnabled = !isLoading,
-            supportingText = "Select a name to save keystore information, leave it empty to not save",
+            supportingText = stringResource(Res.string.select_name_to_save_keystore),
             onItemChanged = { spinnerItem: SpinnerItem ->
                 var keystoreDto: KeystoreDto? = (spinnerItem.data as KeystoreDto?)
 
@@ -408,9 +453,9 @@ fun KeystoreSignForm(
                     )
                 )
             },
-            label = "Keystore Path",
+            label = stringResource(Res.string.keystore_path),
             fileType = keystoreInputType,
-            pickerTitle = "Keystore"
+            pickerTitle = stringResource(Res.string.keystore)
         )
 
         OutlinedTextField(
@@ -428,14 +473,14 @@ fun KeystoreSignForm(
                 )
             },
             label = {
-                Text("Keystore Password")
+                Text(stringResource(Res.string.keystore_password))
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        contentDescription = if (passwordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -456,7 +501,7 @@ fun KeystoreSignForm(
                 )
             },
             label = {
-                Text("Alias")
+                Text(stringResource(Res.string.alias))
             }
         )
 
@@ -475,14 +520,14 @@ fun KeystoreSignForm(
                 )
             },
             label = {
-                Text("Key Password")
+                Text(stringResource(Res.string.key_password))
             },
             visualTransformation = if (keyPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { keyPasswordVisible = !keyPasswordVisible }) {
                     Icon(
                         imageVector = if (keyPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (keyPasswordVisible) "Hide password" else "Show password"
+                        contentDescription = if (keyPasswordVisible) stringResource(Res.string.hide_password) else stringResource(Res.string.show_password)
                     )
                 }
             }
@@ -502,7 +547,7 @@ fun OutputForm(
 
     FormCard(
         modifier = Modifier.fillMaxWidth(),
-        title = "AAB Extract / Install"
+        title = stringResource(Res.string.aab_extract_install)
     ) {
         FilePickerTextField(
             modifier = inputModifier,
@@ -511,9 +556,9 @@ fun OutputForm(
             onFileResult = {
                 onFormDataChange(extractorFormData.copy(aabPath = it.path ?: ""))
             },
-            label = "AAB Path",
+            label = stringResource(Res.string.aab_path),
             fileType = aabInputType,
-            pickerTitle = "AAB"
+            pickerTitle = stringResource(Res.string.aab)
         )
 
         RadioGroup(
@@ -534,10 +579,10 @@ fun KeystoreRemovalDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("REMOVE KEYSTORE DATA")
+            Text(stringResource(Res.string.remove_keystore_data))
         },
         text = {
-            Text("Remove $keystoreName?")
+            Text(stringResource(Res.string.remove_keystore, keystoreName))
         },
         confirmButton = {
             Button(
@@ -546,11 +591,42 @@ fun KeystoreRemovalDialog(
                     onDismiss()
                 },
                 content = {
-                    Text("REMOVE")
+                    Text(stringResource(Res.string.remove))
                 }
             )
         }
     )
+}
+
+@Composable
+fun getErrorMessage(errorType: ErrorType): String {
+    return when (errorType) {
+        ErrorType.SIGN_FAILURE -> stringResource(Res.string.keystore_sign_error)
+        ErrorType.AAB_EXTRACT_FAILURE -> stringResource(Res.string.error_extract_aab)
+        ErrorType.INSTALL_APK_ERROR -> stringResource(Res.string.error_install_apks)
+        ErrorType.INVALID_SETTINGS -> stringResource(Res.string.go_to_settings)
+        else -> ""
+    }
+}
+
+@Composable
+fun getErrorTitle(errorType: ErrorType): String {
+    return when (errorType) {
+        ErrorType.SIGN_FAILURE -> stringResource(Res.string.sign_failure)
+        ErrorType.AAB_EXTRACT_FAILURE -> stringResource(Res.string.aab_extract_failure)
+        ErrorType.INSTALL_APK_ERROR -> stringResource(Res.string.install_apk_error)
+        ErrorType.INVALID_SETTINGS -> stringResource(Res.string.invalid_settings)
+        else -> ""
+    }
+}
+
+@Composable
+fun getSuccessMessage(successType: SuccessMsgType, extractedPath: String, isApks: Boolean): String {
+    return when (successType) {
+        SuccessMsgType.EXTRACT_AAB -> stringResource(Res.string.extracted_with_success, extractedPath)
+        SuccessMsgType.INSTALL_APKS -> if (isApks) stringResource(Res.string.apks_installed_success) else stringResource(Res.string.apk_installed_success)
+        else -> ""
+    }
 }
 
 @Composable

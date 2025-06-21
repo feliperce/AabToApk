@@ -7,6 +7,7 @@ import io.github.feliperce.aabtoapk.data.dto.UploadedFilesDto
 import io.github.feliperce.aabtoapk.data.local.dao.BasePathDao
 import io.github.feliperce.aabtoapk.data.local.dao.ExtractedFilesDao
 import io.github.feliperce.aabtoapk.data.local.dao.UploadFilesDao
+import io.github.feliperce.aabtoapk.config.ServerConfig
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ExtractorResponse
@@ -35,7 +36,7 @@ class AabExtractorRepository(
         return withContext(Dispatchers.IO) {
             val hash = Uuid.random().toHexString()
 
-            val extractsFolder = File("${ServerConstants.PathConf.CACHE_PATH}/$hash")
+            val extractsFolder = File("${ServerConfig.PathConf.CACHE_PATH}/$hash")
             extractsFolder.mkdir()
 
             val currentInstant = getCurrentInstant()
@@ -45,7 +46,7 @@ class AabExtractorRepository(
                     name = hash,
                     path = extractsFolder.absolutePath,
                     createdDate = currentInstant,
-                    dateToRemove = currentInstant.addHour(ServerConstants.REMOVE_UPLOAD_HOUR_TIME)
+                    dateToRemove = currentInstant.addHour(ServerConfig.REMOVE_UPLOAD_HOUR_TIME)
                 )
             )
         }
@@ -103,11 +104,11 @@ class AabExtractorRepository(
 
         val keystore = if (isDebugKeystore) {
             KeystoreInfoDto(
-                path = ServerConstants.DebugKeystore.PATH,
+                path = ServerConfig.DebugKeystore.PATH,
                 fileExtension = ".keystore",
-                keyAlias = ServerConstants.DebugKeystore.ALIAS,
-                password = ServerConstants.DebugKeystore.STORE_PASSWORD,
-                keyPassword = ServerConstants.DebugKeystore.KEY_PASSWORD,
+                keyAlias = ServerConfig.DebugKeystore.ALIAS,
+                password = ServerConfig.DebugKeystore.STORE_PASSWORD,
+                keyPassword = ServerConfig.DebugKeystore.KEY_PASSWORD,
                 name = "",
                 fileBytes = ByteArray(0)
             )
@@ -123,10 +124,9 @@ class AabExtractorRepository(
             onFailure = {
                 trySend(
                     Resource.Error(
-                        error = ErrorResponseType.KEYSTORE.toErrorResponse(it.msg)
+                        error = ErrorResponseType.KEYSTORE.toErrorResponse("Error setting keystore config")
                     )
                 )
-                println("SET KEYSTORE FAIL -> ${it.msg}")
             }
         )
 
@@ -169,10 +169,9 @@ class AabExtractorRepository(
             onFailure = {
                 trySend(
                     Resource.Error(
-                        error = ErrorResponseType.EXTRACT.toErrorResponse(it.msg)
+                        error = ErrorResponseType.EXTRACT.toErrorResponse("Error extracting AAB to APKS")
                     )
                 )
-                println("AAB TO APKS FAIL -> ${it.msg}")
             }
         )
 
@@ -190,5 +189,4 @@ class AabExtractorRepository(
             extractedFilesDao.getByBasePath(basePathDto)
         }
     }
-
 }

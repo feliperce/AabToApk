@@ -3,6 +3,7 @@ package io.github.feliperce.aabtoapk.viewmodel
 import io.github.feliperce.aabtoapk.data.dto.BasePathDto
 import io.github.feliperce.aabtoapk.data.dto.ExtractedFilesDto
 import io.github.feliperce.aabtoapk.data.dto.KeystoreInfoDto
+import io.github.feliperce.aabtoapk.config.ServerConfig
 import io.github.feliperce.aabtoapk.data.remote.Resource
 import io.github.feliperce.aabtoapk.data.remote.ServerConstants
 import io.github.feliperce.aabtoapk.data.remote.response.ExtractorResponse
@@ -96,7 +97,7 @@ class AabExtractorViewModel(
         val extractor = ApksExtractor(
             aabPath = uploadedFilesDto.path,
             outputApksPath = basePathDto.path,
-            buildToolsPath = ServerConstants.PathConf.BUILD_TOOLS_PATH
+            buildToolsPath = ServerConfig.PathConf.BUILD_TOOLS_PATH
         )
 
         return aabExtractorRepository.extract(

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import ui.handler.DefaultErrorMsg
+import ui.handler.DefaultErrorType
 
 class ExtractorRepository(
     private val extractorApi: ExtractorApi
@@ -47,7 +48,7 @@ class ExtractorRepository(
         emit(
             Resource.Error(
                 error = DefaultErrorMsg(
-                    msg = cause.message ?: "Something unexpected occurred, please try again later"
+                    type = DefaultErrorType.GENERIC
                 )
             )
         )

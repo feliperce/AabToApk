@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">AabToApk</string>
+    <string name="apks">APKS</string>
+    <string name="universal_apk">APK Universal</string>
+    <string name="upload_and_extract">ENVIAR E EXTRAIR</string>
+    <string name="download">BAIXAR</string>
+    <string name="built_with">Construído com</string>
+    <string name="file_extracted_success">%1$s extraído com sucesso!</string>
+    <string name="success">SUCESSO!</string>
+    <string name="upload_lag_message">Durante o upload pode haver uma "pausa", não se preocupe, aguarde o processo de upload</string>
+    <string name="upload_lag">Atraso no upload</string>
+    <string name="extractor">Extrator</string>
+    <string name="aab_path">Caminho do AAB</string>
+    <string name="aab">AAB</string>
+    <string name="max_size">Tamanho máximo: %1$d mb</string>
+    <string name="use_debug_keystore">Usar keystore de debug</string>
+    <string name="keystore">Keystore</string>
+    <string name="keystore_path">Caminho do Keystore</string>
+    <string name="keystore_password">Senha do Keystore</string>
+    <string name="hide_password">Ocultar senha</string>
+    <string name="show_password">Mostrar senha</string>
+    <string name="alias">Alias</string>
+    <string name="key_password">Senha da Chave</string>
+    <string name="generic_error">Algo inesperado aconteceu, tente novamente mais tarde</string>
+    <string name="enter_keystore_password">Informe a senha do keystore</string>
+    <string name="enter_keystore_key_alias">Informe o alias da chave do keystore</string>
+    <string name="enter_keystore_key_password">Informe a senha da chave do keystore</string>
+    <string name="enter_keystore_file">Digite o arquivo do keystore</string>
+    <string name="enter_aab_file">Informe o arquivo aab</string>
+    <string name="max_file_size">O tamanho máximo do arquivo aab é: %1$d mb</string>
+</resources>

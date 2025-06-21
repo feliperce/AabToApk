@@ -15,6 +15,12 @@ import feature.nav.state.NavIntent
 import feature.nav.viewmodel.NavViewModel
 import feature.settings.view.SettingsScreen
 import org.koin.compose.viewmodel.koinViewModel
+import aabtoapk.composeapp.generated.resources.Res
+import aabtoapk.composeapp.generated.resources.extractor_title
+import aabtoapk.composeapp.generated.resources.settings_title
+import aabtoapk.composeapp.generated.resources.extractor_label
+import aabtoapk.composeapp.generated.resources.settings_label
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,9 +34,13 @@ fun NavScreen() {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             navUiState.currentScreen?.let {
+                val title = when (it) {
+                    Screen.ExtractorScreen -> stringResource(Res.string.extractor_title)
+                    Screen.SettingsScreen -> stringResource(Res.string.settings_title)
+                }
                 TopAppBar(
                     title = {
-                        Text(text = it.title)
+                        Text(text = title)
                     }
                 )
             }
@@ -66,17 +76,32 @@ fun DefaultBottomNavigation(navController: NavHostController) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
+        val extractorLabel = stringResource(Res.string.extractor_label)
+        val settingsLabel = stringResource(Res.string.settings_label)
+
         bottomNavigationItems.forEach { bottomNavigationItem ->
+            val label = when (bottomNavigationItem.route) {
+                Screen.ExtractorScreen.route -> extractorLabel
+                Screen.SettingsScreen.route -> settingsLabel
+                else -> bottomNavigationItem.label
+            }
+
+            val contentDescription = when (bottomNavigationItem.route) {
+                Screen.ExtractorScreen.route -> extractorLabel
+                Screen.SettingsScreen.route -> settingsLabel
+                else -> bottomNavigationItem.iconContentDescription
+            }
+
             NavigationBarItem(
                 label = {
                     Text(
-                        text = bottomNavigationItem.label
+                        text = label
                     )
                 },
                 icon = {
                     Icon(
                         bottomNavigationItem.icon,
-                        contentDescription = bottomNavigationItem.iconContentDescription
+                        contentDescription = contentDescription
                     )
                 },
                 selected = currentRoute == bottomNavigationItem.route,
