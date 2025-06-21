@@ -1,5 +1,5 @@
-![Kotlin Badge](https://img.shields.io/badge/kotlin-v2.0.0-%237F52FF?logo=kotlin)
-![Compose Badge](https://img.shields.io/badge/compose_multiplatform-v1.6.10-%234285F4?logo=jetpackcompose)
+![Kotlin Badge](https://img.shields.io/badge/kotlin-v2.1.10-%237F52FF?logo=kotlin)
+![Compose Badge](https://img.shields.io/badge/compose_multiplatform-v1.8.0-%234285F4?logo=jetpackcompose)
 ![Platform Windows Badge](https://img.shields.io/badge/platform-windows-%230078D4?logo=windows)
 ![Platform Linux Badge](https://img.shields.io/badge/platform-Linux-%23FCC624?logo=linux)
 ![Platform MacOS Badge](https://img.shields.io/badge/platform-macOS-%23000000?logo=macos)
