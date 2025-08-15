@@ -39,5 +39,3 @@ include(":server")
 include(":extractor")
 include(":sharedui")
 include(":sharedRemote")
-include("extractor:commonMain")
-findProject(":extractor:commonMain")?.name = "commonMain"
